@@ -32,7 +32,7 @@ const Login = () => {
   };
 
   const handleOtpChange = (index, value) => {
-    if (value.length > 1) return;
+    if (value.length > 1 || !/^\d*$/.test(value)) return;
     
     const newOtp = [...otp];
     newOtp[index] = value;
