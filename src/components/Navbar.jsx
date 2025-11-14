@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 // 💡 IMPORTANT: Ensure 'Final Logo.jpg' is now a transparent PNG file 
 // (or rename and import the new transparent PNG file)
 import tereRang from "./Final Logo.jpg"; 
-import { Menu, X } from "lucide-react"; // For mobile menu icons
+import { Menu, X, User, LogOut } from "lucide-react"; // For mobile menu icons
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -11,10 +11,30 @@ const Navbar = () => {
   const [searchText, setSearchText] = useState("");
   const [isLoginMenuOpen, setIsLoginMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
   const dropdownRef = useRef(null);
   const loginRef = useRef(null);
   const location = useLocation();
+
+  // Check authentication status on component mount and route changes
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (token && userData) {
+        setIsAuthenticated(true);
+        setUser(JSON.parse(userData));
+      } else {
+        setIsAuthenticated(false);
+        setUser(null);
+      }
+    };
+
+    checkAuthStatus();
+  }, [location]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -36,6 +56,16 @@ const Navbar = () => {
     setIsLoginMenuOpen(false);
     setIsMobileMenuOpen(false);
   }, [location]);
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setUser(null);
+    setIsLoginMenuOpen(false);
+    window.location.href = '/';
+  };
 
   // Active route highlighting
   const isActive = (path) => location.pathname === path;
@@ -206,63 +236,123 @@ const Navbar = () => {
             </span>
           </div>
 
-          {/* 👤 Login Dropdown */}
-          <div ref={loginRef} className="relative">
-            <button
-              onClick={() => setIsLoginMenuOpen((s) => !s)}
-              className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-1.5 rounded-full font-medium transition"
-            >
-              Login
-            </button>
+          {/* 👤 Authentication Section */}
+          {isAuthenticated ? (
+            /* User Profile Dropdown - When Logged In */
+            <div ref={loginRef} className="relative">
+              <button
+                onClick={() => setIsLoginMenuOpen((s) => !s)}
+                className="flex items-center space-x-2 bg-teal-600 hover:bg-teal-500 text-white px-4 py-1.5 rounded-full font-medium transition"
+              >
+                <User size={16} />
+                <span>{user?.name || user?.phoneNumber || 'User'}</span>
+              </button>
 
-            {isLoginMenuOpen && (
-              <div className="absolute right-0 mt-3 w-60 bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 z-50 p-5">
-                <h4 className="text-lg font-bold mb-2">Welcome</h4>
-                <p className="text-sm text-gray-400 mb-3">
-                  Access your account and manage orders
-                </p>
+              {isLoginMenuOpen && (
+                <div className="absolute right-0 mt-3 w-64 bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 z-50 p-5">
+                  <div className="flex items-center mb-3">
+                    <User className="mr-2" size={20} />
+                    <div>
+                      <h4 className="text-lg font-bold">{user?.name || 'Welcome'}</h4>
+                      <p className="text-sm text-gray-400">{user?.phoneNumber}</p>
+                    </div>
+                  </div>
 
-                <Link
-                  to="/login"
-                  onClick={() => setIsLoginMenuOpen(false)}
-                  className="block bg-teal-600 text-center py-2 rounded-lg font-semibold hover:bg-teal-500 transition mb-3"
+                  <hr className="border-gray-700 mb-3" />
+
+                  <ul className="space-y-2 text-sm">
+                    <li>
+                      <Link
+                        to="/MyOrder"
+                        onClick={() => setIsLoginMenuOpen(false)}
+                        className="flex items-center hover:text-teal-400 transition"
+                      >
+                        📦 My Orders
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/AlwaysOffers"
+                        onClick={() => setIsLoginMenuOpen(false)}
+                        className="flex items-center hover:text-teal-400 transition"
+                      >
+                        🎁 Offers
+                      </Link>
+                    </li>
+                    <li>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left flex items-center space-x-2 hover:text-red-400 transition text-red-300"
+                      >
+                        <LogOut size={16} />
+                        <span>Logout</span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Login/Register Buttons - When Not Logged In */
+            <>
+              <div ref={loginRef} className="relative">
+                <button
+                  onClick={() => setIsLoginMenuOpen((s) => !s)}
+                  className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-1.5 rounded-full font-medium transition"
                 >
-                  LOGIN / SIGNUP
-                </Link>
+                  Login
+                </button>
 
-                <hr className="border-gray-700 mb-3" />
+                {isLoginMenuOpen && (
+                  <div className="absolute right-0 mt-3 w-60 bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 z-50 p-5">
+                    <h4 className="text-lg font-bold mb-2">Welcome</h4>
+                    <p className="text-sm text-gray-400 mb-3">
+                      Access your account and manage orders
+                    </p>
 
-                <ul className="space-y-2 text-sm">
-                  <li>
                     <Link
-                      to="/MyOrder"
+                      to="/login"
                       onClick={() => setIsLoginMenuOpen(false)}
-                      className="hover:text-teal-400"
+                      className="block bg-teal-600 text-center py-2 rounded-lg font-semibold hover:bg-teal-500 transition mb-3"
                     >
-                      📦 My Orders
+                      LOGIN / SIGNUP
                     </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/AlwaysOffers"
-                      onClick={() => setIsLoginMenuOpen(false)}
-                      className="hover:text-teal-400"
-                    >
-                      🎁 Offers
-                    </Link>
-                  </li>
-                </ul>
+
+                    <hr className="border-gray-700 mb-3" />
+
+                    <ul className="space-y-2 text-sm">
+                      <li>
+                        <Link
+                          to="/MyOrder"
+                          onClick={() => setIsLoginMenuOpen(false)}
+                          className="hover:text-teal-400"
+                        >
+                          📦 My Orders
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/AlwaysOffers"
+                          onClick={() => setIsLoginMenuOpen(false)}
+                          className="hover:text-teal-400"
+                        >
+                          🎁 Offers
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* 📝 Register Button */}
-          <Link
-            to="/register"
-            className="hidden md:inline bg-white text-black hover:bg-gray-200 px-4 py-1.5 rounded-full font-semibold transition"
-          >
-            Register
-          </Link>
+              {/* 📝 Register Button */}
+              <Link
+                to="/register"
+                className="hidden md:inline bg-white text-black hover:bg-gray-200 px-4 py-1.5 rounded-full font-semibold transition"
+              >
+                Register
+              </Link>
+            </>
+          )}
 
           {/* 📱 Mobile Menu Button */}
           <button
@@ -298,13 +388,54 @@ const Navbar = () => {
           <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>
             Contact Us
           </Link>
-          <Link
-            to="/register"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block bg-teal-600 text-center py-2 rounded-full font-semibold hover:bg-teal-500 transition"
-          >
-            Register
-          </Link>
+          
+          {/* Authentication section for mobile */}
+          {isAuthenticated ? (
+            <>
+              <div className="border-t border-gray-700 pt-4">
+                <div className="flex items-center mb-3">
+                  <User className="mr-2" size={20} />
+                  <div>
+                    <p className="font-bold">{user?.name || 'Welcome'}</p>
+                    <p className="text-sm text-gray-400">{user?.phoneNumber}</p>
+                  </div>
+                </div>
+                <Link to="/MyOrder" onClick={() => setIsMobileMenuOpen(false)}>
+                  📦 My Orders
+                </Link>
+                <Link to="/AlwaysOffers" onClick={() => setIsMobileMenuOpen(false)}>
+                  🎁 Offers
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left py-2 text-red-300 hover:text-red-400 transition flex items-center space-x-2"
+                >
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block bg-teal-600 text-center py-2 rounded-full font-semibold hover:bg-teal-500 transition"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block bg-white text-black text-center py-2 rounded-full font-semibold hover:bg-gray-200 transition"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>
