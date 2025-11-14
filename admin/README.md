@@ -59,13 +59,18 @@ Admin panel for managing products in the Tere Rang e-commerce platform.
    mongod
    ```
 
-2. Start the backend server:
+2. (Optional) Seed the database with sample products:
+   ```bash
+   npm run seed
+   ```
+
+3. Start the backend server:
    ```bash
    npm run server:dev
    ```
    The server will run on http://localhost:5000
 
-3. In a new terminal, start the frontend development server:
+4. In a new terminal, start the frontend development server:
    ```bash
    npm run dev
    ```
@@ -129,7 +134,8 @@ admin/
 ├── server/              # Backend server
 │   ├── config/         # Database configuration
 │   ├── models/         # Mongoose models
-│   └── routes/         # API routes
+│   ├── routes/         # API routes
+│   └── seed.js         # Database seeding script
 ├── src/                # Frontend source
 │   ├── components/     # Reusable components
 │   ├── pages/          # Page components
@@ -140,12 +146,14 @@ admin/
 └── package.json        # Dependencies and scripts
 ```
 
-## Development
+## Available Scripts
 
-- Run `npm run dev` to start the frontend development server with hot reload
-- Run `npm run server:dev` to start the backend server with auto-restart
-- Run `npm run lint` to check for code issues
-- Run `npm run build` to build the frontend for production
+- `npm run dev` - Start the frontend development server with hot reload
+- `npm run server` - Start the backend server
+- `npm run server:dev` - Start the backend server with auto-restart
+- `npm run seed` - Seed the database with sample products
+- `npm run lint` - Check for code issues
+- `npm run build` - Build the frontend for production
 
 ## Notes
 
