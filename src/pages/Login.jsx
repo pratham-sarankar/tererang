@@ -45,10 +45,6 @@ const Login = () => {
         />
 
         <button type="submit" className="btn-login">Login</button>
-
-        <p className="redirect">
-          Don’t have an account? <a href="/register">Register</a>
-        </p>
       </form>
     </div>
   );
