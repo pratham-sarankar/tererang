@@ -23,11 +23,12 @@ app.use('/api/auth', authRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
+  console.log("Health check endpoint hit");
   res.status(200).json({ message: 'Server is running' });
 });
 
 // Error handling middleware
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });

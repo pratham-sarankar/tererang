@@ -11,7 +11,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = "http://localhost:3001/api";
 
   const handleSendOTP = async (e) => {
     e.preventDefault();
