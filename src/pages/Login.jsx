@@ -3,7 +3,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Label } from "../components/ui/label";
-import { ArrowLeft, ArrowRight, Phone, Smartphone, Shield, Truck, Gift, Star, Clock, CheckCircle, Users, Heart, Percent, Award, Tag } from "lucide-react";
+import { ArrowLeft, ArrowRight, Phone, Smartphone, Shield, Truck, Gift, Star, Clock, CheckCircle, Users, Percent, Award } from "lucide-react";
 
 const Login = () => {
   const [step, setStep] = useState(1); // 1: phone number, 2: OTP
@@ -141,8 +141,6 @@ const Login = () => {
           <CardDescription className="text-lg text-gray-700 font-medium">
             {step === 1 ? "Your Fashion Destination - Login or Sign up" : "Secure Verification"}
           </CardDescription>
-          
-          
         </CardHeader>
 
         <CardContent className="space-y-8">
@@ -348,7 +346,7 @@ const Login = () => {
                       Secure Verification
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      OTP sent to +91 {phoneNumber} • <button onClick={goBack} className="text-blue-600 hover:text-blue-700 underline">Change number</button>
+                      OTP sent to +91 {phoneNumber} • <button type="button" onClick={goBack} className="text-blue-600 hover:text-blue-700 underline">Change number</button>
                     </p>
                   </div>
                 </div>
