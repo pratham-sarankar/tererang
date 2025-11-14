@@ -1,0 +1,145 @@
+/* Navbar */
+.navbar {
+  display: flex
+;
+  align-items: center;
+  justify-content: space-between;
+  background: #c6bae6;
+  padding: 10px 20px;
+  border-bottom: 1px solid #333;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  height: 68px;
+  width: 96%;
+}
+
+.logo a {
+  
+image-rendering: auto;
+height: auto;
+width: auto;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffffff;
+   
+  /* img-src="C:\Users\user\Downloads" alt="Flowers in Chania" heigh=50px weight=80px ; */
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+.nav-links li {
+  position: relative;
+}
+
+.nav-links a, .dropdown-link {
+  text-decoration: none;
+  color: #000;
+  font-size: 21px;
+  padding: 8px 12px;
+  display: inline-block;
+}
+
+.nav-links a:hover, .dropdown-link:hover {
+  color: #ff0404;
+}
+
+/* Mega Dropdown */
+.mega-dropdown {
+  position: absolute;
+  top: 100%;
+  left: -120px;
+  /* background: rgb(253, 253, 253); */
+  width: 400px;
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+  /* border: 1px solid #ddd; */
+  border-top: none;
+  box-shadow: 0 4px 8px rgba(34, 33, 33, 0.1);
+}
+
+.dropdown-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dropdown-column h4 {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #2b3653;
+}
+
+.dropdown-column a {
+  text-decoration: none;
+  font-size: 14px;
+  color: #000000;
+}
+
+.dropdown-column a:hover {
+  color: #ff3f6c;
+}
+
+/* Right section */
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.icons span {
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.auth-buttons .btn {
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.register {
+  background: #ff3f6c;
+  color: white;
+  margin: 12px;
+}
+.login {
+  border: 1px solid #ff3f6c;
+  color: #ff3f6c;
+}
+
+
+
+/* Logo Section */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* space between text and image */
+}
+
+.logo a {
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff3f6c; /* brand highlight */
+  transition: color 0.3s ease;
+}
+
+.logo a:hover {
+  color: #fff; /* slight hover effect */
+}
+
+.logo img {
+  width: 100px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 5px; /* optional: rounded corners */
+}
