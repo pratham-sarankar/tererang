@@ -326,7 +326,7 @@ const Login = () => {
                       Secure Verification
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      OTP sent to +91 {phoneNumber} • <button onClick={goBack} className="text-blue-600 hover:text-blue-700 underline">Change number</button>
+                      OTP sent to +91 {phoneNumber} • <button type="button" onClick={goBack} className="text-blue-600 hover:text-blue-700 underline">Change number</button>
                     </p>
                   </div>
                 </div>
