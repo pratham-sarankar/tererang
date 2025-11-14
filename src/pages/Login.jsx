@@ -119,8 +119,6 @@ const Login = () => {
           <CardDescription className="text-lg text-gray-700 font-medium">
             {step === 1 ? "Your Fashion Destination - Login or Sign up" : "Secure Verification"}
           </CardDescription>
-          
-          
         </CardHeader>
 
         <CardContent className="space-y-8">
