@@ -106,11 +106,6 @@ width: auto;
   font-size: 14px;
 }
 
-.register {
-  background: #ff3f6c;
-  color: white;
-  margin: 12px;
-}
 .login {
   border: 1px solid #ff3f6c;
   color: #ff3f6c;
