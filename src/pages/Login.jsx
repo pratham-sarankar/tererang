@@ -13,6 +13,16 @@ const Login = () => {
   const [canResend, setCanResend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const otpRefs = useRef([]);
+  const timerIntervalRef = useRef(null);
+
+  // Cleanup interval on component unmount
+  useEffect(() => {
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, []);
 
   const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, ""); // Only allow digits
@@ -70,12 +80,18 @@ const Login = () => {
   };
 
   const startTimer = () => {
+    // Clear any existing interval first
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+    }
+    
     setCanResend(false);
     setTimer(30);
-    const interval = setInterval(() => {
+    timerIntervalRef.current = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {
-          clearInterval(interval);
+          clearInterval(timerIntervalRef.current);
+          timerIntervalRef.current = null;
           setCanResend(true);
           return 0;
         }
@@ -98,6 +114,12 @@ const Login = () => {
   };
 
   const goBack = () => {
+    // Clear the timer interval if it's running
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
+    
     setStep(1);
     setOtp(["", "", "", "", "", ""]);
     setTimer(30);
