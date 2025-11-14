@@ -3,7 +3,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Label } from "../components/ui/label";
-import { ArrowLeft, ArrowRight, Phone, Smartphone, Shield, Truck, Gift, Star, Clock, CheckCircle, Users, Heart, Percent, Award, Tag } from "lucide-react";
+import { ArrowLeft, ArrowRight, Phone, Smartphone, Shield, Truck, Gift, Star, Clock, CheckCircle, Users, Percent, Award } from "lucide-react";
 
 const Login = () => {
   const [step, setStep] = useState(1); // 1: phone number, 2: OTP
