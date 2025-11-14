@@ -32,23 +32,23 @@ function ProductForm() {
   const [newImage, setNewImage] = useState('');
 
   useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await productService.getById(id);
+        setFormData(response.data);
+      } catch (err) {
+        setError('Failed to fetch product');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (isEditMode) {
       fetchProduct();
     }
-  }, [id]);
-
-  const fetchProduct = async () => {
-    try {
-      setLoading(true);
-      const response = await productService.getById(id);
-      setFormData(response.data);
-    } catch (err) {
-      setError('Failed to fetch product');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [id, isEditMode]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
