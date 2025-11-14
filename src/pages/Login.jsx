@@ -149,7 +149,7 @@ const Login = () => {
                         value={phoneNumber}
                         onChange={handlePhoneChange}
                         placeholder="Enter your 10-digit mobile number"
-                        className="pl-18 h-12 text-base border-2 focus:border-blue-500"
+                        className="pl-20 h-12 text-base border-2 focus:border-blue-500"
                         maxLength="10"
                         required
                       />
