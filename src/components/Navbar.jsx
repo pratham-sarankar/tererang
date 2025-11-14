@@ -256,15 +256,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* 📝 Register Button */}
-          <Link
-            to="/register"
-            className="hidden md:inline bg-white text-black hover:bg-gray-200 px-4 py-1.5 rounded-full font-semibold transition"
-          >
-            Register
-          </Link>
-
-          {/* 📱 Mobile Menu Button */}
+          {/*  Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden text-3xl hover:text-teal-400 transition"
@@ -297,13 +289,6 @@ const Navbar = () => {
           </Link>
           <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>
             Contact Us
-          </Link>
-          <Link
-            to="/register"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block bg-teal-600 text-center py-2 rounded-full font-semibold hover:bg-teal-500 transition"
-          >
-            Register
           </Link>
         </div>
       )}
