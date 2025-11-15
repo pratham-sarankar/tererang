@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import "../css/Login.css";
 import { apiUrl } from "../config/env.js";
+import { notifyCartAuthChange } from "../context/CartContext.jsx";
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -67,6 +68,7 @@ const Login = () => {
         // Store token in localStorage
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
+        notifyCartAuthChange();
         
         setMessage("Login Successful ✅");
         

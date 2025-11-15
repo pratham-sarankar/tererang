@@ -3,7 +3,25 @@ import { Link, useLocation } from "react-router-dom";
 // 💡 IMPORTANT: Ensure 'Final Logo.jpg' is now a transparent PNG file 
 // (or rename and import the new transparent PNG file)
 import tereRang from "./Final Logo.jpg"; 
-import { Menu, X, User, LogOut } from "lucide-react"; // For mobile menu icons
+import { Menu, X, User, LogOut, ShoppingCart, Trash2 } from "lucide-react"; // For mobile menu icons
+import { useCart, notifyCartAuthChange } from "../context/CartContext.jsx";
+import { imageUrl } from "../config/env.js";
+
+const currencyFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0,
+});
+
+const formatCurrency = (value = 0) => currencyFormatter.format(Math.max(0, value));
+
+const resolveProductImage = (product) => {
+  if (!product) return null;
+  const candidate = product.image || (Array.isArray(product.images) && product.images[0]);
+  if (!candidate) return null;
+  if (/^https?:/i.test(candidate)) return candidate;
+  return imageUrl(candidate);
+};
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -13,10 +31,15 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartFeedback, setCartFeedback] = useState(null);
+  const [removingItemId, setRemovingItemId] = useState(null);
 
   const dropdownRef = useRef(null);
   const loginRef = useRef(null);
+  const cartRef = useRef(null);
   const location = useLocation();
+  const { cartItems, cartCount, cartTotal, loading: cartLoading, removeCartItem, error: cartError } = useCart();
 
   // Check authentication status on component mount and route changes
   useEffect(() => {
@@ -45,6 +68,9 @@ const Navbar = () => {
       if (loginRef.current && !loginRef.current.contains(event.target)) {
         setIsLoginMenuOpen(false);
       }
+      if (cartRef.current && !cartRef.current.contains(event.target)) {
+        setIsCartOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -55,7 +81,20 @@ const Navbar = () => {
     setIsDropdownOpen(false);
     setIsLoginMenuOpen(false);
     setIsMobileMenuOpen(false);
+    setIsCartOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    if (cartError) {
+      setCartFeedback({ type: 'error', text: cartError });
+    }
+  }, [cartError]);
+
+  useEffect(() => {
+    if (!cartFeedback) return undefined;
+    const timer = setTimeout(() => setCartFeedback(null), 3000);
+    return () => clearTimeout(timer);
+  }, [cartFeedback]);
 
   // Logout function
   const handleLogout = () => {
@@ -64,8 +103,27 @@ const Navbar = () => {
     setIsAuthenticated(false);
     setUser(null);
     setIsLoginMenuOpen(false);
+    setIsCartOpen(false);
+    notifyCartAuthChange();
     window.location.href = '/';
   };
+
+  const handleRemoveFromCart = async (itemId) => {
+    if (!itemId) return;
+    try {
+      setRemovingItemId(itemId);
+      setCartFeedback(null);
+      await removeCartItem(itemId);
+      setCartFeedback({ type: 'success', text: 'Item removed from cart' });
+    } catch (error) {
+      setCartFeedback({ type: 'error', text: error.message || 'Unable to remove cart item' });
+    } finally {
+      setRemovingItemId(null);
+    }
+  };
+
+  const cartHasItems = Array.isArray(cartItems) && cartItems.length > 0;
+  const cartBadge = cartCount > 99 ? '99+' : cartCount;
 
   // Active route highlighting
   const isActive = (path) => location.pathname === path;
@@ -205,13 +263,113 @@ const Navbar = () => {
           </div>
 
           {/* 🛒 Cart */}
-          <div className="relative">
-            <button className="text-2xl hover:text-teal-400 transition">
-              🛒
+          <div className="relative" ref={cartRef}>
+            <button
+              onClick={() => setIsCartOpen((prev) => !prev)}
+              className={`relative h-10 w-10 flex items-center justify-center rounded-full border border-gray-700 hover:border-teal-400 transition ${isCartOpen ? 'text-teal-400' : ''}`}
+              aria-label="Shopping cart"
+            >
+              <ShoppingCart size={20} />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-1 bg-teal-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 shadow-md">
+                  {cartBadge}
+                </span>
+              )}
             </button>
-            <span className="absolute -top-2 -right-3 bg-teal-500 text-white text-xs font-bold rounded-full px-2 shadow-md">
-              2
-            </span>
+
+            {isCartOpen && (
+              <div className="absolute right-0 mt-3 w-80 bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 z-50 p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-sm text-gray-400">My Cart</p>
+                    <p className="text-base font-semibold">{cartHasItems ? `${cartCount} item${cartCount === 1 ? '' : 's'}` : 'No items yet'}</p>
+                  </div>
+                  {cartHasItems && (
+                    <span className="text-sm text-gray-400">{formatCurrency(cartTotal)}</span>
+                  )}
+                </div>
+
+                {cartFeedback && (
+                  <div
+                    className={`mb-3 text-xs rounded-lg px-3 py-2 ${
+                      cartFeedback.type === 'error' ? 'bg-red-900/50 text-red-200' : 'bg-teal-900/40 text-teal-200'
+                    }`}
+                  >
+                    {cartFeedback.text}
+                  </div>
+                )}
+
+                {!isAuthenticated ? (
+                  <div className="text-center text-sm text-gray-300">
+                    <p className="mb-3">Log in to start adding beautiful fits to your cart.</p>
+                    <Link
+                      to="/login"
+                      onClick={() => setIsCartOpen(false)}
+                      className="inline-block px-4 py-2 rounded-full bg-teal-600 hover:bg-teal-500 text-white font-semibold"
+                    >
+                      Login to continue
+                    </Link>
+                  </div>
+                ) : cartLoading ? (
+                  <p className="text-sm text-gray-400">Loading cart...</p>
+                ) : cartHasItems ? (
+                  <>
+                    <div className="max-h-64 overflow-y-auto divide-y divide-gray-800">
+                      {cartItems.map((item) => {
+                        const previewSrc = resolveProductImage(item.product);
+                        return (
+                          <div key={item.id} className="flex items-start gap-3 py-3">
+                            {previewSrc ? (
+                              <img src={previewSrc} alt={item.product?.name || 'Product image'} className="h-16 w-16 rounded-lg object-cover border border-gray-800" />
+                            ) : (
+                              <div className="h-16 w-16 rounded-lg bg-gray-800 flex items-center justify-center text-[10px] text-gray-500">
+                                No image
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <p className="text-sm font-semibold leading-tight">
+                                {item.product?.name || 'Unavailable product'}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                Qty {item.quantity}
+                                {item.size ? ` · Size ${item.size}` : ''}
+                                {item.height ? ` · ${item.height}` : ''}
+                              </p>
+                              <p className="text-sm font-semibold text-teal-300 mt-1">
+                                {formatCurrency(item.lineTotal)}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleRemoveFromCart(item.id)}
+                              disabled={removingItemId === item.id}
+                              className={`text-gray-500 hover:text-red-400 transition ${removingItemId === item.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              aria-label="Remove item"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-4 border-t border-gray-800 pt-4 text-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-gray-400">Subtotal</span>
+                        <span className="font-semibold text-white">{formatCurrency(cartTotal)}</span>
+                      </div>
+                      <Link
+                        to="/shop"
+                        onClick={() => setIsCartOpen(false)}
+                        className="block w-full text-center bg-teal-600 hover:bg-teal-500 text-white font-semibold py-2 rounded-full"
+                      >
+                        Continue shopping
+                      </Link>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-400">Your cart is empty. Explore our collections to add something special.</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 👤 Authentication Section */}

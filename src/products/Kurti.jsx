@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Heart, ArrowLeft, Zap, Gift, Ruler, CheckCircle, Share2 } from 'lucide-react';
 import { apiUrl, imageUrl } from '../config/env.js';
+import { useCart } from '../context/CartContext.jsx';
 
 // -------------------------------------------------------------------
 // 1. DATA (Sharara Collection) - UPDATED WITH MULTIPLE IMAGES
@@ -20,6 +21,9 @@ const ProductDetail = ({ productId, switchView, data }) => {
   const [selectedHeight, setSelectedHeight] = useState(''); // Initial state can be empty
   const [isAdded, setIsAdded] = useState(false);
   const [mainImage, setMainImage] = useState(product?.image); // State for the main image
+  const [cartMessage, setCartMessage] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const { addToCart } = useCart();
 
   // Set initial selections when product loads or changes
   React.useEffect(() => {
@@ -42,16 +46,29 @@ const ProductDetail = ({ productId, switchView, data }) => {
     </div>
   );
 
-  const handleAddToCart = () => {
-    if (!selectedSize || !selectedHeight) {
-        console.error("Please select both size and height.");
-        // In a real app, show a toast notification here
-        return;
-    }
-    console.log(`Added to Cart: ${product.title}, Size: ${selectedSize}, Height: ${selectedHeight}`);
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 2000); 
-  };
+  const handleAddToCart = async () => {
+    if (!selectedSize || !selectedHeight) {
+      setCartMessage({ type: 'error', text: 'Please select both size and height.' });
+      return;
+    }
+    try {
+      setIsAdding(true);
+      setCartMessage(null);
+      await addToCart({
+        productId: product.id,
+        quantity: 1,
+        size: selectedSize,
+        height: selectedHeight,
+      });
+      setIsAdded(true);
+      setCartMessage({ type: 'success', text: 'Added to cart!' });
+      setTimeout(() => setIsAdded(false), 2000);
+    } catch (error) {
+      setCartMessage({ type: 'error', text: error.message || 'Failed to add to cart' });
+    } finally {
+      setIsAdding(false);
+    }
+  };
   
   const HighlightItem = ({ icon, text }) => {
       const IconComponent = IconMap[icon];
@@ -177,10 +194,10 @@ const ProductDetail = ({ productId, switchView, data }) => {
             </div>
 
             {/* Action Buttons - Sticky on mobile / prominent on desktop */}
-            <div className="lg:sticky lg:bottom-0 lg:left-0 lg:mt-8 pt-4 lg:bg-white lg:shadow-[0_-5px_15px_rgba(0,0,0,0.05)] flex gap-4 w-full">
+      <div className="lg:sticky lg:bottom-0 lg:left-0 lg:mt-8 pt-4 lg:bg-white lg:shadow-[0_-5px_15px_rgba(0,0,0,0.05)] flex gap-4 w-full">
               <button 
-                onClick={handleAddToCart}
-                disabled={isAdded || !selectedSize || !selectedHeight}
+                onClick={handleAddToCart}
+        disabled={isAdded || isAdding || !selectedSize || !selectedHeight}
                 className="flex-1 flex items-center justify-center bg-purple-600 text-white font-extrabold text-lg py-3 rounded-xl hover:bg-purple-700 transition duration-300 transform hover:scale-[1.01] shadow-xl shadow-purple-300/60 disabled:bg-gray-400 disabled:shadow-none"
               >
                 {isAdded ? (
@@ -189,7 +206,7 @@ const ProductDetail = ({ productId, switchView, data }) => {
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="w-6 h-6 mr-2" /> Add to Cart
+                      <ShoppingCart className="w-6 h-6 mr-2" /> {isAdding ? 'Adding...' : 'Add to Cart'}
                   </>
                 )}
               </button>
@@ -197,6 +214,16 @@ const ProductDetail = ({ productId, switchView, data }) => {
                 <Heart className="w-6 h-6" />
               </button>
             </div>
+
+            {cartMessage?.text && (
+              <p
+                className={`mt-4 text-sm ${
+                  cartMessage.type === 'error' ? 'text-red-500' : 'text-green-500'
+                }`}
+              >
+                {cartMessage.text}
+              </p>
+            )}
             
             {/* Selection Error Message (simple inline) */}
             {(!selectedSize || !selectedHeight) && (

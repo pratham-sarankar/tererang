@@ -29,6 +29,7 @@ import AlwaysOffers from"./products/AlwaysOffers";
 import MyOrder from"./products/MyOrder";
 import ReturnPolicy from"./products/ReturnPolicy";
 import DesignerSuit from"./products/DesignerSuit";
+import { CartProvider } from "./context/CartContext.jsx";
 
 
 
@@ -36,10 +37,11 @@ import DesignerSuit from"./products/DesignerSuit";
 function App() {
   const [showPopup] = useState(false);
   return (
-    <Router>
-      {/* <Navbar /> */}
-      {!showPopup && <Navbar />}
-      <Routes>
+    <CartProvider>
+      <Router>
+        {/* <Navbar /> */}
+        {!showPopup && <Navbar />}
+        <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />   {/* ✅ Changed /Home → / */}
         <Route path="/shop" element={<Shop />} />
@@ -79,7 +81,8 @@ function App() {
           element={<h2 style={{ padding: "20px" }}>404 - Page Not Found</h2>}
         />
       </Routes>
-    </Router>
+      </Router>
+    </CartProvider>
   );
 }
 
