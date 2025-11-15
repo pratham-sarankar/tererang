@@ -30,6 +30,7 @@ import MyOrder from"./products/MyOrder";
 import ReturnPolicy from"./products/ReturnPolicy";
 import DesignerSuit from"./products/DesignerSuit";
 import { CartProvider } from "./context/CartContext.jsx";
+import Checkout from "./pages/Checkout";
 
 
 
@@ -72,6 +73,7 @@ function App() {
         <Route path="/MyOrder" element={<MyOrder/>}/>
         <Route path="ReturnPolicy" element={<ReturnPolicy/>}/>
         <Route path="DesignerSuit" element={<DesignerSuit/>}/>
+  <Route path="/checkout" element={<Checkout />} />
 
 
 

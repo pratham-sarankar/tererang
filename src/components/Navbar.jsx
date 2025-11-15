@@ -356,13 +356,22 @@ const Navbar = () => {
                         <span className="text-gray-400">Subtotal</span>
                         <span className="font-semibold text-white">{formatCurrency(cartTotal)}</span>
                       </div>
-                      <Link
-                        to="/shop"
-                        onClick={() => setIsCartOpen(false)}
-                        className="block w-full text-center bg-teal-600 hover:bg-teal-500 text-white font-semibold py-2 rounded-full"
-                      >
-                        Continue shopping
-                      </Link>
+                      <div className="space-y-2">
+                        <Link
+                          to="/checkout"
+                          onClick={() => setIsCartOpen(false)}
+                          className="block w-full text-center bg-white text-black font-semibold py-2 rounded-full hover:bg-gray-200 transition"
+                        >
+                          Proceed to checkout
+                        </Link>
+                        <Link
+                          to="/shop"
+                          onClick={() => setIsCartOpen(false)}
+                          className="block w-full text-center bg-teal-600 hover:bg-teal-500 text-white font-semibold py-2 rounded-full"
+                        >
+                          Continue shopping
+                        </Link>
+                      </div>
                     </div>
                   </>
                 ) : (
