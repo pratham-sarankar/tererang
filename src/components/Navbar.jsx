@@ -335,16 +335,16 @@ const Navbar = () => {
       {/* ✅ MOBILE MENU */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-gray-900 text-white px-6 py-5 space-y-4 font-medium border-t border-gray-800">
-          <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+          <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="block">
             Home
           </Link>
-          <Link to="/products/kurti" onClick={() => setIsMobileMenuOpen(false)}>
+          <Link to="/products/kurti" onClick={() => setIsMobileMenuOpen(false)} className="block">
             👚 Kurti
           </Link>
-          <Link to="/products/suit" onClick={() => setIsMobileMenuOpen(false)}>
+          <Link to="/products/suit" onClick={() => setIsMobileMenuOpen(false)} className="block">
             👗 Suit
           </Link>
-          <Link to="/products/coat" onClick={() => setIsMobileMenuOpen(false)}>
+          <Link to="/products/coat" onClick={() => setIsMobileMenuOpen(false)} className="block">
             🧥 Coat
           </Link>
           {/* Disabled/Coming soon items */}
@@ -362,10 +362,10 @@ const Navbar = () => {
               <span className="text-xs bg-gray-800 border border-gray-700 text-gray-300 px-2 py-0.5 rounded-full">Coming soon</span>
             </div>
           </div>
-          <Link to="/TermsPage" onClick={() => setIsMobileMenuOpen(false)}>
+          <Link to="/TermsPage" onClick={() => setIsMobileMenuOpen(false)} className="block">
             Terms & Conditions
           </Link>
-          <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>
+          <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block">
             Contact Us
           </Link>
           
@@ -380,10 +380,10 @@ const Navbar = () => {
                     <p className="text-sm text-gray-400">{user?.phoneNumber}</p>
                   </div>
                 </div>
-                <Link to="/MyOrder" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/MyOrder" onClick={() => setIsMobileMenuOpen(false)} className="block mb-2">
                   📦 My Orders
                 </Link>
-                <Link to="/AlwaysOffers" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/AlwaysOffers" onClick={() => setIsMobileMenuOpen(false)} className="block mb-2">
                   🎁 Offers
                 </Link>
                 <button
