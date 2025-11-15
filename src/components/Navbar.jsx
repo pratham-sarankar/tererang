@@ -69,6 +69,16 @@ const Navbar = () => {
 
   // Active route highlighting
   const isActive = (path) => location.pathname === path;
+  
+  // Product menu items: enabled items are clickable, others show "Coming soon"
+  const productMenu = [
+    { name: 'Kurti', to: '/products/kurti', enabled: true, emoji: '👚' },
+    { name: 'Suit', to: '/products/suit', enabled: true, emoji: '👗' },
+    { name: 'Coat', to: '/products/coat', enabled: true, emoji: '🧥' },
+    { name: 'Sharara Suits', to: '/products/ShararaData', enabled: false },
+    { name: 'Skirt', to: '/products/skirt', enabled: false },
+    { name: 'Designer Suits', to: '/products/DesignerSuit', enabled: false },
+  ];
 
   return (
     <nav className="bg-black text-white shadow-lg sticky top-0 z-50">
@@ -107,7 +117,8 @@ const Navbar = () => {
               className={`transition duration-200 ${
                 isActive("/products/kurti") ||
                 isActive("/products/suit") ||
-                isActive("/products/designerSuit")
+                isActive("/products/designerSuit") ||
+                isActive("/products/coat")
                   ? "text-teal-400"
                   : "hover:text-teal-400"
               }`}
@@ -116,63 +127,30 @@ const Navbar = () => {
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute left-1/2 transform -translate-x-1/2 mt-4 bg-gray-900 text-white rounded-xl shadow-2xl p-5 grid grid-cols-2 gap-6 w-[480px] border border-gray-700 z-50">
-                
-                {/* 🌿 Daily Wear */}
-                <div className="p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition">
-                  <h4 className="font-semibold text-teal-400 border-b border-teal-600 pb-1 mb-2">
-                    🌿 Daily Wear
-                  </h4>
-                  <Link
-                    to="/products/kurti"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="block hover:text-teal-400"
-                  >
-                    Kurti
-                  </Link>
-                  <Link
-                    to="/products/suit"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="block hover:text-teal-400"
-                  >
-                    Suit
-                  </Link>
-                  <Link
-                    to="/products/coat"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="block hover:text-teal-400"
-                  >
-                    Coat
-                  </Link>
-                </div>
-
-                {/* 🎉 Party Wear */}
-                <div className="p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition">
-                  <h4 className="font-semibold text-cyan-400 border-b border-cyan-600 pb-1 mb-2">
-                    🎉 Party Wear
-                  </h4>
-                  <Link
-                    to="/products/ShararaData"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="block hover:text-cyan-400"
-                  >
-                    Sarara Suits
-                  </Link>
-                  <Link
-                    to="/products/skirt"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="block hover:text-cyan-400"
-                  >
-                    Skirt
-                  </Link>
-                  <Link
-                    to="/products/DesignerSuit"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="block hover:text-cyan-400"
-                  >
-                    Designer Suits
-                  </Link>
-                </div>
+              <div className="absolute left-1/2 transform -translate-x-1/2 mt-4 bg-gray-900 text-white rounded-xl shadow-2xl p-3 w-[320px] border border-gray-700 z-50">
+                <ul className="divide-y divide-gray-800">
+                  {productMenu.map((item) => (
+                    <li key={item.name} className="py-2">
+                      {item.enabled ? (
+                        <Link
+                          to={item.to}
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="flex items-center justify-between hover:text-teal-400"
+                        >
+                          <span>
+                            {item.emoji ? <span className="mr-2" aria-hidden> {item.emoji} </span> : null}
+                            {item.name}
+                          </span>
+                        </Link>
+                      ) : (
+                        <div className="flex items-center justify-between text-gray-400 cursor-not-allowed">
+                          <span>{item.name}</span>
+                          <span className="ml-3 text-xs bg-gray-800 border border-gray-700 text-gray-300 px-2 py-0.5 rounded-full">Coming soon</span>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </li>
@@ -361,17 +339,29 @@ const Navbar = () => {
             Home
           </Link>
           <Link to="/products/kurti" onClick={() => setIsMobileMenuOpen(false)}>
-            Kurti
+            👚 Kurti
           </Link>
           <Link to="/products/suit" onClick={() => setIsMobileMenuOpen(false)}>
-            Suit
+            👗 Suit
           </Link>
-          <Link
-            to="/products/designerSuit"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Designer Suits
+          <Link to="/products/coat" onClick={() => setIsMobileMenuOpen(false)}>
+            🧥 Coat
           </Link>
+          {/* Disabled/Coming soon items */}
+          <div className="pt-2 space-y-2">
+            <div className="flex items-center justify-between text-gray-400">
+              <span>Sharara Suits</span>
+              <span className="text-xs bg-gray-800 border border-gray-700 text-gray-300 px-2 py-0.5 rounded-full">Coming soon</span>
+            </div>
+            <div className="flex items-center justify-between text-gray-400">
+              <span>Skirt</span>
+              <span className="text-xs bg-gray-800 border border-gray-700 text-gray-300 px-2 py-0.5 rounded-full">Coming soon</span>
+            </div>
+            <div className="flex items-center justify-between text-gray-400">
+              <span>Designer Suits</span>
+              <span className="text-xs bg-gray-800 border border-gray-700 text-gray-300 px-2 py-0.5 rounded-full">Coming soon</span>
+            </div>
+          </div>
           <Link to="/TermsPage" onClick={() => setIsMobileMenuOpen(false)}>
             Terms & Conditions
           </Link>
