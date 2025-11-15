@@ -293,65 +293,55 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            /* Login/Register Buttons - When Not Logged In */
-            <>
-              <div ref={loginRef} className="relative">
-                <button
-                  onClick={() => setIsLoginMenuOpen((s) => !s)}
-                  className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-1.5 rounded-full font-medium transition"
-                >
-                  Login
-                </button>
-
-                {isLoginMenuOpen && (
-                  <div className="absolute right-0 mt-3 w-60 bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 z-50 p-5">
-                    <h4 className="text-lg font-bold mb-2">Welcome</h4>
-                    <p className="text-sm text-gray-400 mb-3">
-                      Access your account and manage orders
-                    </p>
-
-                    <Link
-                      to="/login"
-                      onClick={() => setIsLoginMenuOpen(false)}
-                      className="block bg-teal-600 text-center py-2 rounded-lg font-semibold hover:bg-teal-500 transition mb-3"
-                    >
-                      LOGIN / SIGNUP
-                    </Link>
-
-                    <hr className="border-gray-700 mb-3" />
-
-                    <ul className="space-y-2 text-sm">
-                      <li>
-                        <Link
-                          to="/MyOrder"
-                          onClick={() => setIsLoginMenuOpen(false)}
-                          className="hover:text-teal-400"
-                        >
-                          📦 My Orders
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/AlwaysOffers"
-                          onClick={() => setIsLoginMenuOpen(false)}
-                          className="hover:text-teal-400"
-                        >
-                          🎁 Offers
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              {/* 📝 Register Button */}
-              <Link
-                to="/register"
-                className="hidden md:inline bg-white text-black hover:bg-gray-200 px-4 py-1.5 rounded-full font-semibold transition"
+            /* Login/Signup Button - When Not Logged In */
+            <div ref={loginRef} className="relative">
+              <button
+                onClick={() => setIsLoginMenuOpen((s) => !s)}
+                className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-1.5 rounded-full font-medium transition"
               >
-                Register
-              </Link>
-            </>
+                Login/Signup
+              </button>
+
+              {isLoginMenuOpen && (
+                <div className="absolute right-0 mt-3 w-60 bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 z-50 p-5">
+                  <h4 className="text-lg font-bold mb-2">Welcome</h4>
+                  <p className="text-sm text-gray-400 mb-3">
+                    Access your account and manage orders
+                  </p>
+
+                  <Link
+                    to="/login"
+                    onClick={() => setIsLoginMenuOpen(false)}
+                    className="block bg-teal-600 text-center py-2 rounded-lg font-semibold hover:bg-teal-500 transition mb-3"
+                  >
+                    LOGIN / SIGNUP
+                  </Link>
+
+                  <hr className="border-gray-700 mb-3" />
+
+                  <ul className="space-y-2 text-sm">
+                    <li>
+                      <Link
+                        to="/MyOrder"
+                        onClick={() => setIsLoginMenuOpen(false)}
+                        className="hover:text-teal-400"
+                      >
+                        📦 My Orders
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/AlwaysOffers"
+                        onClick={() => setIsLoginMenuOpen(false)}
+                        className="hover:text-teal-400"
+                      >
+                        🎁 Offers
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
           )}
 
           {/* 📱 Mobile Menu Button */}
@@ -419,22 +409,13 @@ const Navbar = () => {
               </div>
             </>
           ) : (
-            <>
-              <Link
-                to="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block bg-teal-600 text-center py-2 rounded-full font-semibold hover:bg-teal-500 transition"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block bg-white text-black text-center py-2 rounded-full font-semibold hover:bg-gray-200 transition"
-              >
-                Register
-              </Link>
-            </>
+            <Link
+              to="/login"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block bg-teal-600 text-center py-2 rounded-full font-semibold hover:bg-teal-500 transition"
+            >
+              Login/Signup
+            </Link>
           )}
         </div>
       )}
