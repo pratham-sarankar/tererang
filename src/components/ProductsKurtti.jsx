@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-// import KurtiCard from './KurtiCard'
 import Card from '../pages/Card'
+import { apiUrl, imageUrl } from '../config/env.js'
 
 export default function ProductsKurtti() {
     const [products, setProducts] = useState([]);
@@ -13,13 +13,13 @@ export default function ProductsKurtti() {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/products?category=kurti');
+            const response = await fetch(apiUrl('/api/products?category=kurti'));
             const data = await response.json();
             
             if (response.ok) {
                 // Transform the products to match the Card component's expected format
                 const transformedProducts = data.products.map(product => ({
-                    image: `http://localhost:3001/uploads/${(product.images && product.images[0]) ? product.images[0] : product.image}`,
+                    image: imageUrl((product.images && product.images[0]) ? product.images[0] : product.image),
                     name: product.name,
                     price: product.price,
                     id: product._id

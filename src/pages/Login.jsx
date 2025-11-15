@@ -1,6 +1,7 @@
 // src/pages/Login.jsx
 import React, { useState } from "react";
 import "../css/Login.css";
+import { apiUrl } from "../config/env.js";
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -11,7 +12,8 @@ const Login = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const API_URL = "http://localhost:3001/api";
+  // Build API root from environment configuration helper
+  const API_URL = apiUrl('/api').replace(/\/$/, '');
 
   const handleSendOTP = async (e) => {
     e.preventDefault();
@@ -20,7 +22,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/auth/send-otp`, {
+  const response = await fetch(`${API_URL}/auth/send-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +53,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/auth/verify-otp`, {
+  const response = await fetch(`${API_URL}/auth/verify-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

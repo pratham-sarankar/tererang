@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/AdminDashboard.css';
+import { apiUrl, imageUrl } from '../config/env.js';
 
 export default function AdminDashboard() {
     const [products, setProducts] = useState([]);
@@ -33,7 +34,7 @@ export default function AdminDashboard() {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/products');
+            const response = await fetch(apiUrl('/api/products'));
             const data = await response.json();
             
             if (response.ok) {
@@ -88,8 +89,8 @@ export default function AdminDashboard() {
 
         try {
             const url = editingProduct 
-                ? `http://localhost:3001/api/products/${editingProduct._id}`
-                : 'http://localhost:3001/api/products';
+                ? apiUrl(`/api/products/${editingProduct._id}`)
+                : apiUrl('/api/products');
             
             const method = editingProduct ? 'PUT' : 'POST';
 
@@ -137,7 +138,7 @@ export default function AdminDashboard() {
         const token = localStorage.getItem('adminToken');
 
         try {
-            const response = await fetch(`http://localhost:3001/api/products/${productId}`, {
+            const response = await fetch(apiUrl(`/api/products/${productId}`), {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -287,7 +288,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                                         {editingProduct.images.map((img) => (
-                                            <img key={img} src={`http://localhost:3001/uploads/${img}`} alt="preview" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4, border: '1px solid #eee' }} />
+                                            <img key={img} src={imageUrl(img)} alt="preview" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4, border: '1px solid #eee' }} />
                                         ))}
                                     </div>
                                 </div>
@@ -312,7 +313,7 @@ export default function AdminDashboard() {
                     {products.map((product) => (
                         <div key={product._id} className="product-card">
                             <img 
-                                src={`http://localhost:3001/uploads/${(product.images && product.images[0]) ? product.images[0] : product.image}`} 
+                                src={imageUrl((product.images && product.images[0]) ? product.images[0] : product.image)} 
                                 alt={product.name}
                                 className="product-image"
                             />
