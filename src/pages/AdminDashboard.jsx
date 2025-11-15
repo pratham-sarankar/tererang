@@ -3,9 +3,46 @@ import { useNavigate } from 'react-router-dom';
 import '../css/AdminDashboard.css';
 import { apiUrl, imageUrl } from '../config/env.js';
 
+const ORDER_STATUSES = ['pending', 'processing', 'completed', 'cancelled'];
+const PAYMENT_STATUSES = ['pending', 'paid'];
+
+const currencyFormatter = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 0,
+});
+
+const formatCurrency = (value) => currencyFormatter.format(Number(value) || 0);
+
+const formatDate = (value) => {
+    if (!value) return '--';
+    return new Date(value).toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    });
+};
+
+const resolveImagePath = (path) => {
+    if (!path) return '';
+    if (/^https?:\/\//.test(path)) return path;
+    return imageUrl(path);
+};
+
+const defaultOrderForm = {
+    status: 'processing',
+    paymentStatus: 'paid',
+    paymentMethod: 'upi',
+    paymentReference: '',
+    notes: '',
+};
+
 export default function AdminDashboard() {
+    const [activeTab, setActiveTab] = useState('products');
     const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [productLoading, setProductLoading] = useState(false);
+    const [orderLoading, setOrderLoading] = useState(false);
     const [error, setError] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -15,109 +52,147 @@ export default function AdminDashboard() {
         description: '',
         category: 'kurti',
         inStock: true,
-        images: []
+        images: [],
     });
+    const [editingOrderId, setEditingOrderId] = useState(null);
+    const [orderForm, setOrderForm] = useState(defaultOrderForm);
+    const [orderSubmittingId, setOrderSubmittingId] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        checkAuth();
-        fetchProducts();
-    }, []);
+    const logoutAndRedirect = () => {
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminData');
+        navigate('/admin/login');
+    };
 
     const checkAuth = () => {
         const token = localStorage.getItem('adminToken');
         if (!token) {
-            navigate('/admin/login');
-            return;
+            logoutAndRedirect();
         }
+        return token;
     };
 
     const fetchProducts = async () => {
+        setProductLoading(true);
         try {
             const response = await fetch(apiUrl('/api/products'));
             const data = await response.json();
-            
+
             if (response.ok) {
                 setProducts(data.products);
             } else {
-                setError('Failed to fetch products');
+                setError(data.message || 'Failed to fetch products');
             }
-        } catch (error) {
-            console.error('Fetch products error:', error);
+        } catch (fetchError) {
+            console.error('Fetch products error:', fetchError);
             setError('Network error. Please try again.');
         } finally {
-            setLoading(false);
+            setProductLoading(false);
+        }
+    };
+
+    const fetchOrders = async () => {
+        setOrderLoading(true);
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            setOrderLoading(false);
+            logoutAndRedirect();
+            return;
+        }
+
+        try {
+            const response = await fetch(apiUrl('/api/admin/orders'), {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                setOrders(data.orders || []);
+            } else {
+                setError(data.message || 'Failed to fetch orders');
+                if (response.status === 401) {
+                    logoutAndRedirect();
+                }
+            }
+        } catch (fetchError) {
+            console.error('Fetch orders error:', fetchError);
+            setError('Network error. Please try again.');
+        } finally {
+            setOrderLoading(false);
         }
     };
 
     const handleInputChange = (e) => {
         const { name, value, type, checked, files } = e.target;
-        
+
         if (type === 'checkbox') {
-            setFormData(prev => ({
+            setFormData((prev) => ({
                 ...prev,
-                [name]: checked
+                [name]: checked,
             }));
         } else if (type === 'file') {
-            // Allow multiple file selection
-            setFormData(prev => ({
+            setFormData((prev) => ({
                 ...prev,
-                [name]: Array.from(files)
+                [name]: Array.from(files),
             }));
         } else {
-            setFormData(prev => ({
+            setFormData((prev) => ({
                 ...prev,
-                [name]: value
+                [name]: value,
             }));
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('adminToken');
-        
+        const token = checkAuth();
+        if (!token) return;
+
         const submitData = new FormData();
         submitData.append('name', formData.name);
         submitData.append('price', formData.price);
         submitData.append('description', formData.description);
         submitData.append('category', formData.category);
         submitData.append('inStock', formData.inStock);
-        
+
         if (formData.images && formData.images.length > 0) {
             formData.images.forEach((file) => submitData.append('images', file));
         }
 
         try {
-            const url = editingProduct 
+            const url = editingProduct
                 ? apiUrl(`/api/products/${editingProduct._id}`)
                 : apiUrl('/api/products');
-            
+
             const method = editingProduct ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method,
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
                 },
-                body: submitData
+                body: submitData,
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                fetchProducts(); // Refresh products list
-                resetForm();
+                await fetchProducts();
+                resetProductForm();
                 setError('');
             } else {
                 setError(data.message || 'Operation failed');
             }
-        } catch (error) {
-            console.error('Submit error:', error);
+        } catch (submitError) {
+            console.error('Submit error:', submitError);
             setError('Network error. Please try again.');
         }
     };
 
-    const handleEdit = (product) => {
+    const handleEditProduct = (product) => {
         setEditingProduct(product);
         setFormData({
             name: product.name,
@@ -125,81 +200,172 @@ export default function AdminDashboard() {
             description: product.description || '',
             category: product.category,
             inStock: product.inStock,
-            images: [] // user may upload new images to replace existing
+            images: [],
         });
         setShowAddForm(true);
     };
 
-    const handleDelete = async (productId) => {
+    const handleDeleteProduct = async (productId) => {
         if (!window.confirm('Are you sure you want to delete this product?')) {
             return;
         }
 
-        const token = localStorage.getItem('adminToken');
+        const token = checkAuth();
+        if (!token) return;
 
         try {
             const response = await fetch(apiUrl(`/api/products/${productId}`), {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                    Authorization: `Bearer ${token}`,
+                },
             });
 
             if (response.ok) {
-                fetchProducts(); // Refresh products list
+                await fetchProducts();
                 setError('');
             } else {
                 const data = await response.json();
                 setError(data.message || 'Delete failed');
             }
-        } catch (error) {
-            console.error('Delete error:', error);
+        } catch (deleteError) {
+            console.error('Delete error:', deleteError);
             setError('Network error. Please try again.');
         }
     };
 
-    const resetForm = () => {
+    const resetProductForm = () => {
         setFormData({
             name: '',
             price: '',
             description: '',
             category: 'kurti',
             inStock: true,
-            images: []
+            images: [],
         });
         setEditingProduct(null);
         setShowAddForm(false);
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminData');
-        navigate('/admin/login');
+    const handleOrderEdit = (order) => {
+        setEditingOrderId(order.id);
+        setOrderForm({
+            status: order.status,
+            paymentStatus: order.paymentStatus,
+            paymentMethod: order.paymentMethod,
+            paymentReference: order.paymentReference || '',
+            notes: order.notes || '',
+        });
     };
 
+    const cancelOrderEdit = () => {
+        setEditingOrderId(null);
+        setOrderSubmittingId(null);
+        setOrderForm(defaultOrderForm);
+    };
+
+    const handleOrderFormChange = (e) => {
+        const { name, value } = e.target;
+        setOrderForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const submitOrderUpdate = async (orderId) => {
+        const token = checkAuth();
+        if (!token) return;
+
+        setOrderSubmittingId(orderId);
+        try {
+            const response = await fetch(apiUrl(`/api/admin/orders/${orderId}`), {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(orderForm),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setOrders((prev) => prev.map((order) => (order.id === orderId ? data.order : order)));
+                cancelOrderEdit();
+                setError('');
+            } else {
+                setError(data.message || 'Failed to update order');
+                if (response.status === 401) {
+                    logoutAndRedirect();
+                }
+            }
+        } catch (updateError) {
+            console.error('Update order error:', updateError);
+            setError('Network error. Please try again.');
+        } finally {
+            setOrderSubmittingId(null);
+        }
+    };
+
+    const handleOrderDelete = async (orderId) => {
+        if (!window.confirm('Delete this order permanently?')) {
+            return;
+        }
+
+        const token = checkAuth();
+        if (!token) return;
+
+        try {
+            const response = await fetch(apiUrl(`/api/admin/orders/${orderId}`), {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                setOrders((prev) => prev.filter((order) => order.id !== orderId));
+                setError('');
+                if (editingOrderId === orderId) {
+                    cancelOrderEdit();
+                }
+            } else {
+                const data = await response.json();
+                setError(data.message || 'Failed to delete order');
+            }
+        } catch (deleteError) {
+            console.error('Delete order error:', deleteError);
+            setError('Network error. Please try again.');
+        }
+    };
+
+    const handleLogout = () => {
+        logoutAndRedirect();
+    };
+
+    useEffect(() => {
+        checkAuth();
+        const initialize = async () => {
+            setLoading(true);
+            await Promise.all([fetchProducts(), fetchOrders()]);
+            setLoading(false);
+        };
+        initialize();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (activeTab === 'orders') {
+            setShowAddForm(false);
+        }
+    }, [activeTab]);
+
     if (loading) {
-        return <div className="loading">Loading...</div>;
+        return <div className="loading">Loading dashboard...</div>;
     }
 
-    return (
-        <div className="admin-dashboard">
-            <div className="dashboard-header">
-                <h1>Admin Dashboard</h1>
-                <div className="header-actions">
-                    <button 
-                        className="add-btn"
-                        onClick={() => setShowAddForm(!showAddForm)}
-                    >
-                        {showAddForm ? 'Cancel' : 'Add Product'}
-                    </button>
-                    <button className="logout-btn" onClick={handleLogout}>
-                        Logout
-                    </button>
-                </div>
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
+    const renderProductSection = () => (
+        <>
             {showAddForm && (
                 <div className="product-form">
                     <h3>{editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
@@ -282,15 +448,15 @@ export default function AdminDashboard() {
                                 required={!editingProduct}
                             />
                             {editingProduct && Array.isArray(editingProduct.images) && editingProduct.images.length > 0 && (
-                                <div style={{ marginTop: 10 }}>
-                                    <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>
-                                        Current Images (uploading new ones will replace all):
-                                    </div>
-                                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                                        {editingProduct.images.map((img) => (
-                                            <img key={img} src={imageUrl(img)} alt="preview" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4, border: '1px solid #eee' }} />
-                                        ))}
-                                    </div>
+                                <div className="current-images">
+                                    {editingProduct.images.map((img) => (
+                                        <img
+                                            key={img}
+                                            src={imageUrl(img)}
+                                            alt="preview"
+                                            className="current-image"
+                                        />
+                                    ))}
                                 </div>
                             )}
                         </div>
@@ -299,7 +465,7 @@ export default function AdminDashboard() {
                             <button type="submit" className="submit-btn">
                                 {editingProduct ? 'Update Product' : 'Add Product'}
                             </button>
-                            <button type="button" className="cancel-btn" onClick={resetForm}>
+                            <button type="button" className="cancel-btn" onClick={resetProductForm}>
                                 Cancel
                             </button>
                         </div>
@@ -307,51 +473,276 @@ export default function AdminDashboard() {
                 </div>
             )}
 
-            <div className="products-section">
-                <h2>Products ({products.length})</h2>
-                <div className="products-grid">
-                    {products.map((product) => (
-                        <div key={product._id} className="product-card">
-                            <img 
-                                src={imageUrl((product.images && product.images[0]) ? product.images[0] : product.image)} 
-                                alt={product.name}
-                                className="product-image"
-                            />
-                            <div className="product-info">
-                                <h3>{product.name}</h3>
-                                <p className="product-price">₹{product.price}</p>
-                                <p className="product-category">{product.category}</p>
-                                <p className={`product-stock ${product.inStock ? 'in-stock' : 'out-of-stock'}`}>
-                                    {product.inStock ? 'In Stock' : 'Out of Stock'}
-                                </p>
-                                {product.description && (
-                                    <p className="product-description">{product.description}</p>
-                                )}
-                                <div className="product-actions">
-                                    <button 
-                                        className="edit-btn"
-                                        onClick={() => handleEdit(product)}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button 
-                                        className="delete-btn"
-                                        onClick={() => handleDelete(product._id)}
-                                    >
-                                        Delete
-                                    </button>
+            {productLoading ? (
+                <div className="loading">Loading products...</div>
+            ) : (
+                <div className="products-section">
+                    <h2>Products ({products.length})</h2>
+                    <div className="products-grid">
+                        {products.map((product) => (
+                            <div key={product._id} className="product-card">
+                                <img
+                                    src={imageUrl((product.images && product.images[0]) ? product.images[0] : product.image)}
+                                    alt={product.name}
+                                    className="product-image"
+                                />
+                                <div className="product-info">
+                                    <h3>{product.name}</h3>
+                                    <p className="product-price">{formatCurrency(product.price)}</p>
+                                    <p className="product-category">{product.category}</p>
+                                    <p className={`product-stock ${product.inStock ? 'in-stock' : 'out-of-stock'}`}>
+                                        {product.inStock ? 'In Stock' : 'Out of Stock'}
+                                    </p>
+                                    {product.description && (
+                                        <p className="product-description">{product.description}</p>
+                                    )}
+                                    <div className="product-actions">
+                                        <button
+                                            className="edit-btn"
+                                            onClick={() => handleEditProduct(product)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="delete-btn"
+                                            onClick={() => handleDeleteProduct(product._id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {products.length === 0 && (
+                        <div className="no-products">
+                            <p>No products found. Add some products to get started!</p>
+                        </div>
+                    )}
+                </div>
+            )}
+        </>
+    );
+
+    const renderOrderSection = () => (
+        <div className="orders-section">
+            <div className="orders-header">
+                <h2>Orders ({orders.length})</h2>
+                <div className="orders-header-actions">
+                    <button className="refresh-btn" onClick={fetchOrders} disabled={orderLoading}>
+                        {orderLoading ? 'Refreshing…' : 'Refresh'}
+                    </button>
+                </div>
+            </div>
+
+            {orderLoading ? (
+                <div className="loading">Loading orders...</div>
+            ) : orders.length === 0 ? (
+                <div className="no-orders">
+                    <p>No orders yet. They will appear here as soon as customers check out.</p>
+                </div>
+            ) : (
+                <div className="orders-list">
+                    {orders.map((order) => (
+                        <div className="order-card" key={order.id}>
+                            <div className="order-meta">
+                                <div>
+                                    <span className="order-label">Order ID</span>
+                                    <p className="order-value">{order.id}</p>
+                                </div>
+                                <div>
+                                    <span className="order-label">Customer</span>
+                                    <p className="order-value">{order.user?.name || 'Guest'}</p>
+                                    <span className="order-subtext">{order.user?.phoneNumber || order.user?.email || 'N/A'}</span>
+                                </div>
+                                <div>
+                                    <span className="order-label">Subtotal</span>
+                                    <p className="order-value">{formatCurrency(order.subtotal)}</p>
+                                </div>
+                                <div>
+                                    <span className="order-label">Status</span>
+                                    <p className={`status-chip status-${order.status}`}>{order.status}</p>
+                                </div>
+                                <div>
+                                    <span className="order-label">Payment</span>
+                                    <p className={`status-chip payment-${order.paymentStatus}`}>{order.paymentStatus}</p>
+                                    {order.paymentReference && (
+                                        <span className="order-subtext">Ref: {order.paymentReference}</span>
+                                    )}
+                                </div>
+                                <div>
+                                    <span className="order-label">Placed</span>
+                                    <p className="order-value">{formatDate(order.createdAt)}</p>
+                                </div>
+                            </div>
+
+                            <div className="order-items">
+                                {(order.items || []).map((item, index) => (
+                                    <div className="order-item" key={`${order.id}-${index}`}>
+                                        <div className="order-item-image">
+                                            {item.image ? (
+                                                <img src={resolveImagePath(item.image)} alt={item.name} />
+                                            ) : (
+                                                <span className="order-placeholder">No image</span>
+                                            )}
+                                        </div>
+                                        <div className="order-item-info">
+                                            <h4>{item.name}</h4>
+                                            <div className="order-subtext">
+                                                Qty: {item.quantity}
+                                                {item.size && ` • Size: ${item.size}`}
+                                            </div>
+                                        </div>
+                                        <div className="order-item-price">
+                                            {formatCurrency(item.price * item.quantity)}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="order-actions">
+                                {editingOrderId === order.id ? (
+                                    <form
+                                        className="order-edit-form"
+                                        onSubmit={(e) => {
+                                            e.preventDefault();
+                                            submitOrderUpdate(order.id);
+                                        }}
+                                    >
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label htmlFor={`status-${order.id}`}>Status</label>
+                                                <select
+                                                    id={`status-${order.id}`}
+                                                    name="status"
+                                                    value={orderForm.status}
+                                                    onChange={handleOrderFormChange}
+                                                >
+                                                    {ORDER_STATUSES.map((status) => (
+                                                        <option key={status} value={status}>
+                                                            {status}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="form-group">
+                                                <label htmlFor={`paymentStatus-${order.id}`}>Payment Status</label>
+                                                <select
+                                                    id={`paymentStatus-${order.id}`}
+                                                    name="paymentStatus"
+                                                    value={orderForm.paymentStatus}
+                                                    onChange={handleOrderFormChange}
+                                                >
+                                                    {PAYMENT_STATUSES.map((status) => (
+                                                        <option key={status} value={status}>
+                                                            {status}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="form-group">
+                                                <label htmlFor={`paymentMethod-${order.id}`}>Payment Method</label>
+                                                <input
+                                                    type="text"
+                                                    id={`paymentMethod-${order.id}`}
+                                                    name="paymentMethod"
+                                                    value={orderForm.paymentMethod}
+                                                    onChange={handleOrderFormChange}
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label htmlFor={`paymentReference-${order.id}`}>Payment Reference</label>
+                                                <input
+                                                    type="text"
+                                                    id={`paymentReference-${order.id}`}
+                                                    name="paymentReference"
+                                                    value={orderForm.paymentReference}
+                                                    onChange={handleOrderFormChange}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <label htmlFor={`notes-${order.id}`}>Notes</label>
+                                            <textarea
+                                                id={`notes-${order.id}`}
+                                                name="notes"
+                                                rows="3"
+                                                value={orderForm.notes}
+                                                onChange={handleOrderFormChange}
+                                            />
+                                        </div>
+                                        <div className="form-actions">
+                                            <button
+                                                type="submit"
+                                                className="submit-btn"
+                                                disabled={orderSubmittingId === order.id}
+                                            >
+                                                {orderSubmittingId === order.id ? 'Saving…' : 'Save Changes'}
+                                            </button>
+                                            <button type="button" className="cancel-btn" onClick={cancelOrderEdit}>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <div className="order-buttons">
+                                        <button className="edit-btn" onClick={() => handleOrderEdit(order)}>
+                                            Edit
+                                        </button>
+                                        <button className="delete-btn" onClick={() => handleOrderDelete(order.id)}>
+                                            Delete
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
                 </div>
+            )}
+        </div>
+    );
 
-                {products.length === 0 && (
-                    <div className="no-products">
-                        <p>No products found. Add some products to get started!</p>
+    return (
+        <div className="admin-dashboard">
+            <div className="dashboard-header">
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <div className="dashboard-tabs">
+                        <button
+                            type="button"
+                            className={activeTab === 'products' ? 'active' : ''}
+                            onClick={() => setActiveTab('products')}
+                        >
+                            Products
+                        </button>
+                        <button
+                            type="button"
+                            className={activeTab === 'orders' ? 'active' : ''}
+                            onClick={() => setActiveTab('orders')}
+                        >
+                            Orders
+                        </button>
                     </div>
-                )}
+                </div>
+                <div className="header-actions">
+                    {activeTab === 'products' && (
+                        <button
+                            className="add-btn"
+                            onClick={() => setShowAddForm((prev) => !prev)}
+                        >
+                            {showAddForm ? 'Cancel' : 'Add Product'}
+                        </button>
+                    )}
+                    <button className="logout-btn" onClick={handleLogout}>
+                        Logout
+                    </button>
+                </div>
             </div>
+
+            {error && <div className="error-message">{error}</div>}
+
+            {activeTab === 'products' ? renderProductSection() : renderOrderSection()}
         </div>
     );
 }
