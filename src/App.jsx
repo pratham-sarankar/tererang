@@ -31,6 +31,7 @@ import ReturnPolicy from"./products/ReturnPolicy";
 import DesignerSuit from"./products/DesignerSuit";
 import { CartProvider } from "./context/CartContext.jsx";
 import Checkout from "./pages/Checkout";
+import ProductDetail from "./pages/ProductDetail";
 
 
 
@@ -74,6 +75,7 @@ function App() {
         <Route path="ReturnPolicy" element={<ReturnPolicy/>}/>
         <Route path="DesignerSuit" element={<DesignerSuit/>}/>
   <Route path="/checkout" element={<Checkout />} />
+    <Route path="/product/:productId" element={<ProductDetail />} />
 
 
 
