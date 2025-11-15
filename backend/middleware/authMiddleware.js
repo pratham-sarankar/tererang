@@ -54,7 +54,7 @@ const adminAuth = async (req, res, next) => {
 
       // Get admin from token
       req.user = await Admin.findById(decoded.adminId).select('-password');
-      
+
       if (!req.user) {
         return res.status(401).json({ message: 'Admin not found' });
       }

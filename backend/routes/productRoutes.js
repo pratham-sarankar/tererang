@@ -33,7 +33,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const upload = multer({ 
+const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
@@ -68,8 +68,8 @@ router.get('/', async (req, res) => {
         });
     } catch (error) {
         console.error('Get products error:', error);
-        res.status(500).json({ 
-            message: 'Internal server error' 
+        res.status(500).json({
+            message: 'Internal server error'
         });
     }
 });
@@ -79,15 +79,15 @@ router.get('/:id', async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ 
-                message: 'Product not found' 
+            return res.status(404).json({
+                message: 'Product not found'
             });
         }
         res.json(product);
     } catch (error) {
         console.error('Get product error:', error);
-        res.status(500).json({ 
-            message: 'Internal server error' 
+        res.status(500).json({
+            message: 'Internal server error'
         });
     }
 });
@@ -99,15 +99,15 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
 
         // Validate required fields
         if (!name || !price) {
-            return res.status(400).json({ 
-                message: 'Name and price are required' 
+            return res.status(400).json({
+                message: 'Name and price are required'
             });
         }
 
         // Check if image was uploaded
         if (!req.file) {
-            return res.status(400).json({ 
-                message: 'Product image is required' 
+            return res.status(400).json({
+                message: 'Product image is required'
             });
         }
 
@@ -130,7 +130,7 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
 
     } catch (error) {
         console.error('Create product error:', error);
-        
+
         // Delete uploaded file if product creation fails
         if (req.file) {
             try {
@@ -140,8 +140,8 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
             }
         }
 
-        res.status(500).json({ 
-            message: 'Internal server error' 
+        res.status(500).json({
+            message: 'Internal server error'
         });
     }
 });
@@ -153,8 +153,8 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
 
         const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ 
-                message: 'Product not found' 
+            return res.status(404).json({
+                message: 'Product not found'
             });
         }
 
@@ -189,7 +189,7 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
 
     } catch (error) {
         console.error('Update product error:', error);
-        
+
         // Delete uploaded file if update fails
         if (req.file) {
             try {
@@ -199,8 +199,8 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
             }
         }
 
-        res.status(500).json({ 
-            message: 'Internal server error' 
+        res.status(500).json({
+            message: 'Internal server error'
         });
     }
 });
@@ -210,8 +210,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) {
-            return res.status(404).json({ 
-                message: 'Product not found' 
+            return res.status(404).json({
+                message: 'Product not found'
             });
         }
 
@@ -230,8 +230,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
     } catch (error) {
         console.error('Delete product error:', error);
-        res.status(500).json({ 
-            message: 'Internal server error' 
+        res.status(500).json({
+            message: 'Internal server error'
         });
     }
 });

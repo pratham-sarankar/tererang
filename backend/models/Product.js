@@ -40,7 +40,7 @@ const productSchema = new mongoose.Schema({
 });
 
 // Update updatedAt field before saving
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
 });

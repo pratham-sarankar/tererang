@@ -35,7 +35,7 @@ const setupAdmin = async () => {
         console.log(`Username: ${adminData.username}`);
         console.log(`Password: ${adminData.password}`);
         console.log('\n⚠️  Please change the password after first login for security!');
-        
+
     } catch (error) {
         console.error('❌ Error setting up admin:', error.message);
     } finally {
