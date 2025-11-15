@@ -1,7 +1,7 @@
 // backend/server.js
+import 'dotenv/config'
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
@@ -11,8 +11,6 @@ import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 
-// Load environment variables
-dotenv.config({ path: '.env' });
 
 // Connect to database
 connectDB();

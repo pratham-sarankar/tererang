@@ -1,207 +1,83 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Card from "./Card";
 import banner from "../components/Banner.png";
+import { apiUrl, imageUrl } from "../config/env.js";
+
+const LATEST_COLLECTION_LIMIT = 12;
+const FALLBACK_IMAGE = "https://via.placeholder.com/400x600?text=Tererang";
+
+const resolveImageSrc = (productImage, images = []) => {
+  const candidate = productImage || images?.[0];
+  if (!candidate) return FALLBACK_IMAGE;
+  return /^https?:\/\//i.test(candidate) ? candidate : imageUrl(candidate);
+};
+
+const titleCase = (value) => {
+  if (!value) return "Tererang";
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
 
 const Home = () => {
-  // Common product data (you can replace later with API)
-  const products = [
-    {
-          id: 1,
-          title: "Royal Blue Sharara Suit",
-          description: "Elegant royal blue sharara suit with intricate mirror work, soft rayon fabric, and a matching dupatta. Perfect for evening events.",
-          brand: "Tere Rang",
-          oldPrice: "₹5,999",
-          newPrice: "₹4,299",
-          image: "https://img.faballey.com/images/Product/XKS21678A/d4.jpg", // Main image
-          additionalImages: [ // Added multiple images
-            "https://img.faballey.com/images/Product/XKS21678A/d1.jpg",
-            "https://img.faballey.com/images/Product/XKS21678A/d2.jpg",
-            "https://img.faballey.com/images/Product/XKS21678A/d3.jpg",
-            "https://img.faballey.com/images/Product/XKS21678A/d5.jpg",
-          ],
-          sizes: ["S", "M", "L", "XL"],
-          heightOptions: ["Up to 5'3''", "5'4''-5'6''", "5'6'' and above"],
-          highlights: [
-              { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-              { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-              { icon: 'Ruler', text: 'Custom Fitting Available' }
-          ]
-        },
-        {
-          id: 2,
-          title: "Emerald Green Georgette Set",
-          description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-          brand: "Tere Rang",
-          oldPrice: "₹7,499",
-          newPrice: "₹5,850",
-          image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-          additionalImages: [
-            "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-            "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-            "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-            "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-          ],
-          sizes: ["M", "L", "XL", "XXL"],
-          heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-          highlights: [
-              { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-              { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-              { icon: 'Ruler', text: 'Custom Fitting Available' }
-          ]
-        },
-      {
-            id: 3,
-            title: "Velvet Party Wear Suit",
-            description: "Luxury velvet suit with heavy Zari work, perfect for winter weddings and grand events.",
-            brand: "Tere Rang",
-            oldPrice: "₹12,999",
-            newPrice: "₹9,850",
-            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6sV4c_2_s0OQ5OqW_7i3C-Nl8jB2k5b1yYw&s",
-            additionalImages: [
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7kS9i0z6w2y0g-9dF8V7l8zT4w5-2gR6fFw&s",
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8lY4qYtG5e5d3g-G4r4yP3w4F8k5V9i7-Q&s",
-            ],
-            sizes: ["M", "L", "XL", "XXL"],
-            heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-            highlights: [
-                { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-                { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-                { icon: 'Ruler', text: 'Custom Fitting Available' }
-            ]
-          },
-        {
-            id: 4,
-            title: "Yellow Mustard Cotton Kurti",
-            description: "Bright yellow mustard pure cotton kurti with block print design. Perfect for everyday wear or office.",
-            brand: "Tere Rang",
-            oldPrice: "₹2,499",
-            newPrice: "₹1,150",
-            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3G7_W4y9_7J-W5I8H8M8L5Y8k3C_4zG6cQ&s",
-            additionalImages: [
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhvH4x6zY0k8z2p3i0v0I9p7-P0G2n9v4bQ&s",
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7sH8-N1n3f0z7i3J7Y9v8D1v8D9f5d3G7Yw&s",
-            ],
-            sizes: ["S", "M", "L", "XL"],
-            heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-            highlights: [
-                { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-                { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-                { icon: 'Ruler', text: 'Custom Fitting Available' }
-            ]
-          },
-          // Add more products for a rich home page
-          {
-              id: 5,
-              title: "Ivory Anarkali Gown",
-              description: "Flowing ivory Anarkali gown with a gold border and lightweight net dupatta. Ideal for festivals.",
-              brand: "Tere Rang",
-              oldPrice: "₹8,000",
-              newPrice: "₹6,500",
-              image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-A7fT8Pz9x9n9P9x_7j3C-Nl8jB2k5b1yYw&s",
-              additionalImages: [],
-              sizes: ["M", "L", "XL"],
-              heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-              highlights: [
-                  { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-                  { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-                  { icon: 'Ruler', text: 'Custom Fitting Available' }
-              ]
-            },
-//     {
-     
-//      image:
-//         "https://www.libas.in/cdn/shop/files/27190.jpg?v=1756105763",
-//       brand: "Libas",
-//       title: "Women Kurta with Trousers & Dupatta",
-//       price: 2799,
-//       oldPrice: 7999,
-//       discount: 65,
-//     },
-//     {
-//       image:
-//       "https://maharanidesigner.com/wp-content/uploads/2020/08/Designer-Suits-For-Girls.jpeg.webp",
-//       brand: "Anouk",
-//       title: "Embroidered Straight Kurta Set",
-//       price: 2499,
-//       oldPrice: 9999,
-//       discount: 75,
-//     },
-//     {
-//       image:
-// "https://ibaadatbyjasmine.com/cdn/shop/files/WhatsAppImage2025-06-06at21.28.19_b8497859_540x.jpg?v=1749272465",
-//       title: "Printed Cotton Kurta Set",
-//       price: 1799,
-//       oldPrice: 5999,
-//       discount: 70,
-//     },
-//     {
-//       image:
-// "https://ibaadatbyjasmine.com/cdn/shop/files/WhatsAppImage2025-07-18at16.41.24_54276767_540x.jpg?v=1754128491",
-//       brand: "Aaghnya",
-//       title: "Women Printed Kurta Set",
-//       price: 750,
-//       oldPrice: 4345,
-//       discount: 83,
-//     },
-//     { image:
-//       "https://www.libas.in/cdn/shop/files/27190.jpg?v=1756105763",
-//     brand: "Libas",
-//     title: "Women Kurta with Trousers & Dupatta",
-//     price: 2799,
-//     oldPrice: 7999,
-//     discount: 65,
-//   },
-//   {
-//     image:
-//     "https://maharanidesigner.com/wp-content/uploads/2020/08/Designer-Suits-For-Girls.jpeg.webp",
-//     brand: "Anouk",
-//     title: "Embroidered Straight Kurta Set",
-//     price: 2499,
-//     oldPrice: 9999,
-//     discount: 75,
-//   },
-//   {
-//     image:
-// "https://ibaadatbyjasmine.com/cdn/shop/files/WhatsAppImage2025-06-06at21.28.19_b8497859_540x.jpg?v=1749272465",
-//     title: "Printed Cotton Kurta Set",
-//     price: 1799,
-//     oldPrice: 5999,
-//     discount: 70,
-//   },
-//   {
-//     image:
-// "https://ibaadatbyjasmine.com/cdn/shop/files/WhatsAppImage2025-07-18at16.41.24_54276767_540x.jpg?v=1754128491",
-//     brand: "Aaghnya",
-//     title: "Women Printed Kurta Set",
-//     price: 750,
-//     oldPrice: 4345,
-//     discount: 83,
-//   },
-  ];
+  const [latestProducts, setLatestProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [reloadFlag, setReloadFlag] = useState(0);
 
-  // reusable section component
-  const renderSection = (title, gradient) => (
-    <section className="mb-16">
-      <h2
-        className={`text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 text-white py-3 rounded-lg shadow-lg ${gradient}`}
-      >
-        {title}
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {products.map((item, i) => (
-          <Card
-            key={i}
-            image={item.image}
-            brand={item.brand}
-            title={item.title}
-            price={item.price}
-            oldPrice={item.oldPrice}
-            discount={item.discount}
-          />
-        ))}
-      </div>
-    </section>
+  const latestProductsEndpoint = useMemo(
+    () => apiUrl(`/api/products?limit=${LATEST_COLLECTION_LIMIT}`),
+    []
   );
+
+  useEffect(() => {
+    if (!latestProductsEndpoint) {
+      setLoading(false);
+      setError("Missing backend URL. Please configure VITE_BACKEND_URL.");
+      return undefined;
+    }
+
+    let isActive = true;
+    const controller = new AbortController();
+
+    const fetchLatestProducts = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(latestProductsEndpoint, {
+          signal: controller.signal,
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load products");
+        }
+
+        if (isActive) {
+          setLatestProducts(Array.isArray(data.products) ? data.products : []);
+          setError(null);
+        }
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        if (isActive) {
+          setError(err.message || "Unable to load products right now.");
+        }
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchLatestProducts();
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [latestProductsEndpoint, reloadFlag]);
+
+  const handleReload = () => setReloadFlag((flag) => flag + 1);
 
   return (
     <>
@@ -227,11 +103,53 @@ const Home = () => {
 
       {/* Main Product Sections */}
       <div className="max-w-7xl mx-auto px-6">
-        {renderSection("🛍️ Latest Collection", "bg-gradient-to-r from-pink-500 to-rose-500")}
-        {renderSection("✨ Featured Products", "bg-gradient-to-r from-purple-500 to-indigo-500")}
-        {renderSection("🔥 Trending Now", "bg-gradient-to-r from-orange-400 to-red-500")}
-        {renderSection("🌸 New Arrivals", "bg-gradient-to-r from-teal-400 to-cyan-500")}
-        {renderSection("💥 Best Offers", "bg-gradient-to-r from-green-400 to-emerald-500")}
+        <section className="mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 text-white py-3 rounded-lg shadow-lg bg-gradient-to-r from-pink-500 to-rose-500">
+            🛍️ Latest Collection
+          </h2>
+
+          {loading && (
+            <div className="text-center text-gray-500 py-10">
+              Fetching the freshest looks for you...
+            </div>
+          )}
+
+          {!loading && error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <p>{error}</p>
+              <button
+                type="button"
+                onClick={handleReload}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && latestProducts.length === 0 && (
+            <div className="text-center text-gray-500 py-10">
+              No products have been added yet. Check back soon!
+            </div>
+          )}
+
+          {!error && latestProducts.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              {latestProducts.map((product) => (
+                <Card
+                  key={product._id || product.id}
+                  image={resolveImageSrc(product.image, product.images)}
+                  brand={titleCase(product.category)}
+                  title={product.name}
+                  description={product.description}
+                  price={product.price}
+                  oldPrice={product.oldPrice}
+                  discount={product.discount}
+                />
+              ))}
+            </div>
+          )}
+        </section>
       </div>
       <footer className="bg-gradient-to-b from-gray-900 via-gray-950 to-black text-gray-300 pt-16 pb-10 mt-16">
   <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
