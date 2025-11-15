@@ -14,7 +14,7 @@ export default function AdminDashboard() {
         description: '',
         category: 'kurti',
         inStock: true,
-        image: null
+        images: []
     });
     const navigate = useNavigate();
 
@@ -58,9 +58,10 @@ export default function AdminDashboard() {
                 [name]: checked
             }));
         } else if (type === 'file') {
+            // Allow multiple file selection
             setFormData(prev => ({
                 ...prev,
-                [name]: files[0]
+                [name]: Array.from(files)
             }));
         } else {
             setFormData(prev => ({
@@ -81,8 +82,8 @@ export default function AdminDashboard() {
         submitData.append('category', formData.category);
         submitData.append('inStock', formData.inStock);
         
-        if (formData.image) {
-            submitData.append('image', formData.image);
+        if (formData.images && formData.images.length > 0) {
+            formData.images.forEach((file) => submitData.append('images', file));
         }
 
         try {
@@ -123,7 +124,7 @@ export default function AdminDashboard() {
             description: product.description || '',
             category: product.category,
             inStock: product.inStock,
-            image: null
+            images: [] // user may upload new images to replace existing
         });
         setShowAddForm(true);
     };
@@ -163,7 +164,7 @@ export default function AdminDashboard() {
             description: '',
             category: 'kurti',
             inStock: true,
-            image: null
+            images: []
         });
         setEditingProduct(null);
         setShowAddForm(false);
@@ -269,15 +270,28 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="image">Product Image</label>
+                            <label htmlFor="images">Product Images</label>
                             <input
                                 type="file"
-                                id="image"
-                                name="image"
+                                id="images"
+                                name="images"
                                 onChange={handleInputChange}
                                 accept="image/*"
+                                multiple
                                 required={!editingProduct}
                             />
+                            {editingProduct && Array.isArray(editingProduct.images) && editingProduct.images.length > 0 && (
+                                <div style={{ marginTop: 10 }}>
+                                    <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>
+                                        Current Images (uploading new ones will replace all):
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                                        {editingProduct.images.map((img) => (
+                                            <img key={img} src={`http://localhost:3001/uploads/${img}`} alt="preview" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4, border: '1px solid #eee' }} />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="form-actions">
@@ -298,7 +312,7 @@ export default function AdminDashboard() {
                     {products.map((product) => (
                         <div key={product._id} className="product-card">
                             <img 
-                                src={`http://localhost:3001/uploads/${product.image}`} 
+                                src={`http://localhost:3001/uploads/${(product.images && product.images[0]) ? product.images[0] : product.image}`} 
                                 alt={product.name}
                                 className="product-image"
                             />

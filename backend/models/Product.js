@@ -11,10 +11,16 @@ const productSchema = new mongoose.Schema({
         required: true,
         min: 0
     },
+    // Legacy single image field kept for backward compatibility (primary image)
     image: {
         type: String,
         required: true,
         trim: true
+    },
+    // New: support multiple images per product
+    images: {
+        type: [String],
+        default: []
     },
     description: {
         type: String,
@@ -39,9 +45,13 @@ const productSchema = new mongoose.Schema({
     }
 });
 
-// Update updatedAt field before saving
+// Update timestamps and ensure primary image mirrors first images[] item when applicable
 productSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
+    // If multiple images provided but primary not set, use the first one
+    if ((!this.image || this.image.length === 0) && Array.isArray(this.images) && this.images.length > 0) {
+        this.image = this.images[0];
+    }
     next();
 });
 

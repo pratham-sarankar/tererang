@@ -19,7 +19,7 @@ export default function ProductsKurtti() {
             if (response.ok) {
                 // Transform the products to match the Card component's expected format
                 const transformedProducts = data.products.map(product => ({
-                    image: `http://localhost:3001/uploads/${product.image}`,
+                    image: `http://localhost:3001/uploads/${(product.images && product.images[0]) ? product.images[0] : product.image}`,
                     name: product.name,
                     price: product.price,
                     id: product._id

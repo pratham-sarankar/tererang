@@ -92,8 +92,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Create new product (admin only)
-router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
+// Create new product (admin only) - supports multiple images
+router.post('/', authMiddleware, upload.array('images', 8), async (req, res) => {
     try {
         const { name, price, description, category, inStock } = req.body;
 
@@ -104,17 +104,18 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
             });
         }
 
-        // Check if image was uploaded
-        if (!req.file) {
+        // Check if at least one image was uploaded
+        if (!req.files || req.files.length === 0) {
             return res.status(400).json({
-                message: 'Product image is required'
+                message: 'At least one product image is required'
             });
         }
 
         const productData = {
             name,
             price: parseFloat(price),
-            image: req.file.filename,
+            image: req.files[0].filename,
+            images: req.files.map(f => f.filename),
             description: description || '',
             category: category || 'kurti',
             inStock: inStock !== 'false'
@@ -131,13 +132,17 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
     } catch (error) {
         console.error('Create product error:', error);
 
-        // Delete uploaded file if product creation fails
-        if (req.file) {
-            try {
-                await fs.unlink(path.join(__dirname, '../public/images', req.file.filename));
-            } catch (unlinkError) {
-                console.error('Error deleting file:', unlinkError);
-            }
+        // Delete uploaded files if product creation fails
+        if (req.files && req.files.length > 0) {
+            await Promise.all(
+                req.files.map(async (file) => {
+                    try {
+                        await fs.unlink(path.join(__dirname, '../public/images', file.filename));
+                    } catch (unlinkError) {
+                        console.error('Error deleting file:', unlinkError);
+                    }
+                })
+            );
         }
 
         res.status(500).json({
@@ -146,8 +151,8 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
     }
 });
 
-// Update product (admin only)
-router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
+// Update product (admin only) - supports replacing images
+router.put('/:id', authMiddleware, upload.array('images', 8), async (req, res) => {
     try {
         const { name, price, description, category, inStock } = req.body;
 
@@ -165,15 +170,25 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
         if (category) updateData.category = category;
         if (inStock !== undefined) updateData.inStock = inStock !== 'false';
 
-        // Handle image update
-        if (req.file) {
-            // Delete old image file
-            try {
-                await fs.unlink(path.join(__dirname, '../public/images', product.image));
-            } catch (error) {
-                console.error('Error deleting old image:', error);
-            }
-            updateData.image = req.file.filename;
+        // Handle images update: if new files provided, replace all images
+        if (req.files && req.files.length > 0) {
+            // Delete old image files
+            const oldFiles = Array.isArray(product.images) && product.images.length > 0
+                ? product.images
+                : (product.image ? [product.image] : []);
+
+            await Promise.all(
+                oldFiles.map(async (filename) => {
+                    try {
+                        await fs.unlink(path.join(__dirname, '../public/images', filename));
+                    } catch (error) {
+                        console.error('Error deleting old image:', error);
+                    }
+                })
+            );
+
+            updateData.images = req.files.map(f => f.filename);
+            updateData.image = req.files[0].filename; // keep primary in sync
         }
 
         const updatedProduct = await Product.findByIdAndUpdate(
@@ -190,13 +205,17 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
     } catch (error) {
         console.error('Update product error:', error);
 
-        // Delete uploaded file if update fails
-        if (req.file) {
-            try {
-                await fs.unlink(path.join(__dirname, '../public/images', req.file.filename));
-            } catch (unlinkError) {
-                console.error('Error deleting file:', unlinkError);
-            }
+        // Delete uploaded files if update fails
+        if (req.files && req.files.length > 0) {
+            await Promise.all(
+                req.files.map(async (file) => {
+                    try {
+                        await fs.unlink(path.join(__dirname, '../public/images', file.filename));
+                    } catch (unlinkError) {
+                        console.error('Error deleting file:', unlinkError);
+                    }
+                })
+            );
         }
 
         res.status(500).json({
@@ -215,12 +234,20 @@ router.delete('/:id', authMiddleware, async (req, res) => {
             });
         }
 
-        // Delete image file
-        try {
-            await fs.unlink(path.join(__dirname, '../public/images', product.image));
-        } catch (error) {
-            console.error('Error deleting image file:', error);
-        }
+        // Delete image files (all if array exists, else legacy single)
+        const filesToDelete = Array.isArray(product.images) && product.images.length > 0
+            ? product.images
+            : (product.image ? [product.image] : []);
+
+        await Promise.all(
+            filesToDelete.map(async (filename) => {
+                try {
+                    await fs.unlink(path.join(__dirname, '../public/images', filename));
+                } catch (error) {
+                    console.error('Error deleting image file:', error);
+                }
+            })
+        );
 
         await Product.findByIdAndDelete(req.params.id);
 
