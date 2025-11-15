@@ -22,9 +22,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware
-const allowedOrigin = process.env.FRONTEND_URL || '*';
+// CORS: In development allow any localhost origin; in production restrict to FRONTEND_URL
+const frontendUrl = process.env.FRONTEND_URL;
+const isProd = process.env.NODE_ENV === 'production';
 app.use(cors({
-  origin: allowedOrigin,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow non-browser or same-origin
+    if (!isProd) {
+      // Allow any localhost:* during development to avoid port mismatch issues
+      if (/^https?:\/\/localhost(?::\d+)?$/.test(origin)) return callback(null, true);
+    }
+    if (frontendUrl && origin === frontendUrl) return callback(null, true);
+    return callback(new Error('CORS not allowed from this origin'), false);
+  },
   credentials: true,
 }));
 app.use(express.json());
