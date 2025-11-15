@@ -9,6 +9,10 @@ import Contact from "./pages/Contact";
 import Deals from "./pages/Deals";
 import Categories from "./pages/Categories";
 
+// Admin Components
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+
 // Products
 import Kurti from "./products/Kurti";
 import Suit from "./products/Suit";
@@ -46,6 +50,10 @@ function App() {
         {/* Auth Routes */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        
+        {/* Admin Routes */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
         {/* Products */}
         <Route path="/products/Kurti" element={<Kurti />} />
