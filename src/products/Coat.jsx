@@ -1,353 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Heart, ArrowLeft, Zap, Gift, Ruler, CheckCircle, Share2 } from 'lucide-react';
-
-// -------------------------------------------------------------------
-// 1. DATA (Sharara Collection) - UPDATED WITH MULTIPLE IMAGES
-// -------------------------------------------------------------------
-
-const shararaData = [
-  {
-    id: 1,
-    title: "Royal Blue Sharara Suit",
-    description: "Elegant royal blue sharara suit with intricate mirror work, soft rayon fabric, and a matching dupatta. Perfect for evening events.",
-    brand: "Tere Rang",
-    oldPrice: "₹5,999",
-    newPrice: "₹4,299",
-    image: "https://img.faballey.com/images/Product/XKS21678A/d4.jpg", // Main image
-    additionalImages: [ // Added multiple images
-      "https://img.faballey.com/images/Product/XKS21678A/d1.jpg",
-      "https://img.faballey.com/images/Product/XKS21678A/d2.jpg",
-      "https://img.faballey.com/images/Product/XKS21678A/d3.jpg",
-      "https://img.faballey.com/images/Product/XKS21678A/d5.jpg",
-    ],
-    sizes: ["S", "M", "L", "XL"],
-    heightOptions: ["Up to 5'3''", "5'4''-5'6''", "5'6'' and above"],
-    highlights: [
-        { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-        { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-        { icon: 'Ruler', text: 'Custom Fitting Available' }
-    ]
-  },
-  {
-    id: 2,
-    title: "Emerald Green Georgette Set",
-    description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-    brand: "Tere Rang",
-    oldPrice: "₹7,499",
-    newPrice: "₹5,850",
-    image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-    additionalImages: [
-      "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-      "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-      "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-      "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-    ],
-    sizes: ["M", "L", "XL", "XXL"],
-    heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-    highlights: [
-        { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-        { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-        { icon: 'Ruler', text: 'Custom Fitting Available' }
-    ]
-  },
-{
-      id: 3,
-      title: "Emerald Green Georgette Set",
-      description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-      brand: "Tere Rang",
-      oldPrice: "₹7,499",
-      newPrice: "₹5,850",
-      image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-      additionalImages: [
-        "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-        "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-        "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-        "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-      ],
-      sizes: ["M", "L", "XL", "XXL"],
-      heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-      highlights: [
-          { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-          { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-          { icon: 'Ruler', text: 'Custom Fitting Available' }
-      ]
-    },
-  {
-        id: 4,
-        title: "Emerald Green Georgette Set",
-        description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-        brand: "Tere Rang",
-        oldPrice: "₹7,499",
-        newPrice: "₹5,850",
-        image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-        additionalImages: [
-          "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-          "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-          "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-          "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-        ],
-        sizes: ["M", "L", "XL", "XXL"],
-        heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-        highlights: [
-            { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-            { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-            { icon: 'Ruler', text: 'Custom Fitting Available' }
-        ]
-      },
-    {
-          id: 5,
-          title: "Emerald Green Georgette Set",
-          description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-          brand: "Tere Rang",
-          oldPrice: "₹7,499",
-          newPrice: "₹5,850",
-          image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-          additionalImages: [
-            "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-            "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-            "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-            "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-          ],
-          sizes: ["M", "L", "XL", "XXL"],
-          heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-          highlights: [
-              { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-              { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-              { icon: 'Ruler', text: 'Custom Fitting Available' }
-          ]
-        },
-      {
-            id: 6,
-            title: "Emerald Green Georgette Set",
-            description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-            brand: "Tere Rang",
-            oldPrice: "₹7,499",
-            newPrice: "₹5,850",
-            image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-            additionalImages: [
-              "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-              "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-              "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-              "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-            ],
-            sizes: ["M", "L", "XL", "XXL"],
-            heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-            highlights: [
-                { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-                { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-                { icon: 'Ruler', text: 'Custom Fitting Available' }
-            ]
-          },
-  {
-    id: 7,
-    title: "Pastel Pink Chikankari Sharara",
-    description: "Soft pastel pink cotton sharara featuring traditional Lucknowi Chikankari work. Ideal for casual daytime festivities.",
-    brand: "Tere Rang",
-    oldPrice: "₹4,500",
-    newPrice: "₹3,199",
-    image: "https://img.faballey.com/images/Product/XKU09308Z/d4.jpg",
-    additionalImages: [
-      "https://img.faballey.com/images/Product/XKU09308Z/d1.jpg",
-      "https://img.faballey.com/images/Product/XKU09308Z/d2.jpg",
-      "https://img.faballey.com/images/Product/XKU09308Z/d3.jpg",
-      "https://img.faballey.com/images/Product/XKU09308Z/d5.jpg",
-    ],
-    sizes: ["S", "M", "L"],
-    heightOptions: ["Up to 5'3''", "5'4''-5'6''"],
-    highlights: [
-        { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-        { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-        { icon: 'Ruler', text: 'Custom Fitting Available' }
-    ]
-  },
-{
-      id: 8,
-      title: "Royal Blue Sharara Suit",
-      description: "Elegant royal blue sharara suit with intricate mirror work, soft rayon fabric, and a matching dupatta. Perfect for evening events.",
-      brand: "Tere Rang",
-      oldPrice: "₹5,999",
-      newPrice: "₹4,299",
-      image: "https://img.faballey.com/images/Product/XKS21678A/d4.jpg", // Main image
-      additionalImages: [ // Added multiple images
-        "https://img.faballey.com/images/Product/XKS21678A/d1.jpg",
-        "https://img.faballey.com/images/Product/XKS21678A/d2.jpg",
-        "https://img.faballey.com/images/Product/XKS21678A/d3.jpg",
-        "https://img.faballey.com/images/Product/XKS21678A/d5.jpg",
-      ],
-      sizes: ["S", "M", "L", "XL"],
-      heightOptions: ["Up to 5'3''", "5'4''-5'6''", "5'6'' and above"],
-      highlights: [
-          { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-          { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-          { icon: 'Ruler', text: 'Custom Fitting Available' }
-      ]
-    },
-    {
-      id: 9,
-      title: "Emerald Green Georgette Set",
-      description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-      brand: "Tere Rang",
-      oldPrice: "₹7,499",
-      newPrice: "₹5,850",
-      image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-      additionalImages: [
-        "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-        "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-        "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-        "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-      ],
-      sizes: ["M", "L", "XL", "XXL"],
-      heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-      highlights: [
-          { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-          { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-          { icon: 'Ruler', text: 'Custom Fitting Available' }
-      ]
-    },
-  {
-        id: 10,
-        title: "Emerald Green Georgette Set",
-        description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-        brand: "Tere Rang",
-        oldPrice: "₹7,499",
-        newPrice: "₹5,850",
-        image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-        additionalImages: [
-          "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-          "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-          "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-          "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-        ],
-        sizes: ["M", "L", "XL", "XXL"],
-        heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-        highlights: [
-            { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-            { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-            { icon: 'Ruler', text: 'Custom Fitting Available' }
-        ]
-      },
-    {
-          id: 11,
-          title: "Emerald Green Georgette Set",
-          description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-          brand: "Tere Rang",
-          oldPrice: "₹7,499",
-          newPrice: "₹5,850",
-          image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-          additionalImages: [
-            "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-            "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-            "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-            "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-          ],
-          sizes: ["M", "L", "XL", "XXL"],
-          heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-          highlights: [
-              { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-              { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-              { icon: 'Ruler', text: 'Custom Fitting Available' }
-          ]
-        },
-      {
-            id: 12,
-            title: "Emerald Green Georgette Set",
-            description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-            brand: "Tere Rang",
-            oldPrice: "₹7,499",
-            newPrice: "₹5,850",
-            image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-            additionalImages: [
-              "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-              "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-              "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-              "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-            ],
-            sizes: ["M", "L", "XL", "XXL"],
-            heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-            highlights: [
-                { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-                { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-                { icon: 'Ruler', text: 'Custom Fitting Available' }
-            ]
-          },
-        {
-              id: 13,
-              title: "Emerald Green Georgette Set",
-              description: "Lustrous emerald green sharara set made from lightweight georgette with delicate thread embroidery. Comes with a full-length sleeve kurta.",
-              brand: "Tere Rang",
-              oldPrice: "₹7,499",
-              newPrice: "₹5,850",
-              image: "https://img.faballey.com/images/Product/XKS28726A/d4.jpg",
-              additionalImages: [
-                "https://img.faballey.com/images/Product/XKS28726A/d1.jpg",
-                "https://img.faballey.com/images/Product/XKS28726A/d2.jpg",
-                "https://img.faballey.com/images/Product/XKS28726A/d3.jpg",
-                "https://img.faballey.com/images/Product/XKS28726A/d5.jpg",
-              ],
-              sizes: ["M", "L", "XL", "XXL"],
-              heightOptions: ["5'4''-5'6''", "5'6'' and above"],
-              highlights: [
-                  { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-                  { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-                  { icon: 'Ruler', text: 'Custom Fitting Available' }
-              ]
-            },
-    {
-      id: 14,
-      title: "Pastel Pink Chikankari Sharara",
-      description: "Soft pastel pink cotton sharara featuring traditional Lucknowi Chikankari work. Ideal for casual daytime festivities.",
-      brand: "Tere Rang",
-      oldPrice: "₹4,500",
-      newPrice: "₹3,199",
-      image: "https://img.faballey.com/images/Product/XKU09308Z/d4.jpg",
-      additionalImages: [
-        "https://img.faballey.com/images/Product/XKU09308Z/d1.jpg",
-        "https://img.faballey.com/images/Product/XKU09308Z/d2.jpg",
-        "https://img.faballey.com/images/Product/XKU09308Z/d3.jpg",
-        "https://img.faballey.com/images/Product/XKU09308Z/d5.jpg",
-      ],
-      sizes: ["S", "M", "L"],
-      heightOptions: ["Up to 5'3''", "5'4''-5'6''"],
-      highlights: [
-          { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-          { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-          { icon: 'Ruler', text: 'Custom Fitting Available' }
-      ]
-    },
-  {
-        id: 15,
-        title: "Pastel Pink Chikankari Sharara",
-        description: "Soft pastel pink cotton sharara featuring traditional Lucknowi Chikankari work. Ideal for casual daytime festivities.",
-        brand: "Tere Rang",
-        oldPrice: "₹4,500",
-        newPrice: "₹3,199",
-        image: "https://img.faballey.com/images/Product/XKU09308Z/d4.jpg",
-        additionalImages: [
-          "https://img.faballey.com/images/Product/XKU09308Z/d1.jpg",
-          "https://img.faballey.com/images/Product/XKU09308Z/d2.jpg",
-          "https://img.faballey.com/images/Product/XKU09308Z/d3.jpg",
-          "https://img.faballey.com/images/Product/XKU09308Z/d5.jpg",
-        ],
-        sizes: ["S", "M", "L"],
-        heightOptions: ["Up to 5'3''", "5'4''-5'6''"],
-        highlights: [
-            { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
-            { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-            { icon: 'Ruler', text: 'Custom Fitting Available' }
-        ]
-      },
-];
+import { apiUrl, imageUrl } from '../config/env.js';
 
 // Icon mapping helper for highlights
 const IconMap = { Zap, Gift, Ruler };
-
 
 // -------------------------------------------------------------------
 // 2. PRODUCT DETAIL COMPONENT (UPDATED)
 // -------------------------------------------------------------------
 
-const ProductDetail = ({ productId, switchView }) => {
-  const product = shararaData.find((item) => item.id === productId);
+const ProductDetail = ({ productId, switchView, data }) => {
+  const product = data.find((item) => item.id === productId);
   const [selectedSize, setSelectedSize] = useState(''); // Initial state can be empty
   const [selectedHeight, setSelectedHeight] = useState(''); // Initial state can be empty
   const [isAdded, setIsAdded] = useState(false);
@@ -398,7 +61,7 @@ const ProductDetail = ({ productId, switchView }) => {
   };
 
   // Filter out the current product from "You may also like" section
-  const relatedProducts = shararaData.filter(item => item.id !== product.id).slice(0, 3);
+  const relatedProducts = data.filter(item => item.id !== product.id).slice(0, 3);
 
 
   return (
@@ -589,7 +252,7 @@ const ProductCard = ({ product, switchView }) => (
   </div>
 );
 
-const ProductList = ({ switchView }) => (
+const ProductList = ({ data, switchView }) => (
   <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-6 sm:p-10">
     <div className="text-center mb-16 pt-8">
         {/* Outer Black Border */}
@@ -602,7 +265,7 @@ const ProductList = ({ switchView }) => (
         </div>
     </div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-      {shararaData.map((product) => (
+      {data.map((product) => (
         <ProductCard key={product.id} product={product} switchView={switchView} />
       ))}
     </div>
@@ -616,17 +279,138 @@ const ProductList = ({ switchView }) => (
 export default function App() {
   // state to manage the current view: null for list, product ID for detail view
   const [currentProductId, setCurrentProductId] = useState(null);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const switchView = (id) => {
     setCurrentProductId(id);
   };
 
+  const toINR = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch(apiUrl('/api/products?category=coat'));
+        const json = await res.json();
+        if (res.ok) {
+          const mapped = (json.products || []).map((p) => {
+            const primary = (p.images && p.images[0]) ? p.images[0] : p.image;
+            const others = (p.images || []).filter((fn) => fn !== primary);
+            return {
+              id: p._id,
+              title: p.name,
+              description: p.description || '',
+              brand: 'Tere Rang',
+              oldPrice: toINR(Math.round((p.price || 0) * 1.2)),
+              newPrice: toINR(p.price || 0),
+              image: imageUrl(primary),
+              additionalImages: others.map((fn) => imageUrl(fn)),
+              sizes: ['S', 'M', 'L', 'XL'],
+              heightOptions: ["Up to 5'3''", "5'4''-5'6''", "5'6'' and above"],
+              highlights: [
+                { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
+                { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
+                { icon: 'Ruler', text: 'Custom Fitting Available' },
+              ],
+            };
+          });
+          setData(mapped);
+        } else {
+          setError(json.message || 'Failed to fetch products');
+        }
+      } catch (e) {
+        console.error('Fetch products error:', e);
+        setError('Network error. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const dataset = data; // always use backend data
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-600">
+        Loading products...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-gray-700 p-6">
+        <p className="mb-4">{error}</p>
+        <button
+          className="px-4 py-2 rounded bg-purple-600 text-white"
+          onClick={() => {
+            setLoading(true);
+            setError('');
+            (async () => {
+              try {
+                const res = await fetch(apiUrl('/api/products?category=coat'));
+                const json = await res.json();
+                if (res.ok) {
+                  const mapped = (json.products || []).map((p) => {
+                    const primary = (p.images && p.images[0]) ? p.images[0] : p.image;
+                    const others = (p.images || []).filter((fn) => fn !== primary);
+                    return {
+                      id: p._id,
+                      title: p.name,
+                      description: p.description || '',
+                      brand: 'Tere Rang',
+                      oldPrice: toINR(Math.round((p.price || 0) * 1.2)),
+                      newPrice: toINR(p.price || 0),
+                      image: imageUrl(primary),
+                      additionalImages: others.map((fn) => imageUrl(fn)),
+                      sizes: ['S', 'M', 'L', 'XL'],
+                      heightOptions: ["Up to 5'3''", "5'4''-5'6''", "5'6'' and above"],
+                      highlights: [
+                        { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
+                        { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
+                        { icon: 'Ruler', text: 'Custom Fitting Available' },
+                      ],
+                    };
+                  });
+                  setData(mapped);
+                  setError('');
+                } else {
+                  setError(json.message || 'Failed to fetch products');
+                }
+              } catch (e) {
+                setError('Network error. Please try again.');
+              } finally {
+                setLoading(false);
+              }
+          })();
+          }}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (dataset.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-gray-700 p-6">
+        <p className="mb-2 text-lg">No products found in Coat category.</p>
+        <p className="text-sm text-gray-500">Add products in the admin panel or try again later.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="font-sans antialiased">
       {currentProductId ? (
-        <ProductDetail productId={currentProductId} switchView={switchView} />
+        <ProductDetail productId={currentProductId} switchView={switchView} data={dataset} />
       ) : (
-        <ProductList switchView={switchView} />
+        <ProductList switchView={switchView} data={dataset} />
       )}
     </div>
   );
