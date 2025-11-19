@@ -1,0 +1,28 @@
+# Sensitive files - DO NOT COMMIT
+serviceAccountKey.json
+*.json.bak
+*.pem
+*.p12
+*.key
+*.crt
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# AWS credentials
+.aws/
+aws-exports.js
+
+# Google Cloud
+gcloud/
+.gcloud/
+google-cloud-key.json
+*-service-account-*.json
+
+# Other secrets
+secrets/
+private/
