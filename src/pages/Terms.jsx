@@ -49,7 +49,7 @@ const App = () => {
                 {/* Main Content Area: Terms and Conditions */}
                 <main>
                     <div className="max-w-7xl mx-auto px-6 pb-16">
-                        
+
                         {/* Introduction */}
                         <div className="bg-gray-100 p-8 rounded-xl mb-12 shadow-md">
                             <p className="text-lg leading-relaxed text-gray-700">
@@ -66,7 +66,7 @@ const App = () => {
                             {/* 1. Product and Order Terms */}
                             <div className="bg-white p-8 shadow-lg border border-gray-200 rounded-xl">
                                 <h2 className={`text-3xl font-bold ${ACCENT_COLOR_CLASS} mb-6 border-b-2 pb-3 border-gray-200`}>1. Product & Order Terms</h2>
-                                
+
                                 <h3 className={`text-xl font-semibold ${ACCENT_COLOR_CLASS} mt-6 mb-2`}>Order Confirmation and Availability</h3>
                                 <p className="text-gray-700">
                                     All orders are subject to product availability and the confirmation of the order price. While we strive to maintain accurate inventory, placing an item in your cart does not guarantee its availability.
@@ -87,11 +87,11 @@ const App = () => {
                                     </ul>
                                 </div>
                             </div>
-                            
+
                             {/* 2. Payment, Cancellation, and Refund Policy */}
                             <div className="bg-white p-8 shadow-lg border border-gray-200 rounded-xl">
                                 <h2 className={`text-3xl font-bold ${ACCENT_COLOR_CLASS} mb-6 border-b-2 pb-3 border-gray-200`}>2. Payment, Cancellation & Refunds</h2>
-                                
+
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                                     {/* Payment Policy Card (Left) */}
@@ -105,14 +105,14 @@ const App = () => {
                                             We **do not** offer Cash on Delivery (COD) services. All orders must be **prepaid** through the secure payment options available at checkout, including credit/debit cards, UPI, net banking, and digital wallets.
                                         </p>
                                     </PolicyBox>
-                                    
+
                                     {/* Cancellation Policy Card (Right) */}
                                     <PolicyBox iconClass="fas fa-redo-alt" title="Order Cancellation">
                                         <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4 text-sm">
                                             <li>Orders **cannot be cancelled** once payment is confirmed.</li>
                                             <li>Please double-check your order details before making payment.</li>
                                         </ul>
-                                        
+
                                         <h3 className={`text-xl font-semibold ${ACCENT_COLOR_CLASS} mt-6 mb-2 border-t pt-3 border-gray-300`}>Refund Policy</h3>
                                         <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4 text-sm">
                                             <li>Refunds are processed **only for approved store errors** (see Section 3).</li>
@@ -127,7 +127,7 @@ const App = () => {
                             {/* 3. Return & Exchange Policy (Store Errors Only) */}
                             <div className="bg-white p-8 shadow-lg border border-gray-200 rounded-xl">
                                 <h2 className={`text-3xl font-bold ${ACCENT_COLOR_CLASS} mb-6 border-b-2 pb-3 border-gray-200`}>3. Return & Exchange Policy</h2>
-                                
+
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                                     {/* General Policy Card (Left) */}
@@ -136,14 +136,14 @@ const App = () => {
                                             We maintain a strict quality control process. We **do not accept refunds or exchanges** unless the error is clearly from our side ("Store Errors"). Kindly double-check your order details, size, and color before confirming your purchase.
                                         </p>
                                     </PolicyBox>
-                                    
+
                                     {/* Returns Accepted Card (Right) */}
-                                    <PolicyBox iconClass="fas fa-check-circle" title="Returns Accepted Only For Store Errors">
-                                        <p className="font-semibold text-gray-700 text-sm mb-2">A return will be accepted ONLY if:</p>
+                                    <PolicyBox iconClass="fas fa-check-circle" title="No returns, exchange accepted only for store errors.">
+                                        <p className="font-semibold text-gray-700 text-sm mb-2">An exchange will be accepted ONLY if:</p>
                                         <ul className="list-disc list-inside space-y-2 text-gray-600 ml-4 text-sm">
                                             <li>We sent the **wrong item, wrong size**, or a **defective product**.</li>
                                             <li>A **full unboxing video** is provided as proof. The video must be **uncut and continuous** from the moment the sealed package is opened.</li>
-                                            <li>The return process is initiated within **2-3 days** of receiving the order. Requests after this window will not be accepted.</li>
+                                            <li>The exchange process is initiated within **2-3 days** of receiving the order. Requests after this window will not be accepted.</li>
                                         </ul>
                                     </PolicyBox>
                                 </div>
@@ -153,19 +153,19 @@ const App = () => {
                             <div className="bg-white p-8 shadow-lg border border-gray-200 rounded-xl">
                                 <h2 className={`text-3xl font-bold ${ACCENT_COLOR_CLASS} mb-6 border-b-2 pb-3 border-gray-200`}>4. Additional Terms</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                                    
+
                                     <InfoCard
                                         iconClass="fas fa-box-open"
                                         title="Order Confirmation"
                                         content="All orders are subject to availability and confirmation of the order price."
                                     />
-                                    
+
                                     <InfoCard
                                         iconClass="fas fa-palette"
                                         title="Product Images"
                                         content="Colors may vary slightly due to screen settings and lighting conditions."
                                     />
-                                    
+
                                     <InfoCard
                                         iconClass="fas fa-headset"
                                         title="Customer Support"
@@ -173,11 +173,11 @@ const App = () => {
                                     />
                                 </div>
                             </div>
-                            
+
                             {/* 5. General Legal Provisions */}
                             <div className="bg-white p-8 shadow-lg border border-gray-200 rounded-xl">
                                 <h2 className={`text-3xl font-bold ${ACCENT_COLOR_CLASS} mb-6 border-b-2 pb-3 border-gray-200`}>5. General Legal Provisions</h2>
-                                
+
                                 <h3 className={`text-xl font-semibold ${ACCENT_COLOR_CLASS} mt-6 mb-2`}>Intellectual Property</h3>
                                 <p className="text-gray-700">
                                     All content on the Tererang website, including designs, text, graphics, logos, images, and software, is the property of Tererang and protected by intellectual property laws. You may not use any content without our express written permission.
@@ -203,7 +203,7 @@ const App = () => {
                                 Last Updated: October 15, 2025
                             </p>
                         </div>
-                        
+
                     </div>
                 </main>
 

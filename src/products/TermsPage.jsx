@@ -193,7 +193,7 @@ const App = () => {
                                     {/* Cancellation Policy Card (Right) */}
                                     <PolicyBox iconClass="fas fa-redo-alt" title="Order Cancellation">
                                         <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4 text-sm">
-                                            <li className={`text-base text-gray-900`}><span className={`font-extrabold ${HIGHLIGHT_COLOR_CLASS}`}>Orders cannot be cancelled</span> once payment is confirmed.</li>
+                                            <li className={`text-base text-gray-900`}><span className={`font-extrabold ${HIGHLIGHT_COLOR_CLASS}`}>Orders can be cancelled within 12 hrs</span> once payment is confirmed.</li>
                                             <li>Please double-check your order details before making payment.</li>
                                         </ul>
 
@@ -223,12 +223,12 @@ const App = () => {
                                     </PolicyBox>
 
                                     {/* Returns Accepted Card (Right) */}
-                                    <PolicyBox iconClass="fas fa-check-circle" title="Returns Accepted Only For Store Errors">
-                                        <p className="font-semibold text-gray-700 text-sm mb-2">A return will be accepted ONLY if:</p>
+                                    <PolicyBox iconClass="fas fa-check-circle" title="No returns, exchange accepted only for store errors.">
+                                        <p className="font-semibold text-gray-700 text-sm mb-2">An exchange will be accepted ONLY if:</p>
                                         <ul className="list-disc list-inside space-y-2 text-gray-600 ml-4 text-sm">
                                             <li>We sent the **wrong item, wrong size**, or a **defective product**.</li>
                                             <li className={`text-base text-gray-900`}>A <span className={`font-extrabold ${HIGHLIGHT_COLOR_CLASS}`}>full unboxing video</span> is provided as proof. The video must be **uncut and continuous** from the moment the sealed package is opened.</li>
-                                            <li>The return process is initiated within **2-3 days** of receiving the order. Requests after this window will not be accepted.</li>
+                                            <li>The exchange process is initiated within **2-3 days** of receiving the order. Requests after this window will not be accepted.</li>
                                         </ul>
                                     </PolicyBox>
                                 </div>
