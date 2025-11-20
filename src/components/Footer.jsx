@@ -32,7 +32,7 @@ export const Footer = () => (
             <div>
                 <h3 className="text-xl font-semibold text-white mb-5 border-b-2 border-pink-500 inline-block pb-1">Customer Care</h3>
                 <ul className="space-y-3 text-gray-400">
-                    <li><a href="/orders" className="hover:text-pink-400 transition">My Orders</a></li>
+                    <li><a href="/MyOrder" className="hover:text-pink-400 transition">My Orders</a></li>
                     <li><a href="/OrderTracker" className="hover:text-pink-400 transition">Track Order</a></li>
                     <li><a href="/FaqPage" className="hover:text-pink-400 transition">FAQ</a></li>
                     <li><a href="/HelpCenterPage" className="hover:text-pink-400 transition">Help Center</a></li>
@@ -43,10 +43,9 @@ export const Footer = () => (
             <div>
                 <h3 className="text-xl font-semibold text-white mb-5 border-b-2 border-pink-500 inline-block pb-1">Contact Us</h3>
                 <ul className="space-y-3 text-gray-400 text-sm">
-                    <li>📍 D-268, Noida, India</li>
-                    <li>📞 +91 8126742827</li>
-                    <li>✉️ support@tererang.com</li>
-                    <li>🕒 Mon - Sat: 9:00 AM - 8:00 PM</li>
+                    <li>📍 Moradabad, Uttar Pradesh, India</li>
+                    <li>📞 +91 9548971147</li>
+                    <li>✉️ tererang.official@gmail.com</li>
                 </ul>
             </div>
         </div>

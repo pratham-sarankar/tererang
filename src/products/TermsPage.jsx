@@ -4,7 +4,7 @@ import React from 'react';
 const ACCENT_COLOR_CLASS = 'text-[#E91E63]';
 const ACCENT_BG_CLASS = 'bg-[#E91E63]';
 // Used for borders, e.g., on Policy Boxes and main Intro card
-const ACCENT_BORDER_CLASS = 'border-[#E91E63]'; 
+const ACCENT_BORDER_CLASS = 'border-[#E91E63]';
 
 // Highlight Color (Vibrant Teal/Cyan for attention on critical text)
 const HIGHLIGHT_COLOR_CLASS = 'text-cyan-600';
@@ -79,7 +79,7 @@ const Footer = () => (
                 <ul className="space-y-3 text-gray-400 text-sm">
                     <li>📍 D-268, Noida, India</li>
                     <li>📞 +91 8126742827</li>
-                    <li>✉️ support@tererang.com</li>
+                    <li>✉️ tererang.official@gmail.com</li>
                     <li>🕒 Mon - Sat: 9:00 AM - 8:00 PM</li>
                 </ul>
             </div>
@@ -121,13 +121,13 @@ const App = () => {
                 {/* Main Content Area: Terms and Conditions */}
                 <main>
                     <div className="max-w-6xl mx-auto px-6 pb-16">
-                        
+
                         {/* Introduction - HIGHLY HIGHLIGHTED STYLE */}
                         <div className={`bg-white p-10 rounded-xl mb-12 shadow-2xl border-l-8 ${ACCENT_BORDER_CLASS} text-left`}>
-                            
+
                             <div className="flex items-center mb-4 space-x-4">
                                 {/* Large, prominent icon */}
-                                <i className={`fas fa-scroll text-5xl ${ACCENT_COLOR_CLASS}`}></i> 
+                                <i className={`fas fa-scroll text-5xl ${ACCENT_COLOR_CLASS}`}></i>
                                 {/* Highlighted Welcome Text */}
                                 <h2 className="text-3xl font-extrabold text-pink-700 tracking-tight">
                                     Welcome to Tererang!
@@ -149,7 +149,7 @@ const App = () => {
                             <div className="bg-white p-8 shadow-xl border border-gray-100 rounded-xl">
                                 {/* Enhanced H2 Heading: Dark color, larger size */}
                                 <h2 className={`text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 border-b-4 ${ACCENT_BORDER_CLASS} pb-3 text-center`}>1. Product & Order Terms</h2>
-                                
+
                                 <h3 className={`text-xl font-bold ${ACCENT_COLOR_CLASS} mt-6 mb-2 text-center`}>Order Confirmation and Availability</h3>
                                 <p className="text-gray-700 text-left">
                                     All orders are subject to product availability and the confirmation of the order price. While we strive to maintain accurate inventory, placing an item in your cart does not guarantee its availability.
@@ -170,12 +170,12 @@ const App = () => {
                                     </ul>
                                 </div>
                             </div>
-                            
+
                             {/* 2. Payment, Cancellation, and Refund Policy */}
                             <div className="bg-white p-8 shadow-xl border border-gray-100 rounded-xl">
                                 {/* Enhanced H2 Heading: Dark color, larger size */}
                                 <h2 className={`text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 border-b-4 ${ACCENT_BORDER_CLASS} pb-3 text-center`}>2. Payment, Cancellation & Refunds</h2>
-                                
+
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                                     {/* Payment Policy Card (Left) */}
@@ -189,14 +189,14 @@ const App = () => {
                                             We **do not** offer Cash on Delivery (COD) services. All orders must be <span className={`font-bold ${HIGHLIGHT_COLOR_CLASS}`}>prepaid</span> through the secure payment options available at checkout, including credit/debit cards, UPI, net banking, and digital wallets.
                                         </p>
                                     </PolicyBox>
-                                    
+
                                     {/* Cancellation Policy Card (Right) */}
                                     <PolicyBox iconClass="fas fa-redo-alt" title="Order Cancellation">
                                         <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4 text-sm">
                                             <li className={`text-base text-gray-900`}><span className={`font-extrabold ${HIGHLIGHT_COLOR_CLASS}`}>Orders cannot be cancelled</span> once payment is confirmed.</li>
                                             <li>Please double-check your order details before making payment.</li>
                                         </ul>
-                                        
+
                                         <h3 className={`text-xl font-bold ${ACCENT_COLOR_CLASS} mt-6 mb-2 border-t pt-3 border-gray-300`}>Refund Policy</h3>
                                         <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4 text-sm">
                                             <li>Refunds are processed **only for approved store errors** (see Section 3).</li>
@@ -212,7 +212,7 @@ const App = () => {
                             <div className="bg-white p-8 shadow-xl border border-gray-100 rounded-xl">
                                 {/* Enhanced H2 Heading: Dark color, larger size */}
                                 <h2 className={`text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 border-b-4 ${ACCENT_BORDER_CLASS} pb-3 text-center`}>3. Return & Exchange Policy</h2>
-                                
+
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                                     {/* General Policy Card (Left) */}
@@ -221,7 +221,7 @@ const App = () => {
                                             We maintain a strict quality control process. We **do not accept refunds or exchanges** unless the error is clearly from our side ("Store Errors"). Kindly double-check your order details, size, and color before confirming your purchase.
                                         </p>
                                     </PolicyBox>
-                                    
+
                                     {/* Returns Accepted Card (Right) */}
                                     <PolicyBox iconClass="fas fa-check-circle" title="Returns Accepted Only For Store Errors">
                                         <p className="font-semibold text-gray-700 text-sm mb-2">A return will be accepted ONLY if:</p>
@@ -239,19 +239,19 @@ const App = () => {
                                 {/* Enhanced H2 Heading: Dark color, larger size */}
                                 <h2 className={`text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 border-b-4 ${ACCENT_BORDER_CLASS} pb-3 text-center`}>4. Additional Terms</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                                    
+
                                     <InfoCard
                                         iconClass="fas fa-box-open"
                                         title="Order Confirmation"
                                         content="All orders are subject to availability and confirmation of the order price."
                                     />
-                                    
+
                                     <InfoCard
                                         iconClass="fas fa-palette"
                                         title="Product Images"
                                         content="Colors may vary slightly due to screen settings and lighting conditions."
                                     />
-                                    
+
                                     <InfoCard
                                         iconClass="fas fa-headset"
                                         title="Customer Support"
@@ -259,12 +259,12 @@ const App = () => {
                                     />
                                 </div>
                             </div>
-                            
+
                             {/* 5. General Legal Provisions */}
                             <div className="bg-white p-8 shadow-xl border border-gray-100 rounded-xl">
                                 {/* Enhanced H2 Heading: Dark color, larger size */}
                                 <h2 className={`text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 border-b-4 ${ACCENT_BORDER_CLASS} pb-3 text-center`}>5. General Legal Provisions</h2>
-                                
+
                                 <h3 className={`text-xl font-bold ${ACCENT_COLOR_CLASS} mt-6 mb-2 text-center`}>Intellectual Property</h3>
                                 <p className="text-gray-700 text-left">
                                     All content on the Tererang website, including designs, text, graphics, logos, images, and software, is the property of Tererang and protected by intellectual property laws. You may not use any content without our express written permission.
@@ -290,7 +290,7 @@ const App = () => {
                                 Last Updated: October 15, 2025
                             </p>
                         </div>
-                        
+
                     </div>
                 </main>
 

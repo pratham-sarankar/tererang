@@ -3,7 +3,7 @@ import React from 'react';
 // Define the custom primary accent color (Vibrant Magenta: #E91E63)
 const ACCENT_COLOR_CLASS = 'text-[#E91E63]';
 const ACCENT_BG_CLASS = 'bg-[#E91E63]';
-const ACCENT_BORDER_CLASS = 'border-[#E91E63]'; 
+const ACCENT_BORDER_CLASS = 'border-[#E91E63]';
 
 // Secondary Highlight Color (Gold for Premium/Deals)
 const HIGHLIGHT_COLOR_CLASS = 'text-yellow-600';
@@ -58,7 +58,7 @@ const Footer = () => (
                 <ul className="space-y-3 text-gray-400 text-sm">
                     <li>📍 D-268, Noida, India</li>
                     <li>📞 +91 8126742827</li>
-                    <li>✉️ support@tererang.com</li>
+                    <li>✉️ tererang.official@gmail.com</li>
                     <li>🕒 Mon - Sat: 9:00 AM - 8:00 PM</li>
                 </ul>
             </div>
@@ -84,7 +84,7 @@ const OfferCard = ({ title, description, code, condition, icon }) => (
         </div>
         <h3 className={`text-2xl font-extrabold ${ACCENT_COLOR_CLASS} mb-2`}>{title}</h3>
         <p className="text-gray-600 mb-4 flex-grow">{description}</p>
-        
+
         {code && (
             <div className="w-full mt-auto">
                 <p className="text-sm font-semibold text-gray-700 mb-1">Use Code:</p>
@@ -122,7 +122,7 @@ const App = () => {
                 {/* Main Content Area: Offers */}
                 <main>
                     <div className="max-w-7xl mx-auto px-6 pb-16 text-center">
-                        
+
                         {/* Featured Callout - VIP Style */}
                         <div className={`bg-white p-10 rounded-xl mb-16 shadow-2xl border-b-8 ${ACCENT_BORDER_CLASS} relative overflow-hidden`}>
                             <div className="absolute top-0 right-0 p-4 transform rotate-12 text-2xl font-extrabold text-white bg-pink-500 rounded-bl-xl shadow-lg">
@@ -142,14 +142,14 @@ const App = () => {
                                 Shop Now & Claim Your Discount
                             </a>
                         </div>
-                        
+
                         {/* Section 1: Always-On Discounts */}
                         <h2 className={`text-4xl font-extrabold text-gray-900 mb-10 border-b-4 ${ACCENT_BORDER_CLASS} pb-3 inline-block`}>
                             Year-Round Discounts
                         </h2>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            
+
                             <OfferCard
                                 icon="fas fa-truck"
                                 title="Free Shipping"
@@ -164,7 +164,7 @@ const App = () => {
                                 code="TERABUNDLE"
                                 condition="Applies to select collections only."
                             />
-                            
+
                             <OfferCard
                                 icon="fas fa-gift"
                                 title="Loyalty Reward"
@@ -197,7 +197,7 @@ const App = () => {
                             />
 
                         </div>
-                        
+
                         {/* Terms & Conditions CTA */}
                         <div className={`mt-16 bg-pink-100 p-8 rounded-xl shadow-lg border-l-4 ${ACCENT_BORDER_CLASS}`}>
                             <p className="text-xl font-bold text-gray-800 mb-3">
@@ -211,7 +211,7 @@ const App = () => {
                                 Read Full Terms & Conditions Page <i className="fas fa-arrow-right ml-1"></i>
                             </a>
                         </div>
-                        
+
                     </div>
                 </main>
 

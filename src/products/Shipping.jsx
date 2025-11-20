@@ -30,7 +30,7 @@ const ShippingPolicy = () => {
     // Define consistent primary colors for headers/accents
     const PrimaryColor = "text-cyan-800";
     const AccentColor = "text-pink-600";
-    
+
     // Custom section background colors
     const sectionColors = {
         process: "bg-blue-100",
@@ -43,7 +43,7 @@ const ShippingPolicy = () => {
     return (
         // Changed overall background to light gray and applied font-serif
         <div className="bg-gray-50 text-black min-h-screen font-serif">
-            
+
             {/* Header - Kept professional, dark cyan style */}
             <header className="bg-cyan-900 text-white py-12 px-6 shadow-xl">
                 <div className="max-w-6xl mx-auto flex flex-col items-center">
@@ -58,7 +58,7 @@ const ShippingPolicy = () => {
 
             {/* Main Content */}
             <main className="max-w-6xl mx-auto py-16 px-6 sm:px-10">
-                
+
                 {/* Introductory Box */}
                 <BaseBox className="mb-16 bg-white">
                     <p className="text-black text-xl italic text-center font-normal">
@@ -88,7 +88,7 @@ const ShippingPolicy = () => {
 
                         <div className="mt-10 pt-6 border-t border-black p-4 border-2 border-black rounded-lg bg-white shadow-sm">
                             <h4 className={`font-bold flex items-center justify-center gap-2 text-2xl ${PrimaryColor} mb-3`}>
-                                <Phone size={24} className={AccentColor}/> Order Tracking
+                                <Phone size={24} className={AccentColor} /> Order Tracking
                             </h4>
                             <p className="text-center text-lg">
                                 Once your order is shipped, you will receive a tracking number via SMS and email. You can track your package in real-time using this tracking ID.
@@ -111,7 +111,7 @@ const ShippingPolicy = () => {
                                 <li className="flex items-center justify-center gap-2 text-red-600 font-bold"><AlertTriangle size={20} /> Remote areas may take additional time</li>
                             </ul>
                         </InnerContentBox>
-                        
+
                         <InnerContentBox title="Delivery Timeline" bgColor="bg-white">
                             <div className={`flex items-center justify-center gap-2 text-lg font-bold ${PrimaryColor}`}>
                                 <Truck className={AccentColor} size={24} />
@@ -225,7 +225,7 @@ const ShippingPolicy = () => {
                 <section className="text-center py-10 border-2 border-black p-6 rounded-xl bg-white shadow-md">
                     <p className="text-xl font-medium text-black mb-4">
                         We are committed to delivering your orders safely and on time.
-                        <br/>
+                        <br />
                         For any shipping-related queries, our customer support team is here to help.
                     </p>
                     <div className="text-4xl font-extrabold text-black">
@@ -289,7 +289,7 @@ const ShippingPolicy = () => {
                         <ul className="space-y-3 text-gray-400 text-sm">
                             <li>📍 D-268, Noida, India</li>
                             <li>📞 +91 8126742827</li>
-                            <li>✉️ support@tererang.com</li>
+                            <li>✉️ tererang.official@gmail.com</li>
                             {/* <li>🕒 Mon - Sat: 9:00 AM - 8:00 PM</li> */}
                         </ul>
                     </div>

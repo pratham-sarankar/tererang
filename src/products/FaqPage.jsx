@@ -21,7 +21,7 @@ const faqData = [
   },
   {
     question: "How can I contact Customer Support?",
-    answer: "You can email us anytime at **support@tererang.com**. We aim to respond to all inquiries within 24 hours. We are also planning to launch a live chat option on our website soon for immediate assistance!"
+    answer: "You can email us anytime at **tererang.official@gmail.com**. We aim to respond to all inquiries within 24 hours. We are also planning to launch a live chat option on our website soon for immediate assistance!"
   },
 ];
 
@@ -40,13 +40,13 @@ const AccordionItem = ({ faq, isOpen, toggleAccordion, Icon }) => {
             {faq.question}
           </span>
         </div>
-        <ChevronDown 
+        <ChevronDown
           className={`w-5 h-5 ml-4 transform transition-transform duration-300 ${isOpen ? 'rotate-180 text-indigo-500' : 'text-gray-400'}`}
         />
       </button>
-      
+
       {/* Answer Content - Uses transition for smooth opening/closing */}
-      <div 
+      <div
         className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
       >
         <div className="overflow-hidden">
@@ -81,14 +81,14 @@ const FaqPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 sm:p-8 font-sans">
       <div className="max-w-4xl mx-auto py-12">
-        
+
         {/* Header Section */}
         <header className="text-center mb-12">
           <h1 className="text-5xl font-extrabold text-indigo-700 mb-4">
             Your Questions, Our Answers
           </h1>
           <p className="text-xl text-gray-600">
-            Frequently Asked Questions (FAQs) about Tererang. 
+            Frequently Asked Questions (FAQs) about Tererang.
             We know you want to trust a new store, so we've made everything clear and simple.
           </p>
         </header>
@@ -115,7 +115,7 @@ const FaqPage = () => {
             Our dedicated support team is ready to assist you.
           </p>
           <a
-            href="mailto:support@tererang.com"
+            href="mailto:tererang.official@gmail.com"
             className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-full 
                        hover:bg-indigo-700 transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
