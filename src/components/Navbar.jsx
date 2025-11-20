@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 // 💡 IMPORTANT: Ensure 'Final Logo.jpg' is now a transparent PNG file 
 // (or rename and import the new transparent PNG file)
-import tereRang from "./Final Logo.jpg"; 
+import tereRang from "./Final Logo.jpg";
 import { Menu, X, User, LogOut, ShoppingCart, Trash2 } from "lucide-react"; // For mobile menu icons
 import { useCart } from "../context/cartContextStore.js";
 import { notifyCartAuthChange } from "../context/cartEvents.js";
@@ -19,9 +19,9 @@ const formatCurrency = (value = 0) => currencyFormatter.format(Math.max(0, value
 const resolveProductImage = (product) => {
   if (!product) return null;
   // Prioritize imageUrls over images field
-  const candidate = 
+  const candidate =
     (Array.isArray(product.imageUrls) && product.imageUrls[0]) ||
-    product.image || 
+    product.image ||
     (Array.isArray(product.images) && product.images[0]);
   if (!candidate) return null;
   if (/^https?:/i.test(candidate)) return candidate;
@@ -51,7 +51,7 @@ const Navbar = () => {
     const checkAuthStatus = () => {
       const token = localStorage.getItem('token');
       const userData = localStorage.getItem('user');
-      
+
       if (token && userData) {
         setIsAuthenticated(true);
         setUser(JSON.parse(userData));
@@ -132,21 +132,20 @@ const Navbar = () => {
 
   // Active route highlighting
   const isActive = (path) => location.pathname === path;
-  
+
   // Product menu items: enabled items are clickable, others show "Coming soon"
   const productMenu = [
-    { name: 'Kurti', to: '/products/kurti', enabled: true, emoji: '👚' },
-    { name: 'Suit', to: '/products/suit', enabled: true, emoji: '👗' },
-    { name: 'Coat', to: '/products/coat', enabled: true, emoji: '🧥' },
-    { name: 'Sharara Suits', to: '/products/ShararaData', enabled: false },
-    { name: 'Skirt', to: '/products/skirt', enabled: false },
-    { name: 'Designer Suits', to: '/products/DesignerSuit', enabled: false },
+    { name: 'Stylish Kurtis', to: '/products/kurti', enabled: true, emoji: '👚' },
+    { name: 'Designer Suits', to: '/products/suit', enabled: true, emoji: '👗' },
+    { name: 'Elegant Coat Sets', to: '/products/coat', enabled: true, emoji: '🧥' },
+    { name: 'Winter Ethnic Wear', to: '/products/ethnicWear', enabled: false },
+    { name: 'Wedding Collection', to: '/products/festiveSuits', enabled: false },
   ];
 
   return (
     <nav className="bg-black text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex justify-between items-center">
-        
+
         {/* ✅ LOGO SECTION - UPDATED CSS */}
         <div className="flex items-center">
           <Link to="/">
@@ -165,9 +164,8 @@ const Navbar = () => {
           <li>
             <Link
               to="/"
-              className={`transition duration-200 ${
-                isActive("/") ? "text-teal-400" : "hover:text-teal-400"
-              }`}
+              className={`transition duration-200 ${isActive("/") ? "text-teal-400" : "hover:text-teal-400"
+                }`}
             >
               Home
             </Link>
@@ -177,14 +175,13 @@ const Navbar = () => {
           <li ref={dropdownRef} className="relative">
             <button
               onClick={() => setIsDropdownOpen((s) => !s)}
-              className={`transition duration-200 ${
-                isActive("/products/kurti") ||
+              className={`transition duration-200 ${isActive("/products/kurti") ||
                 isActive("/products/suit") ||
                 isActive("/products/designerSuit") ||
                 isActive("/products/coat")
-                  ? "text-teal-400"
-                  : "hover:text-teal-400"
-              }`}
+                ? "text-teal-400"
+                : "hover:text-teal-400"
+                }`}
             >
               Products
             </button>
@@ -221,9 +218,8 @@ const Navbar = () => {
           <li>
             <Link
               to="/TermsPage"
-              className={`transition duration-200 ${
-                isActive("/TermsPage") ? "text-teal-400" : "hover:text-teal-400"
-              }`}
+              className={`transition duration-200 ${isActive("/TermsPage") ? "text-teal-400" : "hover:text-teal-400"
+                }`}
             >
               Terms & Conditions
             </Link>
@@ -232,9 +228,8 @@ const Navbar = () => {
           <li>
             <Link
               to="/contact"
-              className={`transition duration-200 ${
-                isActive("/contact") ? "text-teal-400" : "hover:text-teal-400"
-              }`}
+              className={`transition duration-200 ${isActive("/contact") ? "text-teal-400" : "hover:text-teal-400"
+                }`}
             >
               Contact Us
             </Link>
@@ -243,13 +238,12 @@ const Navbar = () => {
 
         {/* ✅ RIGHT SECTION */}
         <div className="flex items-center space-x-4 relative">
-          
+
           {/* 🔍 Search Section */}
           <div className="relative flex items-center">
             <div
-              className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                isSearchOpen ? "w-48 opacity-100" : "w-0 opacity-0"
-              }`}
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${isSearchOpen ? "w-48 opacity-100" : "w-0 opacity-0"
+                }`}
             >
               <input
                 type="text"
@@ -296,9 +290,8 @@ const Navbar = () => {
 
                 {cartFeedback && (
                   <div
-                    className={`mb-3 text-xs rounded-lg px-3 py-2 ${
-                      cartFeedback.type === 'error' ? 'bg-red-900/50 text-red-200' : 'bg-teal-900/40 text-teal-200'
-                    }`}
+                    className={`mb-3 text-xs rounded-lg px-3 py-2 ${cartFeedback.type === 'error' ? 'bg-red-900/50 text-red-200' : 'bg-teal-900/40 text-teal-200'
+                      }`}
                   >
                     {cartFeedback.text}
                   </div>
@@ -520,13 +513,13 @@ const Navbar = () => {
             Home
           </Link>
           <Link to="/products/kurti" onClick={() => setIsMobileMenuOpen(false)} className="block">
-            👚 Kurti
+            👚 Stylish Kurtis
           </Link>
           <Link to="/products/suit" onClick={() => setIsMobileMenuOpen(false)} className="block">
-            👗 Suit
+            👗 Designer Suits
           </Link>
           <Link to="/products/coat" onClick={() => setIsMobileMenuOpen(false)} className="block">
-            🧥 Coat
+            🧥 Elegant Coat Sets
           </Link>
           {/* Disabled/Coming soon items */}
           <div className="pt-2 space-y-2">
@@ -549,7 +542,7 @@ const Navbar = () => {
           <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block">
             Contact Us
           </Link>
-          
+
           {/* Authentication section for mobile */}
           {isAuthenticated ? (
             <>
