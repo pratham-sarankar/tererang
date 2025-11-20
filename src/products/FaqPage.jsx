@@ -12,8 +12,8 @@ const faqData = [
     answer: "As we are a new store, we place extra emphasis on **Quality Control** and secure packaging. Typically, delivery takes **5 to 7 business days** depending on your location. You will receive a tracking link after shipment so you can monitor your order's status in real-time."
   },
   {
-    question: "What is your Return and Exchange Policy?",
-    answer: "We guarantee 100% satisfaction. If you are not happy with your product, you can request an easy return or exchange within **15 days** of the delivery date. The product must be in its original, unused condition to be accepted for return."
+    question: "What is your Cancellation Policy?",
+    answer: "Orders can only be cancelled within 12 hours of placing the order. After this window, we begin processing your order and cannot accept cancellations. However, exchanges can be accepted with a valid video of the damaged product as proof."
   },
   {
     question: "Is my payment safe and secure on Tererang?",
