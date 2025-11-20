@@ -34,8 +34,28 @@ const ProductDetailPage = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const [cartMessage, setCartMessage] = useState(null);
+  const [globalDiscount, setGlobalDiscount] = useState({ percentage: 0, enabled: false });
 
   const canFetchFromBackend = useMemo(() => Boolean(productId), [productId]);
+
+  // Fetch global discount settings
+  useEffect(() => {
+    const fetchGlobalDiscount = async () => {
+      try {
+        const response = await fetch(apiUrl('/api/settings'));
+        const data = await response.json();
+        if (response.ok && data.settings) {
+          setGlobalDiscount({
+            percentage: data.settings.globalDiscountPercentage || 0,
+            enabled: data.settings.globalDiscountEnabled || false,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch global discount:', err);
+      }
+    };
+    fetchGlobalDiscount();
+  }, []);
 
   useEffect(() => {
     if (!canFetchFromBackend) return undefined;
@@ -102,6 +122,21 @@ const ProductDetailPage = () => {
     setSelectedSize(displaySizes[0] || '');
     setMainImage(product.gallery[0]);
   }, [product, displaySizes]);
+
+  // Calculate displayed original price (marked up from database price)
+  const calculateDisplayedOriginalPrice = (dbPrice) => {
+    if (!globalDiscount.enabled || globalDiscount.percentage <= 0) {
+      return null;
+    }
+    // Database price is the "discounted" price customers pay
+    // Calculate what the "original" price should be to show the discount
+    // Formula: originalPrice = dbPrice / (1 - discount/100)
+    const originalPrice = dbPrice / (1 - globalDiscount.percentage / 100);
+    return Math.round(originalPrice);
+  };
+
+  const actualPrice = product?.price || 0; // This is what customer pays (from DB)
+  const displayedOriginalPrice = calculateDisplayedOriginalPrice(actualPrice);
 
   const handleAddToCart = async () => {
     if (!product) return;
@@ -203,19 +238,33 @@ const ProductDetailPage = () => {
           </span>
           <h1 className="text-4xl font-extrabold text-gray-900 mb-2 mt-1">{product.title}</h1>
 
-          <div className="mb-6 border-b pb-4 flex items-baseline">
-            {product.displayOldPrice && (
-              <span className="line-through text-gray-400 mr-3 text-xl">
-                {product.displayOldPrice}
+          <div className="mb-6 border-b pb-4">
+            <div className="flex items-baseline mb-2">
+              {displayedOriginalPrice && (
+                <span className="line-through text-gray-400 mr-3 text-xl">
+                  ₹{displayedOriginalPrice.toLocaleString('en-IN')}
+                </span>
+              )}
+              <span className="text-4xl font-extrabold text-purple-600">
+                ₹{actualPrice.toLocaleString('en-IN')}
               </span>
+              <button
+                className="ml-auto p-2 border border-gray-300 rounded-full text-gray-500 hover:bg-gray-100 hover:text-purple-600 transition"
+                type="button"
+              >
+                <Share2 className="w-5 h-5" />
+              </button>
+            </div>
+            {displayedOriginalPrice && (
+              <div className="flex items-center gap-2">
+                <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+                  {globalDiscount.percentage}% OFF
+                </span>
+                <span className="text-green-600 text-sm font-medium">
+                  Save ₹{(displayedOriginalPrice - actualPrice).toLocaleString('en-IN')}
+                </span>
+              </div>
             )}
-            <span className="text-4xl font-extrabold text-purple-600">{product.displayPrice}</span>
-            <button
-              className="ml-auto p-2 border border-gray-300 rounded-full text-gray-500 hover:bg-gray-100 hover:text-purple-600 transition"
-              type="button"
-            >
-              <Share2 className="w-5 h-5" />
-            </button>
           </div>
 
           <p className="text-gray-600 mb-6 leading-relaxed text-base">{product.description}</p>
