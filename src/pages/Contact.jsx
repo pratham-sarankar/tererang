@@ -1,5 +1,5 @@
 import React from "react";
-import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaInstagram, FaWhatsapp } from "react-icons/fa";
 
 const Contact = () => {
   return (
@@ -39,16 +39,15 @@ const Contact = () => {
           </div>
 
           <div className="mt-10">
-            <h3 className="font-semibold text-xl mb-2">Follow us:</h3>
-            <div className="flex gap-5 text-2xl">
-              <a href="https://www.instagram.com/tererang.official/" target="_blank" className="hover:text-pink-200 transition-all">
-                🌸 Instagram
+            <h3 className="font-semibold text-xl mb-4">Follow us:</h3>
+            <div className="flex flex-row gap-3 text-lg">
+              <a href="https://www.instagram.com/tererang.official/" target="_blank" className="flex items-center gap-2 hover:text-pink-200 transition-all">
+                <FaInstagram className="text-xl" />
+                Instagram
               </a>
-              {/* <a href="#" className="hover:text-pink-200 transition-all">
-                💼 Youtube
-              </a> */}
-              <a href="https://api.whatsapp.com/send?phone=919548971147" target="_blank" className="hover:text-pink-200 transition-all">
-                🕊️ Whatsapp
+              <a href="https://api.whatsapp.com/send?phone=919548971147" target="_blank" className="flex items-center gap-2 hover:text-pink-200 transition-all">
+                <FaWhatsapp className="text-xl" />
+                Whatsapp
               </a>
             </div>
           </div>
