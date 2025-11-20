@@ -26,29 +26,29 @@ const Contact = () => {
           <div className="space-y-6 text-lg">
             <div className="flex items-center gap-4">
               <FaMapMarkerAlt className="text-2xl" />
-              <p>123 Fashion Street, Noida, Uttar Pradesh, India</p>
+              <p>Moradabad, Uttar Pradesh, India</p>
             </div>
             <div className="flex items-center gap-4">
               <FaPhoneAlt className="text-2xl" />
-              <p>+91 9876543210</p>
+              <p>+91 9548971147</p>
             </div>
             <div className="flex items-center gap-4">
               <FaEnvelope className="text-2xl" />
-              <p>support@tererang.com</p>
+              <p>tererang.official@gmail.com</p>
             </div>
           </div>
 
           <div className="mt-10">
             <h3 className="font-semibold text-xl mb-2">Follow us:</h3>
             <div className="flex gap-5 text-2xl">
-              <a href="#" className="hover:text-pink-200 transition-all">
+              <a href="https://www.instagram.com/tererang.official/" target="_blank" className="hover:text-pink-200 transition-all">
                 🌸 Instagram
               </a>
-              <a href="#" className="hover:text-pink-200 transition-all">
-                💼 LinkedIn
-              </a>
-              <a href="#" className="hover:text-pink-200 transition-all">
-                🕊️ Twitter
+              {/* <a href="#" className="hover:text-pink-200 transition-all">
+                💼 Youtube
+              </a> */}
+              <a href="https://api.whatsapp.com/send?phone=919548971147" target="_blank" className="hover:text-pink-200 transition-all">
+                🕊️ Whatsapp
               </a>
             </div>
           </div>
