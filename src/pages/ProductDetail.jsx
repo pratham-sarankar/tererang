@@ -35,6 +35,7 @@ const ProductDetailPage = () => {
   const [isAdded, setIsAdded] = useState(false);
   const [cartMessage, setCartMessage] = useState(null);
   const [globalDiscount, setGlobalDiscount] = useState({ percentage: 0, enabled: false });
+  const [shareMessage, setShareMessage] = useState(null);
 
   const canFetchFromBackend = useMemo(() => Boolean(productId), [productId]);
 
@@ -162,6 +163,32 @@ const ProductDetailPage = () => {
     }
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: product.title,
+      text: `Check out ${product.title} on Tererang - ₹${actualPrice.toLocaleString('en-IN')}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        // Use Web Share API if available (mobile devices)
+        await navigator.share(shareData);
+        setShareMessage({ type: 'success', text: 'Shared successfully!' });
+      } else {
+        // Fallback: Copy link to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        setShareMessage({ type: 'success', text: 'Link copied to clipboard!' });
+      }
+      setTimeout(() => setShareMessage(null), 3000);
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setShareMessage({ type: 'error', text: 'Failed to share' });
+        setTimeout(() => setShareMessage(null), 3000);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-600">
@@ -220,11 +247,10 @@ const ProductDetailPage = () => {
                 key={imgUrl}
                 src={imgUrl}
                 alt={`${product.title} thumbnail`}
-                className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer transition duration-200 ${
-                  imgUrl === mainImage
-                    ? 'border-purple-600 shadow-md'
-                    : 'border-gray-200 hover:border-purple-300'
-                }`}
+                className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer transition duration-200 ${imgUrl === mainImage
+                  ? 'border-purple-600 shadow-md'
+                  : 'border-gray-200 hover:border-purple-300'
+                  }`}
                 onClick={() => setMainImage(imgUrl)}
                 loading="lazy"
               />
@@ -251,6 +277,8 @@ const ProductDetailPage = () => {
               <button
                 className="ml-auto p-2 border border-gray-300 rounded-full text-gray-500 hover:bg-gray-100 hover:text-purple-600 transition"
                 type="button"
+                onClick={handleShare}
+                aria-label="Share product"
               >
                 <Share2 className="w-5 h-5" />
               </button>
@@ -284,11 +312,10 @@ const ProductDetailPage = () => {
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`border-2 px-6 py-2 rounded-full font-medium transition duration-200 shadow-sm ${
-                  selectedSize === size
-                    ? 'bg-purple-600 text-white border-purple-600 shadow-md transform scale-105'
-                    : 'border-gray-300 text-gray-700 hover:bg-purple-50 hover:border-purple-600'
-                }`}
+                className={`border-2 px-6 py-2 rounded-full font-medium transition duration-200 shadow-sm ${selectedSize === size
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-md transform scale-105'
+                  : 'border-gray-300 text-gray-700 hover:bg-purple-50 hover:border-purple-600'
+                  }`}
                 type="button"
               >
                 {size}
@@ -325,11 +352,19 @@ const ProductDetailPage = () => {
 
           {cartMessage?.text && (
             <p
-              className={`mt-4 text-sm ${
-                cartMessage.type === 'error' ? 'text-red-500' : 'text-green-500'
-              }`}
+              className={`mt-4 text-sm ${cartMessage.type === 'error' ? 'text-red-500' : 'text-green-500'
+                }`}
             >
               {cartMessage.text}
+            </p>
+          )}
+
+          {shareMessage?.text && (
+            <p
+              className={`mt-4 text-sm ${shareMessage.type === 'error' ? 'text-red-500' : 'text-green-500'
+                }`}
+            >
+              {shareMessage.text}
             </p>
           )}
 
