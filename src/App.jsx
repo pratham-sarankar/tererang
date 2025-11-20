@@ -24,11 +24,11 @@ import Shipping from "./products/Shipping";
 import OrderTracker from "./products/OrderTracker";
 import FaqPage from "./products/FaqPage";
 import HelpCenterPage from "./products/HelpCenterPage";
-import TermsPage from"./products/TermsPage";
-import AlwaysOffers from"./products/AlwaysOffers";
-import MyOrder from"./products/MyOrder";
-import ReturnPolicy from"./products/ReturnPolicy";
-import DesignerSuit from"./products/DesignerSuit";
+import TermsPage from "./products/TermsPage";
+import AlwaysOffers from "./products/AlwaysOffers";
+import MyOrder from "./products/MyOrder";
+import ReturnPolicy from "./products/ReturnPolicy";
+import DesignerSuit from "./products/DesignerSuit";
 import { CartProvider } from "./context/CartContext.jsx";
 import Checkout from "./pages/Checkout";
 import ProductDetail from "./pages/ProductDetail";
@@ -45,48 +45,48 @@ function App() {
         {/* <Navbar /> */}
         {!showPopup && <Navbar />}
         <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />   {/* ✅ Changed /Home → / */}
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/deals" element={<Deals />} />
-        <Route path="/contact" element={<Contact />} />
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />   {/* ✅ Changed /Home → / */}
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/deals" element={<Deals />} />
+          <Route path="/contact" element={<Contact />} />
 
-        {/* Auth Routes */}
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          {/* Auth Routes */}
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
 
-        {/* Products */}
-        <Route path="/products/Kurti" element={<Kurti />} />
-        <Route path="/products/Suit" element={<Suit />} />
-        <Route path="/products/Coat" element={<Coat />} />
-        <Route path="/products/ShararaData" element={<ShararaData />} />   {/* ✅ lowercase */}
-        <Route path="/products/Skirt" element={<Skirt />} />     {/* ✅ lowercase */}
-        <Route path="/Shipping" element={<Shipping />} />     {/* ✅ lowercase */}
-        <Route path="/OrderTracker" element={<OrderTracker />} />     {/* ✅ lowercase */}
-        <Route path="/FaqPage" element={<FaqPage />} />
-        <Route path="/HelpCenterPage" element={<HelpCenterPage/>} />
-        <Route path="/TermsPage" element={<TermsPage/>}/>
-        <Route path="/AlwaysOffers" element={<AlwaysOffers/>}/>
-        <Route path="/MyOrder" element={<MyOrder/>}/>
-        <Route path="ReturnPolicy" element={<ReturnPolicy/>}/>
-        <Route path="DesignerSuit" element={<DesignerSuit/>}/>
-  <Route path="/checkout" element={<Checkout />} />
-  <Route path="/addresses" element={<AddressBook />} />
-    <Route path="/product/:productId" element={<ProductDetail />} />
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+          {/* Products */}
+          <Route path="/products/Kurti" element={<Kurti />} />
+          <Route path="/products/Suit" element={<Suit />} />
+          <Route path="/products/Coat" element={<Coat />} />
+          <Route path="/products/ShararaData" element={<ShararaData />} />   {/* ✅ lowercase */}
+          <Route path="/products/Skirt" element={<Skirt />} />     {/* ✅ lowercase */}
+          <Route path="/Shipping" element={<Shipping />} />     {/* ✅ lowercase */}
+          <Route path="/OrderTracker" element={<OrderTracker />} />     {/* ✅ lowercase */}
+          <Route path="/FaqPage" element={<FaqPage />} />
+          <Route path="/HelpCenterPage" element={<HelpCenterPage />} />
+          <Route path="/TermsPage" element={<TermsPage />} />
+          <Route path="/AlwaysOffers" element={<AlwaysOffers />} />
+          <Route path="/MyOrder" element={<MyOrder />} />
+          <Route path="ReturnPolicy" element={<ReturnPolicy />} />
+          <Route path="DesignerSuit" element={<DesignerSuit />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/addresses" element={<AddressBook />} />
+          <Route path="/product/:productId" element={<ProductDetail />} />
 
 
 
-        {/* Fallback Route */}
-        <Route
-          path="*"
-          element={<h2 style={{ padding: "20px" }}>404 - Page Not Found</h2>}
-        />
-      </Routes>
+          {/* Fallback Route */}
+          <Route
+            path="*"
+            element={<h2 style={{ padding: "20px" }}>404 - Page Not Found</h2>}
+          />
+        </Routes>
       </Router>
     </CartProvider>
   );
