@@ -46,6 +46,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [productLoading, setProductLoading] = useState(false);
     const [orderLoading, setOrderLoading] = useState(false);
+    const [settingsLoading, setSettingsLoading] = useState(false);
     const [error, setError] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -62,6 +63,11 @@ export default function AdminDashboard() {
     const [orderForm, setOrderForm] = useState(defaultOrderForm);
     const [orderSubmittingId, setOrderSubmittingId] = useState(null);
     const [orderActionState, setOrderActionState] = useState({ id: null, type: null });
+    const [settings, setSettings] = useState({
+        globalDiscountPercentage: 0,
+        globalDiscountEnabled: false,
+    });
+    const [settingsSaving, setSettingsSaving] = useState(false);
     const navigate = useNavigate();
 
     const logoutAndRedirect = () => {
@@ -127,6 +133,25 @@ export default function AdminDashboard() {
             setError('Network error. Please try again.');
         } finally {
             setOrderLoading(false);
+        }
+    };
+
+    const fetchSettings = async () => {
+        setSettingsLoading(true);
+        try {
+            const response = await fetch(apiUrl('/api/settings'));
+            const data = await response.json();
+
+            if (response.ok) {
+                setSettings(data.settings);
+            } else {
+                setError(data.message || 'Failed to fetch settings');
+            }
+        } catch (fetchError) {
+            console.error('Fetch settings error:', fetchError);
+            setError('Network error. Please try again.');
+        } finally {
+            setSettingsLoading(false);
         }
     };
 
@@ -445,11 +470,54 @@ export default function AdminDashboard() {
         logoutAndRedirect();
     };
 
+    const handleSettingsChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setSettings((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
+        }));
+    };
+
+    const saveSettings = async () => {
+        const token = checkAuth();
+        if (!token) return;
+
+        setSettingsSaving(true);
+        setError('');
+        try {
+            const response = await fetch(apiUrl('/api/settings'), {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(settings),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSettings(data.settings);
+                alert('Settings saved successfully!');
+            } else {
+                setError(data.message || 'Failed to save settings');
+                if (response.status === 401) {
+                    logoutAndRedirect();
+                }
+            }
+        } catch (saveError) {
+            console.error('Save settings error:', saveError);
+            setError('Network error. Please try again.');
+        } finally {
+            setSettingsSaving(false);
+        }
+    };
+
     useEffect(() => {
         checkAuth();
         const initialize = async () => {
             setLoading(true);
-            await Promise.all([fetchProducts(), fetchOrders()]);
+            await Promise.all([fetchProducts(), fetchOrders(), fetchSettings()]);
             setLoading(false);
         };
         initialize();
@@ -867,6 +935,94 @@ export default function AdminDashboard() {
         </div>
     );
 
+    const renderSettingsSection = () => (
+        <div className="settings-section">
+            <h2>Global Settings</h2>
+            {settingsLoading ? (
+                <div className="loading">Loading settings...</div>
+            ) : (
+                <div className="settings-container">
+                    <div className="settings-card">
+                        <div className="settings-card-header">
+                            <h3>Global Discount</h3>
+                            <p className="settings-card-subtitle">
+                                Apply a discount percentage to all products displayed on the store
+                            </p>
+                        </div>
+                        <div className="settings-card-body">
+                            <div className="form-group">
+                                <label className="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        name="globalDiscountEnabled"
+                                        checked={settings.globalDiscountEnabled}
+                                        onChange={handleSettingsChange}
+                                    />
+                                    <span>Enable Global Discount</span>
+                                </label>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="globalDiscountPercentage">
+                                    Discount Percentage (%)
+                                </label>
+                                <input
+                                    type="number"
+                                    id="globalDiscountPercentage"
+                                    name="globalDiscountPercentage"
+                                    value={settings.globalDiscountPercentage}
+                                    onChange={handleSettingsChange}
+                                    min="0"
+                                    max="100"
+                                    step="1"
+                                    disabled={!settings.globalDiscountEnabled}
+                                    className="discount-input"
+                                />
+                                <p className="help-text">
+                                    {settings.globalDiscountEnabled
+                                        ? `Customers will see ${settings.globalDiscountPercentage}% off on all products`
+                                        : 'Enable the discount to set a percentage'}
+                                </p>
+                            </div>
+                            <div className="settings-preview">
+                                <h4>Preview</h4>
+                                <div className="preview-item">
+                                    <span className="preview-label">Original Price:</span>
+                                    <span className="preview-value">₹1,000</span>
+                                </div>
+                                {settings.globalDiscountEnabled && settings.globalDiscountPercentage > 0 && (
+                                    <>
+                                        <div className="preview-item">
+                                            <span className="preview-label">Discount:</span>
+                                            <span className="preview-value discount">
+                                                -{settings.globalDiscountPercentage}%
+                                            </span>
+                                        </div>
+                                        <div className="preview-item final">
+                                            <span className="preview-label">Final Price:</span>
+                                            <span className="preview-value">
+                                                ₹{1000 - (1000 * settings.globalDiscountPercentage) / 100}
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            <div className="settings-actions">
+                                <button
+                                    type="button"
+                                    className="save-settings-btn"
+                                    onClick={saveSettings}
+                                    disabled={settingsSaving}
+                                >
+                                    {settingsSaving ? 'Saving...' : 'Save Settings'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
     return (
         <div className="admin-dashboard">
             <div className="dashboard-header">
@@ -887,6 +1043,13 @@ export default function AdminDashboard() {
                         >
                             Orders
                         </button>
+                        <button
+                            type="button"
+                            className={activeTab === 'settings' ? 'active' : ''}
+                            onClick={() => setActiveTab('settings')}
+                        >
+                            Settings
+                        </button>
                     </div>
                 </div>
                 <div className="header-actions">
@@ -906,7 +1069,9 @@ export default function AdminDashboard() {
 
             {error && <div className="error-message">{error}</div>}
 
-            {activeTab === 'products' ? renderProductSection() : renderOrderSection()}
+            {activeTab === 'products' && renderProductSection()}
+            {activeTab === 'orders' && renderOrderSection()}
+            {activeTab === 'settings' && renderSettingsSection()}
         </div>
     );
 }
