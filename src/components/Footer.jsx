@@ -10,10 +10,10 @@ export const Footer = () => (
                     Every piece is crafted with love, bringing beauty that feels personal and rooted.
                 </p>
                 <div className="flex space-x-4 mt-5">
-                    <a href="#" className="text-gray-400 hover:text-pink-500 transition"><i className="fab fa-facebook-f"></i></a>
-                    <a href="#" className="text-gray-400 hover:text-pink-500 transition"><i className="fab fa-instagram"></i></a>
-                    <a href="#" className="text-gray-400 hover:text-pink-500 transition"><i className="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/tererang.official/" target="_blank" className="text-gray-400 hover:text-pink-500 transition"><i className="fab fa-instagram"></i></a>
                     <a href="#" className="text-gray-400 hover:text-pink-500 transition"><i className="fab fa-youtube"></i></a>
+                    {/* <a href="#" className="text-gray-400 hover:text-pink-500 transition"><i className="fab fa-facebook-f"></i></a> */}
+                    {/* <a href="#" className="text-gray-400 hover:text-pink-500 transition"><i className="fab fa-twitter"></i></a> */}
                 </div>
             </div>
 
@@ -23,8 +23,8 @@ export const Footer = () => (
                 <ul className="space-y-3 text-gray-400">
                     <li><a href="/products/Kurti" className="hover:text-pink-400 transition">Products</a></li>
                     <li><a href="/Shipping" className="hover:text-pink-400 transition">Shipping Policy</a></li>
-                    <li><a href="/terms" className="hover:text-pink-400 transition">Terms & Conditions</a></li>
-                    <li><a href="/returns" className="hover:text-pink-400 transition">Return & Exchange</a></li>
+                    <li><a href="/TermsPage" className="hover:text-pink-400 transition">Terms & Conditions</a></li>
+                    <li><a href="/TermsPage" className="hover:text-pink-400 transition">Return & Exchange</a></li>
                 </ul>
             </div>
 
