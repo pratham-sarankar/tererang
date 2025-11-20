@@ -3,6 +3,7 @@ import { ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { apiUrl } from '../config/env.js';
 import { mapProductForDisplay } from '../utils/productPresentation.js';
+import { Footer } from '../components/Footer.jsx';
 
 const CategoryProductCard = ({ product, onSelect }) => (
   <div className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition duration-500 overflow-hidden cursor-pointer transform hover:-translate-y-2 group border border-gray-100">
@@ -100,60 +101,63 @@ const Suit = () => {
   const handleReload = () => setReloadFlag((flag) => flag + 1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-6 sm:p-10">
-      <div className="text-center mb-16 pt-8">
-        <div className="border-4 border-black inline-block p-2 rounded-xl shadow-2xl">
-          <div className="bg-purple-700 p-6 rounded-lg text-white">
-            <p className="uppercase tracking-[0.5em] text-sm text-purple-200">Suit Atelier</p>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">The Tere Rang Suit Edit</h1>
-            <p className="text-lg text-purple-100 mt-2">
-              Fluid layers, rich embroideries, and statement silhouettes made for celebrations.
-            </p>
+    <>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-6 sm:p-10">
+        <div className="text-center mb-16 pt-8">
+          <div className="border-4 border-black inline-block p-2 rounded-xl shadow-2xl">
+            <div className="bg-purple-700 p-6 rounded-lg text-white">
+              <p className="uppercase tracking-[0.5em] text-sm text-purple-200">Suit Atelier</p>
+              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">The Tere Rang Suit Edit</h1>
+              <p className="text-lg text-purple-100 mt-2">
+                Fluid layers, rich embroideries, and statement silhouettes made for celebrations.
+              </p>
+            </div>
           </div>
-        </div>
-        <button
-          type="button"
-          className="mt-6 inline-flex items-center border border-purple-200 px-4 py-2 rounded-full text-purple-600 hover:bg-purple-50 transition text-sm font-semibold"
-          onClick={handleReload}
-        >
-          Refresh Collection
-        </button>
-      </div>
-
-      {loading && !error && (
-        <div className="flex justify-center py-20">
-          <span className="text-lg text-gray-500">Curating statement suits for you...</span>
-        </div>
-      )}
-
-      {error && (
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow p-8 text-center border border-red-100">
-          <h2 className="text-2xl font-semibold text-red-500 mb-2">Unable to load suits</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
           <button
             type="button"
-            className="px-6 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition"
+            className="mt-6 inline-flex items-center border border-purple-200 px-4 py-2 rounded-full text-purple-600 hover:bg-purple-50 transition text-sm font-semibold"
             onClick={handleReload}
           >
-            Try Again
+            Refresh Collection
           </button>
         </div>
-      )}
 
-      {!error && !loading && formattedProducts.length === 0 && (
-        <div className="text-center text-gray-500 py-10">
-          We're tailoring new styles. Check back soon!
-        </div>
-      )}
+        {loading && !error && (
+          <div className="flex justify-center py-20">
+            <span className="text-lg text-gray-500">Curating statement suits for you...</span>
+          </div>
+        )}
 
-      {!error && formattedProducts.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {formattedProducts.map((product) => (
-            <CategoryProductCard key={product.id} product={product} onSelect={handleSelectProduct} />
-          ))}
-        </div>
-      )}
-    </div>
+        {error && (
+          <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow p-8 text-center border border-red-100">
+            <h2 className="text-2xl font-semibold text-red-500 mb-2">Unable to load suits</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button
+              type="button"
+              className="px-6 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition"
+              onClick={handleReload}
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {!error && !loading && formattedProducts.length === 0 && (
+          <div className="text-center text-gray-500 py-10">
+            We're tailoring new styles. Check back soon!
+          </div>
+        )}
+
+        {!error && formattedProducts.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {formattedProducts.map((product) => (
+              <CategoryProductCard key={product.id} product={product} onSelect={handleSelectProduct} />
+            ))}
+          </div>
+        )}
+      </div>
+      <Footer></Footer>
+    </>
   );
 };
 

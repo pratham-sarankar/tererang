@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import banner from "../components/Banner.png";
 import { apiUrl } from "../config/env.js";
 import { mapProductForDisplay } from "../utils/productPresentation.js";
+import { Footer } from "../components/Footer.jsx";
 
 const LATEST_COLLECTION_LIMIT = 12;
 
@@ -195,6 +196,7 @@ const Home = () => {
           </div>
         )}
       </section>
+      <Footer></Footer>
     </div>
   );
 };
