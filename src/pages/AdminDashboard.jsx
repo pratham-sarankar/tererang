@@ -946,7 +946,7 @@ export default function AdminDashboard() {
                         <div className="settings-card-header">
                             <h3>Global Discount</h3>
                             <p className="settings-card-subtitle">
-                                Apply a discount percentage to all products displayed on the store
+                                Show a marked-up "original price" to create discount perception. Customers pay the database price.
                             </p>
                         </div>
                         <div className="settings-card-body">
@@ -958,7 +958,7 @@ export default function AdminDashboard() {
                                         checked={settings.globalDiscountEnabled}
                                         onChange={handleSettingsChange}
                                     />
-                                    <span>Enable Global Discount</span>
+                                    <span>Enable Global Discount Display</span>
                                 </label>
                             </div>
                             <div className="form-group">
@@ -979,28 +979,37 @@ export default function AdminDashboard() {
                                 />
                                 <p className="help-text">
                                     {settings.globalDiscountEnabled
-                                        ? `Customers will see ${settings.globalDiscountPercentage}% off on all products`
-                                        : 'Enable the discount to set a percentage'}
+                                        ? `Products will show a higher "original price" with ${settings.globalDiscountPercentage}% off, but customers pay the database price`
+                                        : 'Enable to show promotional pricing on all products'}
                                 </p>
                             </div>
                             <div className="settings-preview">
                                 <h4>Preview</h4>
+                                <p className="help-text" style={{ marginBottom: '15px' }}>
+                                    Example: Product stored in database at ₹1,000
+                                </p>
                                 <div className="preview-item">
-                                    <span className="preview-label">Original Price:</span>
+                                    <span className="preview-label">Database Price (What customer pays):</span>
                                     <span className="preview-value">₹1,000</span>
                                 </div>
                                 {settings.globalDiscountEnabled && settings.globalDiscountPercentage > 0 && (
                                     <>
                                         <div className="preview-item">
-                                            <span className="preview-label">Discount:</span>
+                                            <span className="preview-label">Shown as "Original Price":</span>
+                                            <span className="preview-value">
+                                                ₹{Math.round(1000 / (1 - settings.globalDiscountPercentage / 100))}
+                                            </span>
+                                        </div>
+                                        <div className="preview-item">
+                                            <span className="preview-label">Discount Display:</span>
                                             <span className="preview-value discount">
                                                 -{settings.globalDiscountPercentage}%
                                             </span>
                                         </div>
                                         <div className="preview-item final">
-                                            <span className="preview-label">Final Price:</span>
+                                            <span className="preview-label">Customer Pays (Same as DB):</span>
                                             <span className="preview-value">
-                                                ₹{1000 - (1000 * settings.globalDiscountPercentage) / 100}
+                                                ₹1,000
                                             </span>
                                         </div>
                                     </>

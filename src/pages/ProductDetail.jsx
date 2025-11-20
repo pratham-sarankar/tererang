@@ -123,17 +123,20 @@ const ProductDetailPage = () => {
     setMainImage(product.gallery[0]);
   }, [product, displaySizes]);
 
-  // Calculate discounted price
-  const calculateDiscountedPrice = (originalPrice) => {
+  // Calculate displayed original price (marked up from database price)
+  const calculateDisplayedOriginalPrice = (dbPrice) => {
     if (!globalDiscount.enabled || globalDiscount.percentage <= 0) {
       return null;
     }
-    const discount = (originalPrice * globalDiscount.percentage) / 100;
-    return originalPrice - discount;
+    // Database price is the "discounted" price customers pay
+    // Calculate what the "original" price should be to show the discount
+    // Formula: originalPrice = dbPrice / (1 - discount/100)
+    const originalPrice = dbPrice / (1 - globalDiscount.percentage / 100);
+    return Math.round(originalPrice);
   };
 
-  const originalPrice = product?.price || 0;
-  const discountedPrice = calculateDiscountedPrice(originalPrice);
+  const actualPrice = product?.price || 0; // This is what customer pays (from DB)
+  const displayedOriginalPrice = calculateDisplayedOriginalPrice(actualPrice);
 
   const handleAddToCart = async () => {
     if (!product) return;
@@ -237,13 +240,13 @@ const ProductDetailPage = () => {
 
           <div className="mb-6 border-b pb-4">
             <div className="flex items-baseline mb-2">
-              {discountedPrice && (
+              {displayedOriginalPrice && (
                 <span className="line-through text-gray-400 mr-3 text-xl">
-                  ₹{originalPrice.toLocaleString('en-IN')}
+                  ₹{displayedOriginalPrice.toLocaleString('en-IN')}
                 </span>
               )}
               <span className="text-4xl font-extrabold text-purple-600">
-                ₹{(discountedPrice || originalPrice).toLocaleString('en-IN')}
+                ₹{actualPrice.toLocaleString('en-IN')}
               </span>
               <button
                 className="ml-auto p-2 border border-gray-300 rounded-full text-gray-500 hover:bg-gray-100 hover:text-purple-600 transition"
@@ -252,13 +255,13 @@ const ProductDetailPage = () => {
                 <Share2 className="w-5 h-5" />
               </button>
             </div>
-            {discountedPrice && (
+            {displayedOriginalPrice && (
               <div className="flex items-center gap-2">
                 <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
                   {globalDiscount.percentage}% OFF
                 </span>
                 <span className="text-green-600 text-sm font-medium">
-                  Save ₹{(originalPrice - discountedPrice).toLocaleString('en-IN')}
+                  Save ₹{(displayedOriginalPrice - actualPrice).toLocaleString('en-IN')}
                 </span>
               </div>
             )}
