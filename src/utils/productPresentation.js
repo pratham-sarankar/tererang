@@ -95,6 +95,7 @@ export const mapProductForDisplay = (rawProduct = {}, options = {}) => {
         title: rawProduct.title || rawProduct.name || 'Tererang Exclusive',
         description: rawProduct.description || '',
         brand: rawProduct.brand || fallbackBrand,
+        price: numericPrice, // Add numeric price for calculations
         displayPrice,
         displayOldPrice,
         discount,
