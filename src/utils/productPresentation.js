@@ -7,7 +7,7 @@ export const DEFAULT_HEIGHTS = ["Up to 5'3''", "5'4''-5'6''", "5'6'' and above"]
 export const DEFAULT_HIGHLIGHTS = [
     { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
     { icon: 'Gift', text: 'Free Delivery & Gift Wrapping' },
-    { icon: 'Ruler', text: 'Custom Fitting Available' },
+    // { icon: 'Ruler', text: 'Custom Fitting Available' },
 ];
 
 export const toAbsoluteImage = (pathValue) => {

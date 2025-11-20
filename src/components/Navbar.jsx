@@ -240,7 +240,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-4 relative">
 
           {/* 🔍 Search Section */}
-          <div className="relative flex items-center">
+          {/* <div className="relative flex items-center">
             <div
               className={`transition-all duration-300 ease-in-out overflow-hidden ${isSearchOpen ? "w-48 opacity-100" : "w-0 opacity-0"
                 }`}
@@ -260,7 +260,7 @@ const Navbar = () => {
               🔍
             </button>
           </div>
-
+ */}
           {/* 🛒 Cart */}
           <div className="relative" ref={cartRef}>
             <button
@@ -422,7 +422,7 @@ const Navbar = () => {
                         📍 Addresses
                       </Link>
                     </li>
-                    <li>
+                    {/* <li>
                       <Link
                         to="/AlwaysOffers"
                         onClick={() => setIsLoginMenuOpen(false)}
@@ -430,7 +430,7 @@ const Navbar = () => {
                       >
                         🎁 Offers
                       </Link>
-                    </li>
+                    </li> */}
                     <li>
                       <button
                         onClick={handleLogout}

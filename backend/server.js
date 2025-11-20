@@ -27,7 +27,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware
-// CORS: In development allow any localhost origin; in production restrict to FRONTEND_URL
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

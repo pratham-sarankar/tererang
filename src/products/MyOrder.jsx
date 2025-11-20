@@ -185,7 +185,7 @@ const MyOrder = () => {
                         <div className="text-center bg-white rounded-3xl border border-dashed border-gray-200 p-12">
                             <p className="text-xl font-semibold text-gray-900 mb-3">No orders yet</p>
                             <p className="text-gray-500 mb-6">Your upcoming favorites will appear here right after checkout.</p>
-                            <Link to="/shop" className="inline-flex px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold shadow-lg">Discover the collection</Link>
+                            <Link to="/" className="inline-flex px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold shadow-lg">Discover the collection</Link>
                         </div>
                     ) : (
                         <div className="space-y-6">
