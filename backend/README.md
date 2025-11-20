@@ -34,6 +34,9 @@ Backend API for Tererang e-commerce platform with phone number authentication po
 - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`: Credentials from your Twilio console
 - `TWILIO_VERIFY_SERVICE_SID`: The Verify Service ID (starts with `VA...`) for OTP delivery
 - `TWILIO_DEFAULT_COUNTRY_CODE`: (Optional) Country code prefix, defaults to `+91`
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`: SMTP credentials for sending emails (Gmail, etc.)
+- `ORDER_NOTIFICATION_EMAIL`: Email address to receive order notifications and contact form submissions
+- `COMPANY_SUPPORT_EMAIL`: Support email displayed in emails and contact information
 
 3. Make sure dependencies are installed:
 
@@ -160,6 +163,32 @@ Content-Type: application/json
 
 ```
 
+### Contact Form
+
+#### Send Contact Message
+
+```
+
+POST /api/contact
+Content-Type: application/json
+
+{
+"name": "John Doe",
+"email": "john@example.com",
+"message": "I have a question about your products..."
+}
+
+````
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Your message has been sent successfully! We will get back to you soon."
+}
+```
+
 ### Health Check
 
 ```
@@ -224,6 +253,54 @@ This application uses Google Cloud Storage for product images:
 2. Configure environment variables in your `.env` file
 3. Test the connection using: `node test-gcs.js`
 
+## Email Service Configuration
+
+This application uses SMTP to send emails for order notifications and contact form submissions.
+
+### Supported Email Providers
+
+- **Gmail**: Use App Passwords (not your regular password)
+- **Outlook/Hotmail**: Enable SMTP in settings
+- **Custom SMTP**: Any SMTP server
+
+### Gmail Setup (Recommended)
+
+1. Enable 2-Factor Authentication on your Google account
+2. Generate an App Password:
+   - Go to Google Account Settings → Security
+   - Under "Signing in to Google", select "App passwords"
+   - Generate a new app password for "Mail"
+3. Update your `.env` file:
+   ```env
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-16-char-app-password
+   ORDER_NOTIFICATION_EMAIL=tererang.official@gmail.com
+   ```
+
+### Email Features
+
+- **Order Notifications**: Sends detailed order emails to admin
+- **Customer Confirmations**: Sends order confirmation with GST invoice to customers
+- **Contact Form**: Forwards contact form submissions to support email
+- **Reply-To Support**: Contact form emails include customer's email as reply-to
+
+### Testing Email Service
+
+The email service will log to console if SMTP credentials are missing or invalid. To test:
+
+1. Configure SMTP credentials in `.env`
+2. Restart the server
+3. Submit the contact form or place a test order
+4. Check console logs and email inbox
+
+### Setup Google Cloud Storage
+
+1. Follow the detailed setup guide in `GOOGLE_CLOUD_STORAGE_SETUP.md`
+2. Configure environment variables in your `.env` file
+3. Test the connection using: `node test-gcs.js`
+
 ### Image Migration
 
 If migrating from local file storage, use the migration script:
@@ -246,4 +323,7 @@ node migrate-images.js
 
 - JWT tokens expire after 30 days
 - Twilio handles OTP expiration and retry policies via the configured Verify Service
-````
+
+```
+
+```

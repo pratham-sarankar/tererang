@@ -354,6 +354,91 @@ export const sendCustomerOrderStatusEmail = async ({ order, user, type, reason }
     }
 };
 
+export const sendContactEmail = async ({ name, email, message }) => {
+    const supportEmail = COMPANY_SUPPORT_EMAIL || ORDER_NOTIFICATION_EMAIL || SMTP_USER;
+
+    if (!supportEmail) {
+        console.warn('[emailService] No support email configured for contact form');
+        return { success: false, message: 'Support email not configured' };
+    }
+
+    const activeTransporter = initTransporter();
+
+    if (!activeTransporter) {
+        console.info('[emailService] Transporter unavailable. Logging contact form instead:', {
+            from: email,
+            name,
+            message,
+        });
+        return { success: false, message: 'Email service not configured' };
+    }
+
+    const contactHtml = `
+        <div style="font-family:Arial,sans-serif;color:#111;padding:24px;background:#fdfdfd;">
+            <h2 style="margin-top:0;color:#d91e78;">${BRAND_NAME} • New Contact Message</h2>
+            <p style="color:#333;">You have received a new message from your website contact form.</p>
+            
+            <table style="border-collapse:collapse;width:100%;margin-top:16px;">
+                <tr>
+                    <td style="padding:12px;border:1px solid #eee;background:#fafafa;font-weight:600;width:30%;">Name</td>
+                    <td style="padding:12px;border:1px solid #eee;">${name}</td>
+                </tr>
+                <tr>
+                    <td style="padding:12px;border:1px solid #eee;background:#fafafa;font-weight:600;">Email</td>
+                    <td style="padding:12px;border:1px solid #eee;"><a href="mailto:${email}">${email}</a></td>
+                </tr>
+                <tr>
+                    <td style="padding:12px;border:1px solid #eee;background:#fafafa;font-weight:600;">Received at</td>
+                    <td style="padding:12px;border:1px solid #eee;">${new Date().toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    })}</td>
+                </tr>
+            </table>
+            
+            <div style="margin-top:20px;padding:16px;border:1px solid #eee;border-radius:8px;background:#fff;">
+                <p style="margin:0 0 8px 0;font-weight:bold;color:#333;">Message:</p>
+                <p style="margin:0;color:#444;line-height:1.6;white-space:pre-wrap;">${message}</p>
+            </div>
+            
+            <p style="margin-top:24px;color:#666;font-size:12px;">
+                You can reply directly to this email to respond to ${name}.
+            </p>
+        </div>
+    `;
+
+    try {
+        console.info('[emailService] Sending contact form email', {
+            from: email,
+            name,
+            to: supportEmail,
+        });
+
+        const response = await activeTransporter.sendMail({
+            from: `${BRAND_NAME} Contact Form <${SMTP_USER}>`,
+            replyTo: email,
+            to: supportEmail,
+            subject: `${BRAND_NAME} • Contact Form Message from ${name}`,
+            html: contactHtml,
+        });
+
+        console.info('[emailService] Contact form email sent successfully', {
+            messageId: response.messageId,
+            accepted: response.accepted,
+        });
+
+        return { success: true, messageId: response.messageId };
+    } catch (error) {
+        console.error('[emailService] Failed to send contact form email', {
+            error: error.message,
+        });
+        return { success: false, message: error.message };
+    }
+};
+
 export const checkSmtpConnectivity = async () => {
     const mailTo = ORDER_NOTIFICATION_EMAIL || SMTP_USER || null;
     const activeTransporter = initTransporter();
