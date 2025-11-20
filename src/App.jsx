@@ -29,6 +29,7 @@ import AlwaysOffers from "./products/AlwaysOffers";
 import MyOrder from "./products/MyOrder";
 import ReturnPolicy from "./products/ReturnPolicy";
 import DesignerSuit from "./products/DesignerSuit";
+import Privacy from "./pages/Privacy";
 import { CartProvider } from "./context/CartContext.jsx";
 import Checkout from "./pages/Checkout";
 import ProductDetail from "./pages/ProductDetail";
@@ -75,6 +76,7 @@ function App() {
           <Route path="/MyOrder" element={<MyOrder />} />
           <Route path="ReturnPolicy" element={<ReturnPolicy />} />
           <Route path="DesignerSuit" element={<DesignerSuit />} />
+          <Route path="/privacy-policy" element={<Privacy />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/addresses" element={<AddressBook />} />
           <Route path="/product/:productId" element={<ProductDetail />} />

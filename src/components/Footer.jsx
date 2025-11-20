@@ -24,6 +24,7 @@ export const Footer = () => (
                     <li><a href="/products/Kurti" className="hover:text-pink-400 transition">Products</a></li>
                     <li><a href="/Shipping" className="hover:text-pink-400 transition">Shipping Policy</a></li>
                     <li><a href="/TermsPage" className="hover:text-pink-400 transition">Terms & Conditions</a></li>
+                    <li><a href="/privacy-policy" className="hover:text-pink-400 transition">Privacy Policy</a></li>
                     <li><a href="/TermsPage" className="hover:text-pink-400 transition">Return & Exchange</a></li>
                 </ul>
             </div>
