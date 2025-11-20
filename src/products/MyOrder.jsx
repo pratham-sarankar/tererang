@@ -27,9 +27,9 @@ const formatDate = (value) => new Date(value).toLocaleDateString('en-IN', {
 const resolveImage = (item) => {
     if (!item) return null;
     // Prioritize imageUrls over images field
-    const source = 
+    const source =
         (Array.isArray(item.imageUrls) && item.imageUrls[0]) ||
-        item.image || 
+        item.image ||
         (Array.isArray(item.images) && item.images[0]);
     if (!source) return null;
     if (/^https?:/i.test(source)) return source;
@@ -168,7 +168,7 @@ const MyOrder = () => {
                 <section>
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-2xl font-bold text-gray-900">Latest updates</h2>
-                        <Link to="/shop" className="text-sm font-semibold text-pink-500 hover:text-pink-600">Shop more →</Link>
+                        <Link to="/" className="text-sm font-semibold text-pink-500 hover:text-pink-600">Shop more →</Link>
                     </div>
 
                     {error && (
