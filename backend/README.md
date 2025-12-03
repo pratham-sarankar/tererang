@@ -276,7 +276,7 @@ This application uses SMTP to send emails for order notifications and contact fo
    SMTP_PORT=587
    SMTP_USER=your-email@gmail.com
    SMTP_PASS=your-16-char-app-password
-   ORDER_NOTIFICATION_EMAIL=tererang.official@gmail.com
+   ORDER_NOTIFICATION_EMAIL=tererangofficial@gmail.com
    ```
 
 ### Email Features

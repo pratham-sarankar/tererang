@@ -128,7 +128,7 @@ const PrivacyPolicy = () => {
                 <li>Withdraw consent where we rely on it</li>
               </ul>
               <p className="mt-4 leading-relaxed">
-                To exercise these rights, please contact us at <a href="mailto:tererang.official@gmail.com" className="text-pink-600 hover:text-pink-700 font-semibold">tererang.official@gmail.com</a>
+                To exercise these rights, please contact us at <a href="mailto:tererangofficial@gmail.com" className="text-pink-600 hover:text-pink-700 font-semibold">tererangofficial@gmail.com</a>
               </p>
             </div>
           </section>
@@ -180,7 +180,7 @@ const PrivacyPolicy = () => {
                 </p>
                 <p className="flex items-center">
                   <i className="fas fa-envelope text-pink-600 mr-3"></i>
-                  <a href="mailto:tererang.official@gmail.com" className="text-pink-600 hover:text-pink-700 font-semibold">tererang.official@gmail.com</a>
+                  <a href="mailto:tererangofficial@gmail.com" className="text-pink-600 hover:text-pink-700 font-semibold">tererangofficial@gmail.com</a>
                 </p>
               </div>
             </div>

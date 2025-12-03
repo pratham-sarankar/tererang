@@ -92,7 +92,7 @@ const Contact = () => {
               </div>
               <div className="flex items-center gap-4">
                 <FaEnvelope className="text-2xl" />
-                <p>tererang.official@gmail.com</p>
+                <p>tererangofficial@gmail.com</p>
               </div>
             </div>
 
@@ -119,8 +119,8 @@ const Contact = () => {
 
             {submitStatus.message && (
               <div className={`mb-4 p-4 rounded-lg ${submitStatus.type === 'success'
-                  ? 'bg-green-100 text-green-800 border border-green-300'
-                  : 'bg-red-100 text-red-800 border border-red-300'
+                ? 'bg-green-100 text-green-800 border border-green-300'
+                : 'bg-red-100 text-red-800 border border-red-300'
                 }`}>
                 {submitStatus.message}
               </div>

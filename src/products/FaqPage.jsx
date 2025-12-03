@@ -21,7 +21,7 @@ const faqData = [
   },
   {
     question: "How can I contact Customer Support?",
-    answer: "You can email us anytime at **tererang.official@gmail.com**. We aim to respond to all inquiries within 24 hours. We are also planning to launch a live chat option on our website soon for immediate assistance!"
+    answer: "You can email us anytime at **tererangofficial@gmail.com**. We aim to respond to all inquiries within 24 hours. We are also planning to launch a live chat option on our website soon for immediate assistance!"
   },
 ];
 
@@ -115,7 +115,7 @@ const FaqPage = () => {
             Our dedicated support team is ready to assist you.
           </p>
           <a
-            href="mailto:tererang.official@gmail.com"
+            href="mailto:tererangofficial@gmail.com"
             className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-full 
                        hover:bg-indigo-700 transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >

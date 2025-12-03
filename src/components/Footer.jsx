@@ -46,7 +46,7 @@ export const Footer = () => (
                 <ul className="space-y-3 text-gray-400 text-sm">
                     <li>📍 Moradabad, Uttar Pradesh, India</li>
                     <li>📞 +91 9548971147</li>
-                    <li>✉️ tererang.official@gmail.com</li>
+                    <li>✉️ tererangofficial@gmail.com</li>
                 </ul>
             </div>
         </div>
