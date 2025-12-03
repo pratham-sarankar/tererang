@@ -206,7 +206,6 @@ const App = () => {
 
                     </div>
                 </main>
-
                 <Footer />
             </div>
         </>
