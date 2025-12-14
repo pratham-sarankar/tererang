@@ -264,6 +264,13 @@ const Home = () => {
                 color: "from-yellow-500 to-orange-500",
                 desc: "Modern elegance",
               },
+              {
+                name: "Winter Ethnic Wear",
+                icon: Crown,
+                path: "/products/EthnicWear",
+                color: "from-indigo-500 to-purple-600",
+                desc: "Cozy & festive",
+              },
             ].map((category, index) => (
               <div
                 key={index}

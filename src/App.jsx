@@ -17,6 +17,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Kurti from "./products/Kurti";
 import Suit from "./products/Suit";
 import Coat from "./products/Coat";
+import EthnicWear from "./products/EthnicWear";
 import ShararaData from "./products/ShararaData";
 import Skirt from "./products/Skirt";
 //import Offers from "./pages/Offers";
@@ -63,6 +64,7 @@ function App() {
 
           {/* Products */}
           <Route path="/products/Kurti" element={<Kurti />} />
+          <Route path="/products/EthnicWear" element={<EthnicWear />} />
           <Route path="/products/Suit" element={<Suit />} />
           <Route path="/products/Coat" element={<Coat />} />
           <Route path="/products/ShararaData" element={<ShararaData />} />   {/* ✅ lowercase */}

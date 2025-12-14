@@ -580,6 +580,7 @@ export default function AdminDashboard() {
                                     <option value="suit">Suit</option>
                                     <option value="skirt">Skirt</option>
                                     <option value="coat">Coat</option>
+                                    <option value="ethnicWear">Ethnic Wear</option>
                                 </select>
                             </div>
                             <div className="form-group">
@@ -606,43 +607,43 @@ export default function AdminDashboard() {
                             />
                         </div>
 
-                                        <div className="form-group">
-                                            <label>Size-wise stock</label>
-                                            <div className="size-stock-grid">
-                                                {formData.sizeStock.map((row, index) => (
-                                                    <div className="size-stock-row" key={`size-row-${index}`}>
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Size (e.g. M)"
-                                                            value={row.size}
-                                                            onChange={(e) => updateSizeStockValue(index, 'size', e.target.value)}
-                                                        />
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            value={row.quantity}
-                                                            onChange={(e) => updateSizeStockValue(index, 'quantity', e.target.value)}
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            aria-label="Remove size"
-                                                            onClick={() => removeSizeStockRow(index)}
-                                                            disabled={formData.sizeStock.length <= 1}
-                                                        >
-                                                            &times;
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <div className="size-stock-actions">
-                                                <button type="button" className="add-size-btn" onClick={addSizeStockRow}>
-                                                    + Add custom size
-                                                </button>
-                                            </div>
-                                            <p className="size-stock-hint">
-                                                We will automatically deduct one unit for the selected size whenever an order is confirmed.
-                                            </p>
-                                        </div>
+                        <div className="form-group">
+                            <label>Size-wise stock</label>
+                            <div className="size-stock-grid">
+                                {formData.sizeStock.map((row, index) => (
+                                    <div className="size-stock-row" key={`size-row-${index}`}>
+                                        <input
+                                            type="text"
+                                            placeholder="Size (e.g. M)"
+                                            value={row.size}
+                                            onChange={(e) => updateSizeStockValue(index, 'size', e.target.value)}
+                                        />
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={row.quantity}
+                                            onChange={(e) => updateSizeStockValue(index, 'quantity', e.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            aria-label="Remove size"
+                                            onClick={() => removeSizeStockRow(index)}
+                                            disabled={formData.sizeStock.length <= 1}
+                                        >
+                                            &times;
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="size-stock-actions">
+                                <button type="button" className="add-size-btn" onClick={addSizeStockRow}>
+                                    + Add custom size
+                                </button>
+                            </div>
+                            <p className="size-stock-hint">
+                                We will automatically deduct one unit for the selected size whenever an order is confirmed.
+                            </p>
+                        </div>
 
                         <div className="form-group">
                             <label htmlFor="images">Product Images</label>
@@ -692,8 +693,8 @@ export default function AdminDashboard() {
                                 <img
                                     src={
                                         // Use imageUrls as primary source (images field no longer in API response)
-                                        (product.imageUrls && product.imageUrls[0]) || 
-                                        product.image || 
+                                        (product.imageUrls && product.imageUrls[0]) ||
+                                        product.image ||
                                         null
                                     }
                                     alt={product.name}
