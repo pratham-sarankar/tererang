@@ -2,7 +2,7 @@ import express from 'express';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 import { protect } from '../middleware/authMiddleware.js';
-import { sendOrderConfirmationEmail, checkSmtpConnectivity } from '../utils/emailService.js';
+import { sendOrderConfirmationEmail, sendCustomerOrderStatusEmail, checkSmtpConnectivity } from '../utils/emailService.js';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 
@@ -328,6 +328,7 @@ router.post('/verify-payment', async (req, res) => {
             subtotal,
             taxAmount,
             grandTotal,
+            status: 'confirmed',
             paymentMethod: 'razorpay',
             paymentStatus: 'paid',
             paymentReference: razorpay_payment_id,
@@ -339,6 +340,7 @@ router.post('/verify-payment', async (req, res) => {
 
         // Send email
         try {
+            // Notify Admin
             await sendOrderConfirmationEmail({
                 order,
                 user: {
@@ -346,6 +348,15 @@ router.post('/verify-payment', async (req, res) => {
                     phoneNumber: user.phoneNumber,
                     email: user.email,
                 },
+            });
+            // Notify Customer
+            await sendCustomerOrderStatusEmail({
+                order,
+                user: {
+                    name: user.name,
+                    email: user.email,
+                },
+                type: 'confirmed'
             });
         } catch (emailError) {
             console.error('[orderRoutes] Order email error', emailError);
