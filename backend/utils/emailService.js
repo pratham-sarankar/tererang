@@ -146,7 +146,6 @@ const buildOrderHtml = (order, user) => {
                 ${orderMetaRows}
             </table>
             ${formattedAddress}
-            ${formattedAddress}
       <table style="border-collapse:collapse;width:100%;margin-top:16px;">
       <table style="border-collapse:collapse;width:100%;margin-top:16px;">
         <thead>
