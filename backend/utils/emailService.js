@@ -285,8 +285,6 @@ const buildCustomerOrderHtml = ({ order, user, type, reason }) => {
                 </tbody>
             </table>
             ${shippingBlock}
-            ${shippingBlock}
-            <p style="margin-top:24px;color:#444;">${supportLine}</p>
             <p style="margin-top:24px;color:#444;">${supportLine}</p>
             <p style="margin-top:12px;color:#999;font-size:12px;">This is an automated message from ${BRAND_NAME}. Please keep it for your records.</p>
         </div>
