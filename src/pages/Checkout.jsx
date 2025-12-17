@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShieldCheck, Smartphone, CheckCircle, Wallet, Loader2, MapPin, Plus, Pencil, Star, Clock3, Mail } from 'lucide-react';
+import { ShieldCheck, Smartphone, CheckCircle, Wallet, Loader2, MapPin, Plus, Pencil, Star, Clock3, Mail, CreditCard } from 'lucide-react';
 import { useCart } from '../context/cartContextStore.js';
-import { apiUrl, imageUrl, UPI_ID, UPI_PAYEE_NAME, upiQrUrl, upiPaymentLink, GST_RATE, GST_RATE_LABEL } from '../config/env.js';
+import { apiUrl, GST_RATE, GST_RATE_LABEL } from '../config/env.js';
 import AddressForm from '../components/AddressForm.jsx';
 import { createAddress, listAddresses, setDefaultAddress, updateAddress } from '../utils/addressApi.js';
+import { useRazorpay } from '../hooks/useRazorpay.js';
 
 const formatter = new Intl.NumberFormat('en-IN', {
   style: 'currency',
@@ -39,8 +40,10 @@ const persistUserProfile = (user) => {
 const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems, cartTotal, loading, refreshCart } = useCart();
+  const { loadRazorpay } = useRazorpay();
+
   const initialStoredUser = useMemo(() => readStoredUser(), []);
-  const [paymentReference, setPaymentReference] = useState('');
+  const [paymentReference, setPaymentReference] = useState(''); // Kept for legacy compatibility if needed
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
@@ -250,97 +253,136 @@ const Checkout = () => {
     return () => clearTimeout(timer);
   }, [statusMessage]);
 
-  const handleConfirmPayment = async () => {
+
+  const verifyPayment = async (razorpayData, orderDetails) => {
+    try {
+      const response = await fetch(apiUrl('/api/orders/verify-payment'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          razorpay_order_id: razorpayData.razorpay_order_id,
+          razorpay_payment_id: razorpayData.razorpay_payment_id,
+          razorpay_signature: razorpayData.razorpay_signature,
+          addressId: selectedAddressId,
+          notes
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Payment verification failed');
+      }
+
+      setStatusMessage({ type: 'success', text: 'Payment successful! Order placed.' });
+      await refreshCart();
+      setTimeout(() => navigate('/MyOrder'), 1500);
+
+    } catch (error) {
+      setStatusMessage({ type: 'error', text: error.message });
+      setSubmitting(false);
+    }
+  };
+
+  const handleRazorpayPayment = async () => {
     if (!cartItems?.length) {
       setStatusMessage({ type: 'error', text: 'Your cart is empty.' });
       return;
     }
 
     if (!selectedAddressId) {
-      setStatusMessage({ type: 'error', text: 'Please add or select a delivery address before placing your order.' });
+      setStatusMessage({ type: 'error', text: 'Please add or select a delivery address.' });
       return;
     }
 
     if (userLoading) {
-      setStatusMessage({ type: 'error', text: 'Please wait while we sync your profile details.' });
+      setStatusMessage({ type: 'error', text: 'Please wait, syncing profile...' });
       return;
     }
 
     if (!userProfile?.email) {
-      setStatusMessage({ type: 'error', text: 'Add your email address to continue with the order.' });
+      setStatusMessage({ type: 'error', text: 'Please add your email address.' });
+      return;
+    }
+
+    setSubmitting(true);
+    setStatusMessage(null);
+
+    // Load script
+    const isLoaded = await loadRazorpay();
+    if (!isLoaded) {
+      setStatusMessage({ type: 'error', text: 'Failed to load Razorpay SDK. Check connection.' });
+      setSubmitting(false);
       return;
     }
 
     try {
-      setSubmitting(true);
-      setStatusMessage(null);
-      const response = await fetch(apiUrl('/api/orders'), {
+      // 1. Create Order
+      const response = await fetch(apiUrl('/api/orders/create-razorpay-order'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          addressId: selectedAddressId,
-          paymentReference: paymentReference.trim() || undefined,
-          notes: notes.trim() || undefined,
-        }),
+        body: JSON.stringify({ addressId: selectedAddressId })
       });
 
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to confirm payment');
+        throw new Error(data.message || 'Failed to initiate payment');
       }
 
-      setStatusMessage({ type: 'success', text: 'Payment confirmed! Your order is being processed.' });
-      setPaymentReference('');
-      setNotes('');
-      await refreshCart();
-      setTimeout(() => navigate('/MyOrder'), 1500);
+      // 2. Open Razorpay
+      const options = {
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: "TereRang",
+        description: "Complete your purchase",
+        order_id: data.id,
+        image: "https://tererang.in/logo.png", // Fallback or use real logo if available
+        handler: function (response) {
+          verifyPayment(response, data);
+        },
+        prefill: data.prefill,
+        theme: {
+          color: "#14B8A6" // Teal-500
+        },
+        modal: {
+          ondismiss: function () {
+            setSubmitting(false);
+            setStatusMessage({ type: 'error', text: 'Payment cancelled' });
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
     } catch (error) {
       setStatusMessage({ type: 'error', text: error.message });
-    } finally {
       setSubmitting(false);
     }
   };
 
+
   const subtotalAmount = useMemo(() => Number(cartTotal || 0), [cartTotal]);
   const gstAmount = useMemo(() => Number((subtotalAmount * GST_RATE).toFixed(2)), [subtotalAmount]);
   const payableWithGst = useMemo(() => subtotalAmount + gstAmount, [subtotalAmount, gstAmount]);
-  const upiCartSummary = useMemo(() => {
-    if (!cartItems?.length) return 'TereRang order';
-    const itemLabel = cartItems.length === 1 ? 'item' : 'items';
-    return `TereRang order (${cartItems.length} ${itemLabel})`;
-  }, [cartItems]);
-  const upiQrImageSrc = useMemo(
-    () =>
-      upiQrUrl({
-        amount: payableWithGst > 0 ? payableWithGst : undefined,
-        note: upiCartSummary,
-      }),
-    [payableWithGst, upiCartSummary]
-  );
-  const upiIntentLink = useMemo(
-    () =>
-      upiPaymentLink({
-        amount: payableWithGst > 0 ? payableWithGst : undefined,
-        note: upiCartSummary,
-      }),
-    [payableWithGst, upiCartSummary]
-  );
-  const upiHandle = UPI_ID;
-  const upiReferenceHint = (UPI_PAYEE_NAME || 'Tere Rang').replace(/\s+/g, '').toUpperCase();
+
   const resolveImage = (product) => {
     if (!product) return null;
-    // Prioritize imageUrls over images field
-    const source = 
+    const source =
       (Array.isArray(product.imageUrls) && product.imageUrls[0]) ||
-      product.image || 
+      product.image ||
       (Array.isArray(product.images) ? product.images[0] : null);
     if (!source) return null;
     if (/^https?:/i.test(source)) return source;
     return imageUrl(source);
   };
+
   const hasEmail = Boolean(userProfile?.email);
   const requiresEmail = !hasEmail;
   const showEmailForm = requiresEmail || editingEmail;
@@ -355,37 +397,51 @@ const Checkout = () => {
         <section className="bg-white/5 backdrop-blur rounded-3xl border border-white/10 shadow-2xl p-8">
           <p className="uppercase tracking-[0.35em] text-sm text-teal-300 mb-2">Checkout</p>
           <h1 className="text-4xl font-black mb-6">Complete Your Purchase</h1>
-          <p className="text-gray-300 mb-8">
-            Scan the QR code below using any UPI-enabled app. Once the payment is complete, share the reference ID so we can match it with your order.
-          </p>
 
-          <div className="bg-black/60 rounded-2xl p-6 flex flex-col items-center border border-teal-900/40">
-            <div className="rounded-2xl bg-white p-4 mb-4 shadow-xl">
-              <img src={upiQrImageSrc} alt="UPI QR" className="h-48 w-48 object-contain" />
+          <div className="bg-gradient-to-br from-teal-900/20 to-black rounded-2xl p-8 border border-teal-800/30">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 bg-teal-500/20 rounded-xl">
+                <CreditCard size={32} className="text-teal-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Secure Payment</h3>
+                <p className="text-gray-400 text-sm">Powered by Razorpay</p>
+              </div>
             </div>
-            <p className="text-lg font-semibold">UPI ID: <span className="text-teal-300">{upiHandle}</span></p>
-            <p className="text-sm text-gray-400">Reference message: {upiReferenceHint} + your name</p>
-            <p className="text-sm text-teal-200 mt-2">Amount (incl. GST): {formatCurrency(payableWithGst)}</p>
-            <a
-              href={upiIntentLink}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 inline-flex items-center gap-2 rounded-full border border-teal-400/60 px-4 py-2 text-sm text-teal-200 hover:border-white/80 hover:text-white transition"
-            >
-              Open in UPI app
-            </a>
+
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-start gap-3">
+                <CheckCircle size={20} className="text-teal-400 shrink-0 mt-0.5" />
+                <span className="text-gray-300 text-sm">Accepts UPI, Cards, Netbanking, and Wallets.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <ShieldCheck size={20} className="text-teal-400 shrink-0 mt-0.5" />
+                <span className="text-gray-300 text-sm">100% Secure & Encrypted transaction.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle size={20} className="text-teal-400 shrink-0 mt-0.5" />
+                <span className="text-gray-300 text-sm">Instant confirmation & invoice via email.</span>
+              </li>
+            </ul>
+
+            <div className="flex items-center justify-between border-t border-white/10 pt-6">
+              <div>
+                <p className="text-sm text-gray-400">Total Amount</p>
+                <p className="text-3xl font-bold text-white mt-1">{formatCurrency(payableWithGst)}</p>
+              </div>
+              <Wallet size={32} className="text-gray-600" />
+            </div>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-            {[{ icon: ShieldCheck, title: 'Secure checkout', body: 'UPI transaction validation' }, { icon: Smartphone, title: 'UPI ready', body: 'Works with all apps' }, { icon: Wallet, title: 'No hidden fees', body: 'Pay only what you see' }].map((card) => (
-              <div key={card.title} className="bg-white/5 rounded-2xl border border-white/10 p-4 flex items-start gap-3">
-                <card.icon size={20} className="text-teal-300 mt-1" />
-                <div>
-                  <p className="font-semibold">{card.title}</p>
-                  <p className="text-gray-400 text-xs mt-1">{card.body}</p>
-                </div>
-              </div>
-            ))}
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <p className="font-semibold mb-1 text-teal-200">Fast Refund</p>
+              <p className="text-xs text-gray-400">Instant refund for failed transactions.</p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <p className="font-semibold mb-1 text-teal-200">Buyer Protection</p>
+              <p className="text-xs text-gray-400">Secure payment coverage.</p>
+            </div>
           </div>
         </section>
 
@@ -649,16 +705,6 @@ const Checkout = () => {
 
                 <div className="mt-6 space-y-4">
                   <div>
-                    <label className="text-sm text-gray-300 block mb-2">Payment reference / UPI transaction ID</label>
-                    <input
-                      type="text"
-                      value={paymentReference}
-                      onChange={(e) => setPaymentReference(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
-                      placeholder="e.g. UPI1234ABCD"
-                    />
-                  </div>
-                  <div>
                     <label className="text-sm text-gray-300 block mb-2">Notes for designer (optional)</label>
                     <textarea
                       rows="3"
@@ -671,17 +717,18 @@ const Checkout = () => {
                 </div>
 
                 <button
-                  onClick={handleConfirmPayment}
+                  onClick={handleRazorpayPayment}
                   disabled={submitting || !selectedAddressId || userLoading || !userProfile?.email}
                   title={!userProfile?.email ? 'Add your email to continue' : undefined}
                   className="mt-6 flex items-center justify-center gap-2 w-full bg-gradient-to-r from-teal-400 to-blue-500 text-black font-extrabold py-4 rounded-2xl shadow-[0_10px_40px_rgba(20,184,166,0.35)] hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {submitting ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle size={20} />}
-                  {submitting ? 'Confirming Payment...' : 'I have paid'}
+                  {submitting ? <Loader2 className="animate-spin" size={18} /> : <CreditCard size={20} />}
+                  {submitting ? 'Processing...' : `Pay ${formatCurrency(payableWithGst)}`}
                 </button>
 
                 <p className="text-xs text-center text-gray-400 mt-3">
-                  Need help? <a href="/contact" className="text-teal-300 font-semibold">Chat with concierge</a>
+                  <ShieldCheck size={14} className="inline mr-1" />
+                  Transactions are 100% Secure and Encrypted.
                 </p>
               </>
             ) : (
