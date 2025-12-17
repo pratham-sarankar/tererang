@@ -13,9 +13,7 @@ const razorpay = new Razorpay({
 
 const router = express.Router();
 const resolveGstRate = () => {
-    const raw = Number(process.env.GST_RATE ?? process.env.GST_RATE_PERCENT ?? 0.05);
-    if (!Number.isFinite(raw) || raw <= 0) return 0.05;
-    return raw > 1 ? raw / 100 : raw;
+    return 0;
 };
 const GST_RATE = resolveGstRate();
 

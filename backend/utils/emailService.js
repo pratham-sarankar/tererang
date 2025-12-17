@@ -146,7 +146,8 @@ const buildOrderHtml = (order, user) => {
                 ${orderMetaRows}
             </table>
             ${formattedAddress}
-            ${gstBlock}
+            ${formattedAddress}
+      <table style="border-collapse:collapse;width:100%;margin-top:16px;">
       <table style="border-collapse:collapse;width:100%;margin-top:16px;">
         <thead>
           <tr>
@@ -157,16 +158,8 @@ const buildOrderHtml = (order, user) => {
         <tbody>
           ${itemsRows}
           <tr>
-            <td style="padding:12px;border:1px solid #eee;text-align:left;font-weight:bold;">Subtotal</td>
-                                                <td style="padding:12px;border:1px solid #eee;text-align:right;font-weight:bold;">${formatCurrency(order.subtotal)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:12px;border:1px solid #eee;text-align:left;">GST (${GST_PERCENT_DISPLAY}%)</td>
-                        <td style="padding:12px;border:1px solid #eee;text-align:right;">${formatCurrency(gstAmount)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:12px;border:1px solid #eee;text-align:left;font-weight:bold;">Grand total (incl. GST)</td>
-                        <td style="padding:12px;border:1px solid #eee;text-align:right;font-weight:bold;">${formatCurrency(grandTotal)}</td>
+            <td style="padding:12px;border:1px solid #eee;text-align:left;font-weight:bold;">Total Amount</td>
+            <td style="padding:12px;border:1px solid #eee;text-align:right;font-weight:bold;">${formatCurrency(order.grandTotal || order.subtotal)}</td>
           </tr>
         </tbody>
       </table>
@@ -287,21 +280,14 @@ const buildCustomerOrderHtml = ({ order, user, type, reason }) => {
                 <tbody>
                     ${itemsRows}
                     <tr>
-                        <td style="padding:12px;border:1px solid #eee;text-align:left;font-weight:bold;">Subtotal</td>
-                        <td style="padding:12px;border:1px solid #eee;text-align:right;font-weight:bold;">${formatCurrency(order.subtotal)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:12px;border:1px solid #eee;text-align:left;">GST (${GST_PERCENT_DISPLAY}%)</td>
-                        <td style="padding:12px;border:1px solid #eee;text-align:right;">${formatCurrency(gstAmount)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:12px;border:1px solid #eee;text-align:left;font-weight:bold;">Grand total (incl. GST)</td>
-                        <td style="padding:12px;border:1px solid #eee;text-align:right;font-weight:bold;">${formatCurrency(grandTotal)}</td>
+                        <td style="padding:12px;border:1px solid #eee;text-align:left;font-weight:bold;">Total Amount</td>
+                        <td style="padding:12px;border:1px solid #eee;text-align:right;font-weight:bold;">${formatCurrency(order.grandTotal || order.subtotal)}</td>
                     </tr>
                 </tbody>
             </table>
             ${shippingBlock}
-            ${gstBlock}
+            ${shippingBlock}
+            <p style="margin-top:24px;color:#444;">${supportLine}</p>
             <p style="margin-top:24px;color:#444;">${supportLine}</p>
             <p style="margin-top:12px;color:#999;font-size:12px;">This is an automated message from ${BRAND_NAME}. Please keep it for your records.</p>
         </div>

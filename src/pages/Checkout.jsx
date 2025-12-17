@@ -685,21 +685,9 @@ const Checkout = () => {
                 </div>
 
                 <div className="mt-6 space-y-3 border-t border-white/10 pt-4">
-                  <div className="flex justify-between text-gray-300 text-sm">
-                    <span>Subtotal</span>
-                    <span>{formatCurrency(subtotalAmount)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-300 text-sm">
-                    <span>GST ({GST_RATE_LABEL})</span>
-                    <span>{formatCurrency(gstAmount)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-300 text-sm">
-                    <span>Shipping</span>
-                    <span className="text-teal-300">Free Express</span>
-                  </div>
                   <div className="flex justify-between text-lg font-bold">
-                    <span>Total (incl. GST)</span>
-                    <span>{formatCurrency(payableWithGst)}</span>
+                    <span>Total Amount</span>
+                    <span>{formatCurrency(subtotalAmount)}</span>
                   </div>
                 </div>
 
@@ -739,7 +727,7 @@ const Checkout = () => {
             )}
           </div>
         </section>
-      </div>
+      </div >
       <div className="max-w-6xl mx-auto mt-8 text-center text-xs text-gray-400">
         <span>Read our </span>
         <Link to="/TermsPage" className="text-teal-300 font-semibold hover:underline underline-offset-4">
@@ -747,7 +735,7 @@ const Checkout = () => {
         </Link>
         <span> to learn how we protect your data.</span>
       </div>
-    </div>
+    </div >
   );
 };
 

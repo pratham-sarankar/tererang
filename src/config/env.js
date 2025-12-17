@@ -11,7 +11,7 @@ const UPI_QR_SIZE = import.meta.env.VITE_UPI_QR_SIZE || '220x220';
 const UPI_DEFAULT_CURRENCY = import.meta.env.VITE_UPI_CURRENCY || 'INR';
 const UPI_DEFAULT_MODE = import.meta.env.VITE_UPI_MODE || '02';
 const RAW_GST_RATE = Number(import.meta.env.VITE_GST_RATE ?? import.meta.env.VITE_GST_RATE_PERCENT ?? 0.05);
-const GST_RATE_VALUE = Number.isFinite(RAW_GST_RATE) && RAW_GST_RATE > 0 ? (RAW_GST_RATE > 1 ? RAW_GST_RATE / 100 : RAW_GST_RATE) : 0.05;
+const GST_RATE_VALUE = 0;
 const GST_RATE_PERCENT_LABEL = `${(GST_RATE_VALUE * 100).toFixed(2).replace(/\.00$/, '')}%`;
 
 if (!BACKEND_URL) {
