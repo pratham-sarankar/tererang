@@ -166,11 +166,11 @@ const Navbar = () => {
           </div>
 
           {/* ✅ DESKTOP MENU */}
-          <ul className="hidden md:flex space-x-8 items-center font-medium">
+          <ul className="hidden md:flex space-x-8 items-center font-light">
             <li>
               <Link
                 to="/"
-                className={`transition duration-200 font-semibold ${isActive("/")
+                className={`transition duration-200 relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full ${isActive("/")
                   ? "text-white"
                   : "text-gray-700"
                   }`}
@@ -185,10 +185,15 @@ const Navbar = () => {
             </li>
 
             {/* ✅ PRODUCTS DROPDOWN */}
-            <li ref={dropdownRef} className="relative">
+            <li
+              ref={dropdownRef}
+              className="relative"
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}
+            >
               <button
                 onClick={() => setIsDropdownOpen((s) => !s)}
-                className={`transition duration-200 font-semibold ${isActive("/products/kurti") ||
+                className={`transition duration-200 relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full ${isActive("/products/kurti") ||
                   isActive("/products/suit") ||
                   isActive("/products/designerSuit") ||
                   isActive("/products/coat")
@@ -219,33 +224,35 @@ const Navbar = () => {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute left-1/2 transform -translate-x-1/2 mt-4 bg-white text-gray-900 rounded-xl shadow-2xl p-3 w-[320px] border border-gray-200 z-50">
-                  <ul className="divide-y divide-gray-200">
-                    {productMenu.map((item) => (
-                      <li key={item.name} className="py-2">
-                        {item.enabled ? (
-                          <Link
-                            to={item.to}
-                            onClick={() => setIsDropdownOpen(false)}
-                            className="flex items-center justify-between text-gray-700 transition"
-                            style={{ color: "#b81582" }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "#b81582")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "#b81582")}
-                          >
-                            <span>
-                              {item.emoji ? <span className="mr-2" aria-hidden> {item.emoji} </span> : null}
-                              {item.name}
-                            </span>
-                          </Link>
-                        ) : (
-                          <div className="flex items-center justify-between text-gray-500 cursor-not-allowed">
-                            <span>{item.name}</span>
-                            <span className="ml-3 text-xs bg-gray-100 border border-gray-300 text-gray-600 px-2 py-0.5 rounded-full">Coming soon</span>
-                          </div>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="absolute left-1/2 transform -translate-x-1/2 top-full pt-4 w-[320px] z-50">
+                  <div className="bg-white text-gray-900 rounded-xl shadow-2xl p-3 border border-gray-200">
+                    <ul className="divide-y divide-gray-200">
+                      {productMenu.map((item) => (
+                        <li key={item.name} className="py-2">
+                          {item.enabled ? (
+                            <Link
+                              to={item.to}
+                              onClick={() => setIsDropdownOpen(false)}
+                              className="flex items-center justify-between text-gray-700 transition"
+                              style={{ color: "#b81582" }}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = "#b81582")}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = "#b81582")}
+                            >
+                              <span>
+                                {item.emoji ? <span className="mr-2" aria-hidden> {item.emoji} </span> : null}
+                                {item.name}
+                              </span>
+                            </Link>
+                          ) : (
+                            <div className="flex items-center justify-between text-gray-500 cursor-not-allowed">
+                              <span>{item.name}</span>
+                              <span className="ml-3 text-xs bg-gray-100 border border-gray-300 text-gray-600 px-2 py-0.5 rounded-full">Coming soon</span>
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               )}
             </li>
@@ -253,7 +260,7 @@ const Navbar = () => {
             <li>
               <Link
                 to="/TermsPage"
-                className={`transition duration-200 font-semibold ${isActive("/TermsPage") ? "text-white" : "text-gray-700"
+                className={`transition duration-200 relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full ${isActive("/TermsPage") ? "text-white" : "text-gray-700"
                   }`}
                 style={{
                   color: isActive("/TermsPage") ? "#b81582" : undefined,
@@ -268,7 +275,7 @@ const Navbar = () => {
             <li>
               <Link
                 to="/contact"
-                className={`transition duration-200 font-semibold ${isActive("/contact") ? "text-white" : "text-gray-700"
+                className={`transition duration-200 relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full ${isActive("/contact") ? "text-white" : "text-gray-700"
                   }`}
                 style={{
                   color: isActive("/contact") ? "#b81582" : undefined,
