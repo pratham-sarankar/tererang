@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 // 💡 IMPORTANT: Ensure 'Final Logo.jpg' is now a transparent PNG file 
 // (or rename and import the new transparent PNG file)
-import tereRang from "./Final Logo.jpg";
+import tereRang from "../assets/logo.png";
 import { Menu, X, User, LogOut, ShoppingCart, Trash2 } from "lucide-react"; // For mobile menu icons
 import { useCart } from "../context/cartContextStore.js";
 import { notifyCartAuthChange } from "../context/cartEvents.js";
