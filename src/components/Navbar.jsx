@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 // (or rename and import the new transparent PNG file)
 import tereRang from "../assets/logo.png";
 import { Menu, X, User, LogOut, ShoppingCart, Trash2, Gift, Home, ShoppingBag, FileText, Phone, Package, MapPin, Tag } from "lucide-react"; // For mobile menu icons
-import { GiAmpleDress, GiKimono, GiLabCoat, GiScarf, GiDiamondRing, GiSkirt } from "react-icons/gi";
+import { GiAmpleDress, GiKimono, GiLabCoat, GiPoncho, GiDiamondRing, GiSkirt } from "react-icons/gi";
 import { useCart } from "../context/cartContextStore.js";
 import { notifyCartAuthChange } from "../context/cartEvents.js";
 import { imageUrl } from "../config/env.js";
@@ -140,7 +140,7 @@ const Navbar = () => {
     { name: 'Stylish Kurtis', to: '/products/kurti', enabled: true, icon: <GiAmpleDress /> },
     { name: 'Designer Suits', to: '/products/suit', enabled: true, icon: <GiKimono /> },
     { name: 'Elegant Coat Sets', to: '/products/coat', enabled: true, icon: <GiLabCoat /> },
-    { name: 'Winter Ethnic Wear', to: '/products/EthnicWear', enabled: true, icon: <GiScarf /> },
+    { name: 'Winter Ethnic Wear', to: '/products/EthnicWear', enabled: true, icon: <GiPoncho /> },
     { name: 'Wedding Collection', to: '/products/festiveSuits', enabled: false },
   ];
 
@@ -688,7 +688,7 @@ const Navbar = () => {
                         <span className="mr-2"><GiLabCoat size={18} /></span> Elegant Coat Sets
                       </Link>
                       <Link to="/products/EthnicWear" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-all text-sm ml-2">
-                        <span className="mr-2"><GiScarf size={18} /></span> Winter Ethnic Wear
+                        <span className="mr-2"><GiPoncho size={18} /></span> Winter Ethnic Wear
                       </Link>
 
                       {/* Coming Soon in Accordion */}
