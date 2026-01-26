@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 // 💡 IMPORTANT: Ensure 'Final Logo.jpg' is now a transparent PNG file 
 // (or rename and import the new transparent PNG file)
 import tereRang from "../assets/logo.png";
-import { Menu, X, User, LogOut, ShoppingCart, Trash2, Gift, Home, ShoppingBag, FileText, Phone, Package, MapPin, Tag } from "lucide-react"; // For mobile menu icons
+import { Menu, X, User, LogOut, ShoppingCart, Trash2, Gift, Home, ShoppingBag, FileText, Phone, Package, MapPin, Tag, ChevronDown } from "lucide-react"; // For mobile menu icons
 import { GiAmpleDress, GiKimono, GiLabCoat, GiPoncho, GiDiamondRing, GiSkirt } from "react-icons/gi";
 import { useCart } from "../context/cartContextStore.js";
 import { notifyCartAuthChange } from "../context/cartEvents.js";
@@ -672,7 +672,7 @@ const Navbar = () => {
                       <span className="mr-3 text-lg"><ShoppingBag size={20} /></span> Collections
                     </div>
                     <span className={`transform transition-transform duration-300 ${isProductsAccordionOpen ? 'rotate-180' : ''}`}>
-                      ▼
+                      <ChevronDown size={20} />
                     </span>
                   </button>
 
