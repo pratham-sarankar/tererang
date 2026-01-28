@@ -1,58 +1,61 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ShoppingCart,
   Sparkles,
-  Truck,
-  Shield,
   ArrowRight,
-  Shirt,
   Package,
-  Crown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { apiUrl } from "../config/env.js";
 import { mapProductForDisplay } from "../utils/productPresentation.js";
 import { Footer } from "../components/Footer.jsx";
+import SplitBanner from "../components/SplitBanner.jsx";
 
 const LATEST_COLLECTION_LIMIT = 12;
 
 const HomeProductCard = ({ product, onSelect = () => { } }) => (
-  <div className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition duration-500 overflow-hidden cursor-pointer transform hover:-translate-y-2 group border border-gray-100">
+  <div className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer group border border-gray-100 hover:border-[#b81582]/30">
     <div className="relative overflow-hidden" onClick={() => onSelect(product)}>
       <img
         src={product.image}
         alt={product.title}
-        className="w-full h-80 object-cover transition duration-500 group-hover:scale-110"
+        className="w-full h-80 object-cover transition duration-700 group-hover:scale-110"
         loading="lazy"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-end p-4">
-        <span className="text-white text-lg font-bold p-2 bg-purple-600/90 rounded-lg shadow-lg transform translate-y-full group-hover:translate-y-0 transition duration-300">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+        <span className="text-white text-sm font-bold px-4 py-2 bg-[#b81582] rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition duration-300 mx-auto w-full text-center">
           Quick View
         </span>
       </div>
     </div>
     <div className="p-5">
-      <h3 className="text-xl font-bold text-gray-900 mb-1 truncate">
-        {product.title}
-      </h3>
-      <p className="text-sm text-gray-500 mb-3 uppercase tracking-wider">
-        {product.brand}
-      </p>
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="mb-2">
+        <p className="text-xs text-[#b81582] font-semibold uppercase tracking-widest mb-1">
+          {product.brand}
+        </p>
+        <h3 className="text-lg font-bold text-gray-900 truncate leading-tight group-hover:text-[#b81582] transition-colors">
+          {product.title}
+        </h3>
+      </div>
+
+      <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-3">
+        <div className="flex flex-col">
           {product.displayOldPrice && (
-            <span className="line-through text-gray-400 text-base mr-2">
+            <span className="line-through text-gray-400 text-xs">
               {product.displayOldPrice}
             </span>
           )}
-          <span className="text-2xl font-extrabold text-purple-600">
+          <span className="text-xl font-bold text-[#b81582]">
             {product.displayPrice}
           </span>
         </div>
         <button
-          onClick={() => onSelect(product)}
-          className="text-white bg-purple-600 p-3 rounded-full shadow-lg hover:bg-purple-700 transition transform hover:scale-110"
-          aria-label={`View ${product.title}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(product);
+          }}
+          className="text-white bg-[#b81582] p-2.5 rounded-full shadow-md hover:bg-[#a01270] transition-transform transform hover:scale-105 active:scale-95"
+          aria-label={`Add ${product.title} to cart`}
           type="button"
         >
           <ShoppingCart className="w-5 h-5" />
@@ -121,17 +124,20 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
+      {/* Hero Banner */}
+      <SplitBanner />
+
       {/* Latest Collection */}
       <section
         id="latest-collection"
-        className="py-10 bg-gradient-to-b from-purple-50 to-white"
+        className="py-16 bg-gradient-to-b from-pink-50/50 to-white"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
-              <div className="inline-flex items-center bg-purple-100 rounded-full px-3 py-1 mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-purple-600 mr-1.5" />
-                <span className="text-purple-600 uppercase tracking-wider text-xs font-bold">
+              <div className="inline-flex items-center bg-pink-100/50 rounded-full px-3 py-1 mb-2 border border-pink-100">
+                <Sparkles className="w-3.5 h-3.5 text-[#b81582] mr-1.5" />
+                <span className="text-[#b81582] uppercase tracking-wider text-xs font-bold">
                   New Arrivals
                 </span>
               </div>
@@ -144,7 +150,7 @@ const Home = () => {
             </div>
             <button
               type="button"
-              className="flex items-center border-2 border-purple-200 px-4 py-2 rounded-full text-purple-600 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition font-semibold text-sm"
+              className="flex items-center border-2 border-pink-100 px-4 py-2 rounded-full text-[#b81582] hover:bg-[#b81582] hover:text-white hover:border-[#b81582] transition-colors duration-300 font-semibold text-sm"
               onClick={handleReload}
             >
               <svg
@@ -200,7 +206,7 @@ const Home = () => {
               <p className="text-gray-600 mb-4 text-sm">{error}</p>
               <button
                 type="button"
-                className="px-6 py-2 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 transition shadow-lg text-sm"
+                className="px-6 py-2 bg-[#b81582] text-white rounded-full font-semibold hover:bg-[#a01270] transition shadow-lg text-sm"
                 onClick={handleReload}
               >
                 Try Again
@@ -236,12 +242,12 @@ const Home = () => {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="py-12 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+      <section className="py-12 bg-gradient-to-r from-[#b81582] to-pink-600 text-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
             Ready to Transform Your Wardrobe?
           </h2>
-          <p className="text-base sm:text-lg text-purple-100 mb-6 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-pink-100 mb-6 max-w-3xl mx-auto leading-relaxed">
             Join thousands of satisfied customers who trust Tererang for
             authentic, high-quality ethnic wear delivered in 7-9 days.
           </p>
@@ -252,14 +258,14 @@ const Home = () => {
                   document.getElementById("latest-collection");
                 latestSection?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="group bg-white text-purple-600 px-8 py-3 rounded-full font-bold text-base hover:bg-purple-50 transition transform hover:scale-105 shadow-2xl inline-flex items-center"
+              className="group bg-white text-[#b81582] px-8 py-3 rounded-full font-bold text-base hover:bg-pink-50 transition transform hover:scale-105 shadow-2xl inline-flex items-center"
             >
               View Collection
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition" />
             </button>
             <button
               onClick={() => navigate("/contact")}
-              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-bold text-base hover:bg-white hover:text-purple-600 transition transform hover:scale-105 inline-flex items-center"
+              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-bold text-base hover:bg-white hover:text-[#b81582] transition transform hover:scale-105 inline-flex items-center"
             >
               Contact Us
             </button>
