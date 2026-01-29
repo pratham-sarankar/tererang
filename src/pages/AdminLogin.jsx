@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/AdminLogin.css';
 import { apiUrl } from '../config/env.js';
-import { Lock, User } from 'lucide-react';
+import { Lock, User, AlertCircle } from 'lucide-react';
 
 export default function AdminLogin() {
     const [credentials, setCredentials] = useState({
@@ -105,7 +105,7 @@ export default function AdminLogin() {
 
                     {error && (
                         <div className="admin-error-message">
-                            <span className="admin-error-icon">⚠</span>
+                            <AlertCircle size={18} className="admin-error-icon" />
                             {error}
                         </div>
                     )}

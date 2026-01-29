@@ -999,6 +999,15 @@ export default function AdminDashboard() {
         </div>
     );
 
+    const getPageTitle = () => {
+        const titles = {
+            products: 'Products',
+            orders: 'Orders',
+            settings: 'Settings'
+        };
+        return titles[activeTab] || 'Dashboard';
+    };
+
     return (
         <div className="admin-layout">
             <Sidebar
@@ -1012,7 +1021,7 @@ export default function AdminDashboard() {
                 <div className="admin-dashboard">
                     <div className="dashboard-header">
                         <div>
-                            <h1>{activeTab === 'products' ? 'Products' : activeTab === 'orders' ? 'Orders' : 'Settings'}</h1>
+                            <h1>{getPageTitle()}</h1>
                         </div>
                         <div className="header-actions">
                             {activeTab === 'products' && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import '../css/ProductsTable.css';
 
@@ -6,6 +6,11 @@ const ITEMS_PER_PAGE = 10;
 
 export default function ProductsTable({ products, onEdit, onDelete, imageUrl }) {
     const [currentPage, setCurrentPage] = useState(1);
+
+    // Reset to page 1 when products change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [products]);
 
     const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -27,6 +32,20 @@ export default function ProductsTable({ products, onEdit, onDelete, imageUrl }) 
     const getTotalStock = (sizeStock) => {
         if (!sizeStock || !Array.isArray(sizeStock)) return 0;
         return sizeStock.reduce((total, item) => total + (Number(item.quantity) || 0), 0);
+    };
+
+    const getProductImage = (product) => {
+        // Handle different image field formats from API
+        if (product.imageUrls && product.imageUrls.length > 0) {
+            return product.imageUrls[0];
+        }
+        if (product.images && product.images.length > 0) {
+            return imageUrl(product.images[0]);
+        }
+        if (product.image) {
+            return imageUrl(product.image);
+        }
+        return null;
     };
 
     return (
@@ -54,13 +73,14 @@ export default function ProductsTable({ products, onEdit, onDelete, imageUrl }) 
                         ) : (
                             currentProducts.map((product) => {
                                 const totalStock = getTotalStock(product.sizeStock);
+                                const productImage = getProductImage(product);
                                 return (
                                     <tr key={product._id}>
                                         <td>
                                             <div className="product-image-cell">
-                                                {product.images && product.images.length > 0 ? (
+                                                {productImage ? (
                                                     <img
-                                                        src={imageUrl(product.images[0])}
+                                                        src={productImage}
                                                         alt={product.name}
                                                         className="product-thumbnail"
                                                     />
@@ -97,14 +117,16 @@ export default function ProductsTable({ products, onEdit, onDelete, imageUrl }) 
                                                 <button
                                                     className="action-btn edit-btn"
                                                     onClick={() => onEdit(product)}
-                                                    title="Edit"
+                                                    title="Edit product"
+                                                    aria-label={`Edit ${product.name}`}
                                                 >
                                                     <Edit size={16} />
                                                 </button>
                                                 <button
                                                     className="action-btn delete-btn"
                                                     onClick={() => onDelete(product._id)}
-                                                    title="Delete"
+                                                    title="Delete product"
+                                                    aria-label={`Delete ${product.name}`}
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>
@@ -124,6 +146,7 @@ export default function ProductsTable({ products, onEdit, onDelete, imageUrl }) 
                         className="pagination-btn"
                         onClick={() => goToPage(currentPage - 1)}
                         disabled={currentPage === 1}
+                        aria-label="Go to previous page"
                     >
                         <ChevronLeft size={16} />
                         Previous
@@ -135,6 +158,7 @@ export default function ProductsTable({ products, onEdit, onDelete, imageUrl }) 
                         className="pagination-btn"
                         onClick={() => goToPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
+                        aria-label="Go to next page"
                     >
                         Next
                         <ChevronRight size={16} />
