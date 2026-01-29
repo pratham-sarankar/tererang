@@ -269,7 +269,8 @@ const Checkout = () => {
           razorpay_payment_id: razorpayData.razorpay_payment_id,
           razorpay_signature: razorpayData.razorpay_signature,
           addressId: selectedAddressId,
-          notes
+          notes,
+          paymentMethod
         })
       });
 
@@ -278,7 +279,10 @@ const Checkout = () => {
         throw new Error(data.message || 'Payment verification failed');
       }
 
-      setStatusMessage({ type: 'success', text: 'Payment successful! Order placed.' });
+      const successMessage = paymentMethod === 'cod' 
+        ? 'COD fee paid! Order placed. Pay remaining amount on delivery.' 
+        : 'Payment successful! Order placed.';
+      setStatusMessage({ type: 'success', text: successMessage });
       await refreshCart();
       setTimeout(() => navigate('/MyOrder'), 1500);
 
@@ -391,35 +395,67 @@ const Checkout = () => {
     }
 
     if (!codAgreed) {
-      setStatusMessage({ type: 'error', text: 'Please agree to the COD charge to continue.' });
+      setStatusMessage({ type: 'error', text: 'Please agree to the COD terms to continue.' });
       return;
     }
 
     setSubmitting(true);
     setStatusMessage(null);
 
+    // Load Razorpay script for COD fee payment
+    const isLoaded = await loadRazorpay();
+    if (!isLoaded) {
+      setStatusMessage({ type: 'error', text: 'Failed to load Razorpay SDK. Check connection.' });
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      const response = await fetch(apiUrl('/api/orders'), {
+      // 1. Create Razorpay order for ₹59 COD fee
+      const response = await fetch(apiUrl('/api/orders/create-razorpay-order'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
+        body: JSON.stringify({ 
           addressId: selectedAddressId,
-          notes,
           paymentMethod: 'cod'
         })
       });
 
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to place order');
+        throw new Error(data.message || 'Failed to initiate COD fee payment');
       }
 
-      setStatusMessage({ type: 'success', text: 'Order placed successfully!' });
-      await refreshCart();
-      setTimeout(() => navigate('/MyOrder'), 1500);
+      // 2. Open Razorpay for ₹59 payment
+      const options = {
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: "TereRang",
+        description: "COD Handling Fee",
+        order_id: data.id,
+        image: "https://tererang.in/logo.png",
+        handler: function (response) {
+          // After successful ₹59 payment, verify and place the COD order
+          verifyPayment(response, data);
+        },
+        prefill: data.prefill,
+        theme: {
+          color: "#14B8A6"
+        },
+        modal: {
+          ondismiss: function () {
+            setSubmitting(false);
+            setStatusMessage({ type: 'error', text: 'COD fee payment cancelled' });
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
 
     } catch (error) {
       setStatusMessage({ type: 'error', text: error.message });
@@ -430,8 +466,9 @@ const Checkout = () => {
 
   const subtotalAmount = useMemo(() => Number(cartTotal || 0), [cartTotal]);
   const gstAmount = useMemo(() => Number((subtotalAmount * GST_RATE).toFixed(2)), [subtotalAmount]);
-  const codChargeAmount = useMemo(() => paymentMethod === 'cod' ? COD_CHARGE : 0, [paymentMethod]);
-  const payableWithGst = useMemo(() => subtotalAmount + gstAmount + codChargeAmount, [subtotalAmount, gstAmount, codChargeAmount]);
+  // COD charge is NOT added to order total - it's paid separately upfront
+  const codChargeAmount = 0;
+  const payableWithGst = useMemo(() => subtotalAmount + gstAmount, [subtotalAmount, gstAmount]);
 
   const resolveImage = (product) => {
     if (!product) return null;
@@ -526,8 +563,8 @@ const Checkout = () => {
                       <Banknote size={20} className="text-teal-400" />
                       <p className="font-semibold text-white">Cash on Delivery (COD)</p>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">Pay when you receive your order</p>
-                    <p className="text-xs text-teal-200 mt-1 font-semibold">+ ₹{COD_CHARGE} handling charge</p>
+                    <p className="text-xs text-gray-400 mt-1">Pay ₹{COD_CHARGE} now, rest on delivery</p>
+                    <p className="text-xs text-teal-200 mt-1 font-semibold">₹{COD_CHARGE} upfront fee (online payment required)</p>
                   </div>
                 </div>
               </div>
@@ -557,15 +594,19 @@ const Checkout = () => {
                   <ul className="space-y-2 text-xs text-gray-300">
                     <li className="flex items-start gap-2">
                       <span className="text-amber-400 mt-0.5">•</span>
-                      <span>A handling charge of ₹{COD_CHARGE} will be added to your order total.</span>
+                      <span>Pay ₹{COD_CHARGE} upfront as COD handling fee via online payment (Razorpay).</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-amber-400 mt-0.5">•</span>
-                      <span>Please keep exact cash ready for payment on delivery.</span>
+                      <span>After successful payment, your order will be placed.</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-amber-400 mt-0.5">•</span>
-                      <span>Order confirmation will be sent to your email.</span>
+                      <span>Pay the remaining order amount ({formatCurrency(payableWithGst)}) in cash when you receive the order.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-400 mt-0.5">•</span>
+                      <span>Keep exact cash ready for payment on delivery.</span>
                     </li>
                   </ul>
                 </div>
@@ -577,7 +618,7 @@ const Checkout = () => {
                     className="mt-1 h-4 w-4 rounded border-white/30 bg-black/40 text-teal-500 focus:ring-2 focus:ring-teal-400"
                   />
                   <span className="text-sm text-gray-300">
-                    I agree to pay ₹{COD_CHARGE} as COD handling charge along with the order amount at the time of delivery.
+                    I agree to pay ₹{COD_CHARGE} upfront as COD handling fee and the remaining amount ({formatCurrency(payableWithGst)}) on delivery.
                   </span>
                 </label>
               </div>
@@ -585,10 +626,12 @@ const Checkout = () => {
 
             <div className="flex items-center justify-between border-t border-white/10 pt-6">
               <div>
-                <p className="text-sm text-gray-400">Total Amount</p>
+                <p className="text-sm text-gray-400">
+                  {paymentMethod === 'cod' ? 'Order Amount (Pay on Delivery)' : 'Total Amount'}
+                </p>
                 <p className="text-3xl font-bold text-white mt-1">{formatCurrency(payableWithGst)}</p>
                 {paymentMethod === 'cod' && (
-                  <p className="text-xs text-teal-200 mt-1">Includes ₹{COD_CHARGE} COD charge</p>
+                  <p className="text-xs text-amber-200 mt-1">+ ₹{COD_CHARGE} upfront fee (charged now)</p>
                 )}
               </div>
               <Wallet size={32} className="text-gray-600" />
@@ -851,16 +894,17 @@ const Checkout = () => {
                     <span className="text-gray-400">Subtotal</span>
                     <span>{formatCurrency(subtotalAmount)}</span>
                   </div>
-                  {paymentMethod === 'cod' && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">COD Handling Charge</span>
-                      <span className="text-teal-200">+ {formatCurrency(COD_CHARGE)}</span>
-                    </div>
-                  )}
                   <div className="flex justify-between text-lg font-bold border-t border-white/10 pt-3">
-                    <span>Total Amount</span>
+                    <span>{paymentMethod === 'cod' ? 'Amount on Delivery' : 'Total Amount'}</span>
                     <span>{formatCurrency(payableWithGst)}</span>
                   </div>
+                  {paymentMethod === 'cod' && (
+                    <div className="bg-amber-900/10 border border-amber-800/30 rounded-xl p-3 text-xs text-amber-200">
+                      <p className="font-semibold mb-1">COD Payment Details:</p>
+                      <p>• ₹{COD_CHARGE} upfront fee (charged now via Razorpay)</p>
+                      <p>• {formatCurrency(payableWithGst)} to be paid on delivery in cash</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-6 space-y-4">
@@ -898,7 +942,7 @@ const Checkout = () => {
                   {submitting 
                     ? 'Processing...' 
                     : paymentMethod === 'cod' 
-                    ? `Place COD Order • ${formatCurrency(payableWithGst)}`
+                    ? `Pay ₹${COD_CHARGE} COD Fee`
                     : `Pay ${formatCurrency(payableWithGst)}`
                   }
                 </button>

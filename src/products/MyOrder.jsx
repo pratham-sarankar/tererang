@@ -94,12 +94,12 @@ const OrderCard = ({ order }) => (
             <div className="text-right">
                 <p className="text-xs uppercase tracking-[0.3em] text-gray-400">Total Amount</p>
                 <p className="text-2xl font-black text-gray-900">{formatCurrency(order.grandTotal || order.subtotal)}</p>
-                {order.paymentMethod === 'cod' && order.codCharge > 0 && (
-                    <p className="text-xs text-gray-500 mt-1">Includes ₹{order.codCharge} COD charge</p>
+                {order.paymentMethod === 'cod' && (
+                    <p className="text-xs text-amber-600 mt-1 font-semibold">Cash on Delivery (₹59 fee paid)</p>
                 )}
-                {order.paymentMethod && (
+                {order.paymentMethod && order.paymentMethod !== 'cod' && (
                     <p className="text-xs text-gray-500 mt-1">
-                        Payment: {order.paymentMethod === 'cod' ? 'Cash on Delivery' : order.paymentMethod === 'razorpay' ? 'Online (Razorpay)' : 'UPI'}
+                        Payment: {order.paymentMethod === 'razorpay' ? 'Online (Razorpay)' : 'UPI'}
                     </p>
                 )}
             </div>
