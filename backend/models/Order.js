@@ -128,16 +128,31 @@ const orderSchema = new mongoose.Schema(
         },
         paymentMethod: {
             type: String,
+            enum: ['upi', 'razorpay', 'cod'],
             default: 'upi',
         },
         paymentStatus: {
             type: String,
-            enum: ['pending', 'paid'],
+            enum: ['pending', 'paid', 'partially_paid'],
             default: 'paid',
         },
         paymentReference: {
             type: String,
             trim: true,
+        },
+        codAdvancePayment: {
+            type: Number,
+            min: 0,
+            default: 0,
+        },
+        codAdvanceReference: {
+            type: String,
+            trim: true,
+        },
+        codRemainingPayment: {
+            type: Number,
+            min: 0,
+            default: 0,
         },
         notes: {
             type: String,

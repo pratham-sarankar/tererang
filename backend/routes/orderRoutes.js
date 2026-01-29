@@ -26,6 +26,9 @@ const serializeOrder = (order) => ({
     paymentMethod: order.paymentMethod,
     paymentStatus: order.paymentStatus,
     paymentReference: order.paymentReference,
+    codAdvancePayment: order.codAdvancePayment || 0,
+    codAdvanceReference: order.codAdvanceReference || '',
+    codRemainingPayment: order.codRemainingPayment || 0,
     notes: order.notes,
     createdAt: order.createdAt,
     shippingAddress: order.shippingAddress,
@@ -211,8 +214,8 @@ router.get('/', async (req, res) => {
 
 router.post('/create-razorpay-order', async (req, res) => {
     try {
-        const { addressId } = req.body;
-        console.info('[orderRoutes] Initiating Razorpay order', { userId: req.user._id });
+        const { addressId, paymentType = 'full' } = req.body;
+        console.info('[orderRoutes] Initiating Razorpay order', { userId: req.user._id, paymentType });
 
         const user = await User.findById(req.user._id).populate('cart.product');
         if (!user || !user.cart?.length) {
@@ -230,7 +233,14 @@ router.post('/create-razorpay-order', async (req, res) => {
         const subtotal = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
         const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
         const grandTotal = subtotal + taxAmount;
-        const amountInPaise = Math.round(grandTotal * 100);
+        
+        // Determine amount based on payment type
+        let amountToPay = grandTotal;
+        if (paymentType === 'cod_advance') {
+            amountToPay = 199; // Fixed advance for COD
+        }
+        
+        const amountInPaise = Math.round(amountToPay * 100);
 
         if (amountInPaise <= 0) {
             return res.status(400).json({ message: 'Invalid order amount' });
@@ -247,14 +257,17 @@ router.post('/create-razorpay-order', async (req, res) => {
 
         console.info('[orderRoutes] Razorpay order created', {
             razorpayOrderId: order.id,
-            amount: order.amount
+            amount: order.amount,
+            paymentType
         });
 
         res.json({
             id: order.id,
             currency: order.currency,
             amount: order.amount,
-            keyId: process.env.RAZORPAY_KEY_ID, // Send key config to frontend
+            keyId: process.env.RAZORPAY_KEY_ID,
+            paymentType,
+            grandTotal: Math.round(grandTotal * 100), // Total order value in paise
             prefill: {
                 name: user.name || '',
                 email: user.email || '',
@@ -275,7 +288,8 @@ router.post('/verify-payment', async (req, res) => {
             razorpay_payment_id,
             razorpay_signature,
             addressId,
-            notes
+            notes,
+            paymentType = 'full'
         } = req.body;
 
         const body = razorpay_order_id + '|' + razorpay_payment_id;
@@ -311,15 +325,11 @@ router.post('/verify-payment', async (req, res) => {
         });
 
         const subtotal = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
-        // Recalculate totals to be safe, although payment already happened based on cart
-        // Ideally should match what was paid, but cart might have changed? 
-        // Assuming cart is locked or unlikely to change in seconds. 
-        // For robustness, one might store these details temporarily or just trust the cart now.
-
         const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
         const grandTotal = subtotal + taxAmount;
 
-        const order = await Order.create({
+        // Create order with appropriate payment details based on type
+        const orderData = {
             user: req.user._id,
             items,
             shippingAddress: snapshotAddress(selectedAddress),
@@ -327,11 +337,25 @@ router.post('/verify-payment', async (req, res) => {
             taxAmount,
             grandTotal,
             status: 'confirmed',
-            paymentMethod: 'razorpay',
-            paymentStatus: 'paid',
-            paymentReference: razorpay_payment_id,
             notes,
-        });
+        };
+
+        if (paymentType === 'cod_advance') {
+            // COD order with advance payment
+            orderData.paymentMethod = 'cod';
+            orderData.paymentStatus = 'partially_paid';
+            orderData.codAdvancePayment = 199;
+            orderData.codAdvanceReference = razorpay_payment_id;
+            orderData.codRemainingPayment = grandTotal - 199;
+            orderData.paymentReference = razorpay_payment_id;
+        } else {
+            // Full payment
+            orderData.paymentMethod = 'razorpay';
+            orderData.paymentStatus = 'paid';
+            orderData.paymentReference = razorpay_payment_id;
+        }
+
+        const order = await Order.create(orderData);
 
         user.cart = [];
         await user.save();
