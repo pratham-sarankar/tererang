@@ -349,12 +349,6 @@ router.post('/verify-payment', async (req, res) => {
 
         if (paymentType === 'cod_advance') {
             // COD order with advance payment
-            // Validate that order total is sufficient
-            if (grandTotal < COD_ADVANCE_AMOUNT) {
-                return res.status(400).json({ 
-                    message: `Order total must be at least ₹${COD_ADVANCE_AMOUNT} for COD orders` 
-                });
-            }
             orderData.paymentMethod = 'cod';
             orderData.paymentStatus = 'partially_paid';
             orderData.codAdvancePayment = COD_ADVANCE_AMOUNT;
