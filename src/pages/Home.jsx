@@ -14,38 +14,53 @@ import SplitBanner from "../components/SplitBanner.jsx";
 const LATEST_COLLECTION_LIMIT = 12;
 
 const HomeProductCard = ({ product, onSelect = () => { } }) => (
-  <div className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer group border border-gray-100 hover:border-[#b81582]/30">
+  <div className="bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer group relative">
+    {/* Discount Badge */}
+    {product.discount > 0 && (
+      <div className="absolute top-4 left-4 z-10 bg-[#b81582] text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+        {product.discount}% OFF
+      </div>
+    )}
+
     <div className="relative overflow-hidden" onClick={() => onSelect(product)}>
       <img
         src={product.image}
         alt={product.title}
-        className="w-full h-80 object-cover transition duration-700 group-hover:scale-110"
+        className="w-full h-80 object-cover transition duration-700 group-hover:scale-105"
         loading="lazy"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-        <span className="text-white text-sm font-bold px-4 py-2 bg-[#b81582] rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition duration-300 mx-auto w-full text-center">
+
+      {/* Overlay with Centered Action */}
+      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+        <div className="bg-white/90 backdrop-blur-sm text-[#b81582] px-6 py-2.5 rounded-full font-bold shadow-lg transform scale-95 group-hover:scale-100 transition-transform duration-300">
           Quick View
-        </span>
+        </div>
       </div>
     </div>
+
     <div className="p-5">
       <div className="mb-2">
-        <p className="text-xs text-[#b81582] font-semibold uppercase tracking-widest mb-1">
+        <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mb-1 group-hover:text-[#b81582] transition-colors">
           {product.brand}
         </p>
-        <h3 className="text-lg font-bold text-gray-900 truncate leading-tight group-hover:text-[#b81582] transition-colors">
+        <h3 className="text-lg font-bold text-gray-900 truncate leading-tight mb-1">
           {product.title}
         </h3>
+        {product.description && (
+          <p className="text-xs text-gray-500 line-clamp-2 h-8 leading-snug mb-3 opacity-80">
+            {product.description}
+          </p>
+        )}
       </div>
 
-      <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-3">
+      <div className="flex items-end justify-between mt-2">
         <div className="flex flex-col">
           {product.displayOldPrice && (
-            <span className="line-through text-gray-400 text-xs">
+            <span className="line-through text-gray-400 text-xs mb-0.5">
               {product.displayOldPrice}
             </span>
           )}
-          <span className="text-xl font-bold text-[#b81582]">
+          <span className="text-xl font-extrabold text-[#b81582]">
             {product.displayPrice}
           </span>
         </div>
@@ -54,7 +69,7 @@ const HomeProductCard = ({ product, onSelect = () => { } }) => (
             e.stopPropagation();
             onSelect(product);
           }}
-          className="text-white bg-[#b81582] p-2.5 rounded-full shadow-md hover:bg-[#a01270] transition-transform transform hover:scale-105 active:scale-95"
+          className="bg-gray-100 text-[#b81582] p-2.5 rounded-full hover:bg-[#b81582] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md"
           aria-label={`Add ${product.title} to cart`}
           type="button"
         >
