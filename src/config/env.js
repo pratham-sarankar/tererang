@@ -60,6 +60,7 @@ export const UPI_ID = DEFAULT_UPI_ID;
 export const UPI_PAYEE_NAME = DEFAULT_UPI_PAYEE_NAME;
 export const GST_RATE = GST_RATE_VALUE;
 export const GST_RATE_LABEL = GST_RATE_PERCENT_LABEL;
+export const COD_ADVANCE_AMOUNT = 199; // Non-refundable advance for Cash on Delivery orders
 
 export const upiPaymentLink = (overrides) => buildUpiPayload(overrides);
 

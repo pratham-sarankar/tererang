@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, Smartphone, CheckCircle, Wallet, Loader2, MapPin, Plus, Pencil, Star, Clock3, Mail, CreditCard } from 'lucide-react';
 import { useCart } from '../context/cartContextStore.js';
-import { apiUrl, GST_RATE, GST_RATE_LABEL } from '../config/env.js';
+import { apiUrl, GST_RATE, GST_RATE_LABEL, COD_ADVANCE_AMOUNT } from '../config/env.js';
 import AddressForm from '../components/AddressForm.jsx';
 import { createAddress, listAddresses, setDefaultAddress, updateAddress } from '../utils/addressApi.js';
 import { useRazorpay } from '../hooks/useRazorpay.js';
@@ -346,7 +346,7 @@ const Checkout = () => {
         currency: data.currency,
         name: "TereRang",
         description: paymentMethod === 'cod' 
-          ? "Pay ₹199 advance for Cash on Delivery"
+          ? `Pay ₹${COD_ADVANCE_AMOUNT} advance for Cash on Delivery`
           : "Complete your purchase",
         order_id: data.id,
         image: "https://tererang.in/logo.png",
@@ -763,11 +763,11 @@ const Checkout = () => {
                               <p className="font-semibold text-white">Cash on Delivery (COD)</p>
                             </div>
                             <div className="text-xs text-gray-400 mt-1 space-y-1">
-                              <p>• Pay ₹199 advance now (non-refundable)</p>
-                              <p>• Pay remaining {formatCurrency(payableWithGst - 199)} on delivery</p>
+                              <p>• Pay ₹{COD_ADVANCE_AMOUNT} advance now (non-refundable)</p>
+                              <p>• Pay remaining {formatCurrency(payableWithGst - COD_ADVANCE_AMOUNT)} on delivery</p>
                             </div>
                             <div className="mt-2 bg-yellow-900/30 border border-yellow-700/40 rounded-xl px-3 py-2 text-xs text-yellow-200">
-                              <strong>Note:</strong> ₹199 advance payment is mandatory and non-refundable for COD orders.
+                              <strong>Note:</strong> ₹{COD_ADVANCE_AMOUNT} advance payment is mandatory and non-refundable for COD orders.
                             </div>
                           </div>
                         </div>
@@ -783,7 +783,7 @@ const Checkout = () => {
                   className="mt-6 flex items-center justify-center gap-2 w-full bg-gradient-to-r from-teal-400 to-blue-500 text-black font-extrabold py-4 rounded-2xl shadow-[0_10px_40px_rgba(20,184,166,0.35)] hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {submitting ? <Loader2 className="animate-spin" size={18} /> : <CreditCard size={20} />}
-                  {submitting ? 'Processing...' : paymentMethod === 'cod' ? 'Pay ₹199 Advance' : `Pay ${formatCurrency(payableWithGst)}`}
+                  {submitting ? 'Processing...' : paymentMethod === 'cod' ? `Pay ₹${COD_ADVANCE_AMOUNT} Advance` : `Pay ${formatCurrency(payableWithGst)}`}
                 </button>
 
                 <p className="text-xs text-center text-gray-400 mt-3">

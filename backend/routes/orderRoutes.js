@@ -5,6 +5,7 @@ import { protect } from '../middleware/authMiddleware.js';
 import { sendOrderConfirmationEmail, sendCustomerOrderStatusEmail, checkSmtpConnectivity } from '../utils/emailService.js';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
+import { COD_ADVANCE_AMOUNT } from '../config/constants.js';
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -237,7 +238,13 @@ router.post('/create-razorpay-order', async (req, res) => {
         // Determine amount based on payment type
         let amountToPay = grandTotal;
         if (paymentType === 'cod_advance') {
-            amountToPay = 199; // Fixed advance for COD
+            // Validate that order total is at least the advance amount
+            if (grandTotal < COD_ADVANCE_AMOUNT) {
+                return res.status(400).json({ 
+                    message: `Order total must be at least ₹${COD_ADVANCE_AMOUNT} for COD orders` 
+                });
+            }
+            amountToPay = COD_ADVANCE_AMOUNT;
         }
         
         const amountInPaise = Math.round(amountToPay * 100);
@@ -342,11 +349,17 @@ router.post('/verify-payment', async (req, res) => {
 
         if (paymentType === 'cod_advance') {
             // COD order with advance payment
+            // Validate that order total is sufficient
+            if (grandTotal < COD_ADVANCE_AMOUNT) {
+                return res.status(400).json({ 
+                    message: `Order total must be at least ₹${COD_ADVANCE_AMOUNT} for COD orders` 
+                });
+            }
             orderData.paymentMethod = 'cod';
             orderData.paymentStatus = 'partially_paid';
-            orderData.codAdvancePayment = 199;
+            orderData.codAdvancePayment = COD_ADVANCE_AMOUNT;
             orderData.codAdvanceReference = razorpay_payment_id;
-            orderData.codRemainingPayment = grandTotal - 199;
+            orderData.codRemainingPayment = grandTotal - COD_ADVANCE_AMOUNT;
             orderData.paymentReference = razorpay_payment_id;
         } else {
             // Full payment

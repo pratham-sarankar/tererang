@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Loader2, PackageCheck, MapPin, ShoppingBag, Wallet } from 'lucide-react';
-import { apiUrl, imageUrl } from '../config/env.js';
+import { apiUrl, imageUrl, COD_ADVANCE_AMOUNT } from '../config/env.js';
 
 const formatter = new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -109,11 +109,11 @@ const OrderCard = ({ order }) => {
                     <div className="mt-3 space-y-1 text-xs">
                         <div className="flex justify-end items-center gap-2 text-green-600">
                             <span>✓ Advance Paid:</span>
-                            <span className="font-semibold">{formatCurrency(order.codAdvancePayment || 199)}</span>
+                            <span className="font-semibold">{formatCurrency(order.codAdvancePayment || COD_ADVANCE_AMOUNT)}</span>
                         </div>
                         <div className="flex justify-end items-center gap-2 text-orange-600">
                             <span>Due on Delivery:</span>
-                            <span className="font-semibold">{formatCurrency(order.codRemainingPayment || (order.subtotal - 199))}</span>
+                            <span className="font-semibold">{formatCurrency(order.codRemainingPayment || (order.subtotal - COD_ADVANCE_AMOUNT))}</span>
                         </div>
                     </div>
                 )}
