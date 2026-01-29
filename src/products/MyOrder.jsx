@@ -50,7 +50,11 @@ const formatShippingAddress = (address) => {
     return chunks.join(', ');
 };
 
-const OrderCard = ({ order }) => (
+const OrderCard = ({ order }) => {
+    const isCOD = order.paymentMethod === 'cod';
+    const isPartiallyPaid = order.paymentStatus === 'partially_paid';
+    
+    return (
     <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex flex-wrap items-center gap-4 justify-between">
             <div>
@@ -58,9 +62,16 @@ const OrderCard = ({ order }) => (
                 <p className="font-black text-lg text-gray-900">#{order.id.slice(-8).toUpperCase()}</p>
                 <p className="text-sm text-gray-500">Placed on {formatDate(order.createdAt)}</p>
             </div>
-            <span className={`text-xs font-semibold px-4 py-2 rounded-full border ${statusClasses[order.status] || statusClasses.processing}`}>
-                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-            </span>
+            <div className="flex flex-wrap gap-2 items-center">
+                <span className={`text-xs font-semibold px-4 py-2 rounded-full border ${statusClasses[order.status] || statusClasses.processing}`}>
+                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                </span>
+                {isCOD && (
+                    <span className="text-xs font-semibold px-4 py-2 rounded-full border bg-orange-100 text-orange-700 border-orange-300">
+                        COD
+                    </span>
+                )}
+            </div>
         </div>
 
         <div className="p-6 space-y-4">
@@ -94,10 +105,23 @@ const OrderCard = ({ order }) => (
             <div className="text-right">
                 <p className="text-xs uppercase tracking-[0.3em] text-gray-400">Total</p>
                 <p className="text-2xl font-black text-gray-900">{formatCurrency(order.subtotal)}</p>
+                {isCOD && isPartiallyPaid && (
+                    <div className="mt-3 space-y-1 text-xs">
+                        <div className="flex justify-end items-center gap-2 text-green-600">
+                            <span>✓ Advance Paid:</span>
+                            <span className="font-semibold">{formatCurrency(order.codAdvancePayment || 199)}</span>
+                        </div>
+                        <div className="flex justify-end items-center gap-2 text-orange-600">
+                            <span>Due on Delivery:</span>
+                            <span className="font-semibold">{formatCurrency(order.codRemainingPayment || (order.subtotal - 199))}</span>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     </div>
-);
+    );
+};
 
 const MyOrder = () => {
     const [orders, setOrders] = useState([]);

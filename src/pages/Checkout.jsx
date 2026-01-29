@@ -61,6 +61,7 @@ const Checkout = () => {
   const [emailStatus, setEmailStatus] = useState(null);
   const [emailSaving, setEmailSaving] = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('razorpay'); // 'razorpay' or 'cod'
 
   const token = useMemo(() => (typeof window !== 'undefined' ? localStorage.getItem('token') : null), []);
   const expectedDelivery = useMemo(() => {
@@ -267,7 +268,8 @@ const Checkout = () => {
           razorpay_payment_id: razorpayData.razorpay_payment_id,
           razorpay_signature: razorpayData.razorpay_signature,
           addressId: selectedAddressId,
-          notes
+          notes,
+          paymentType: paymentMethod === 'cod' ? 'cod_advance' : 'full'
         })
       });
 
@@ -326,7 +328,10 @@ const Checkout = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ addressId: selectedAddressId })
+        body: JSON.stringify({ 
+          addressId: selectedAddressId,
+          paymentType: paymentMethod === 'cod' ? 'cod_advance' : 'full'
+        })
       });
 
       const data = await response.json();
@@ -340,15 +345,17 @@ const Checkout = () => {
         amount: data.amount,
         currency: data.currency,
         name: "TereRang",
-        description: "Complete your purchase",
+        description: paymentMethod === 'cod' 
+          ? "Pay ₹199 advance for Cash on Delivery"
+          : "Complete your purchase",
         order_id: data.id,
-        image: "https://tererang.in/logo.png", // Fallback or use real logo if available
+        image: "https://tererang.in/logo.png",
         handler: function (response) {
           verifyPayment(response, data);
         },
         prefill: data.prefill,
         theme: {
-          color: "#14B8A6" // Teal-500
+          color: "#14B8A6"
         },
         modal: {
           ondismiss: function () {
@@ -702,6 +709,71 @@ const Checkout = () => {
                       placeholder="Color preferences, delivery instructions..."
                     />
                   </div>
+                  
+                  <div>
+                    <label className="text-sm text-gray-300 block mb-3">Payment Method</label>
+                    <div className="space-y-3">
+                      <div 
+                        onClick={() => setPaymentMethod('razorpay')}
+                        className={`cursor-pointer rounded-2xl border p-4 transition ${
+                          paymentMethod === 'razorpay' 
+                            ? 'border-teal-400 bg-teal-400/10 shadow-lg' 
+                            : 'border-white/10 bg-black/30 hover:border-teal-400/40'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`mt-1 h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                            paymentMethod === 'razorpay' ? 'border-teal-300' : 'border-white/30'
+                          }`}>
+                            <span className={`h-2.5 w-2.5 rounded-full ${
+                              paymentMethod === 'razorpay' ? 'bg-teal-300' : 'bg-transparent'
+                            }`} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <CreditCard size={18} className="text-teal-400" />
+                              <p className="font-semibold text-white">Pay Full Amount Online</p>
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">
+                              Pay {formatCurrency(payableWithGst)} now via UPI, Cards, or Wallets
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div 
+                        onClick={() => setPaymentMethod('cod')}
+                        className={`cursor-pointer rounded-2xl border p-4 transition ${
+                          paymentMethod === 'cod' 
+                            ? 'border-teal-400 bg-teal-400/10 shadow-lg' 
+                            : 'border-white/10 bg-black/30 hover:border-teal-400/40'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`mt-1 h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                            paymentMethod === 'cod' ? 'border-teal-300' : 'border-white/30'
+                          }`}>
+                            <span className={`h-2.5 w-2.5 rounded-full ${
+                              paymentMethod === 'cod' ? 'bg-teal-300' : 'bg-transparent'
+                            }`} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <Wallet size={18} className="text-teal-400" />
+                              <p className="font-semibold text-white">Cash on Delivery (COD)</p>
+                            </div>
+                            <div className="text-xs text-gray-400 mt-1 space-y-1">
+                              <p>• Pay ₹199 advance now (non-refundable)</p>
+                              <p>• Pay remaining {formatCurrency(payableWithGst - 199)} on delivery</p>
+                            </div>
+                            <div className="mt-2 bg-yellow-900/30 border border-yellow-700/40 rounded-xl px-3 py-2 text-xs text-yellow-200">
+                              <strong>Note:</strong> ₹199 advance payment is mandatory and non-refundable for COD orders.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <button
@@ -711,7 +783,7 @@ const Checkout = () => {
                   className="mt-6 flex items-center justify-center gap-2 w-full bg-gradient-to-r from-teal-400 to-blue-500 text-black font-extrabold py-4 rounded-2xl shadow-[0_10px_40px_rgba(20,184,166,0.35)] hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {submitting ? <Loader2 className="animate-spin" size={18} /> : <CreditCard size={20} />}
-                  {submitting ? 'Processing...' : `Pay ${formatCurrency(payableWithGst)}`}
+                  {submitting ? 'Processing...' : paymentMethod === 'cod' ? 'Pay ₹199 Advance' : `Pay ${formatCurrency(payableWithGst)}`}
                 </button>
 
                 <p className="text-xs text-center text-gray-400 mt-3">
