@@ -139,6 +139,7 @@ const Home = () => {
 
   const handleReload = () => {
     setCurrentPage(1);
+    setHasMore(true);
     setReloadFlag((flag) => flag + 1);
   };
 
