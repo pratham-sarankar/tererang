@@ -92,8 +92,16 @@ const OrderCard = ({ order }) => (
                 </div>
             </div>
             <div className="text-right">
-                <p className="text-xs uppercase tracking-[0.3em] text-gray-400">Total</p>
-                <p className="text-2xl font-black text-gray-900">{formatCurrency(order.subtotal)}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-gray-400">Total Amount</p>
+                <p className="text-2xl font-black text-gray-900">{formatCurrency(order.grandTotal || order.subtotal)}</p>
+                {order.paymentMethod === 'cod' && order.codCharge > 0 && (
+                    <p className="text-xs text-gray-500 mt-1">Includes ₹{order.codCharge} COD charge</p>
+                )}
+                {order.paymentMethod && (
+                    <p className="text-xs text-gray-500 mt-1">
+                        Payment: {order.paymentMethod === 'cod' ? 'Cash on Delivery' : order.paymentMethod === 'razorpay' ? 'Online (Razorpay)' : 'UPI'}
+                    </p>
+                )}
             </div>
         </div>
     </div>
