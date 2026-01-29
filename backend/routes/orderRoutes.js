@@ -16,11 +16,13 @@ const resolveGstRate = () => {
     return 0;
 };
 const GST_RATE = resolveGstRate();
+const COD_CHARGE = 59; // Fixed COD charge of ₹59
 
 const serializeOrder = (order) => ({
     id: order._id,
     subtotal: order.subtotal,
     taxAmount: order.taxAmount,
+    codCharge: order.codCharge,
     grandTotal: order.grandTotal,
     status: order.status,
     paymentMethod: order.paymentMethod,
@@ -65,11 +67,12 @@ const snapshotAddress = (addressDoc) => ({
 
 router.post('/', async (req, res) => {
     try {
-        const { paymentReference, notes, addressId } = req.body;
+        const { paymentReference, notes, addressId, paymentMethod } = req.body;
         console.info('[orderRoutes] Incoming order placement request', {
             userId: req.user._id,
             paymentReference,
             addressId,
+            paymentMethod,
         });
 
         const user = await User.findById(req.user._id).populate('cart.product');
@@ -125,7 +128,9 @@ router.post('/', async (req, res) => {
         });
 
         const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
-        const grandTotal = subtotal + taxAmount;
+        const selectedPaymentMethod = paymentMethod || 'upi';
+        const codCharge = selectedPaymentMethod === 'cod' ? COD_CHARGE : 0;
+        const grandTotal = subtotal + taxAmount + codCharge;
 
         const order = await Order.create({
             user: req.user._id,
@@ -133,9 +138,10 @@ router.post('/', async (req, res) => {
             shippingAddress: snapshotAddress(selectedAddress),
             subtotal,
             taxAmount,
+            codCharge,
             grandTotal,
-            paymentMethod: 'upi',
-            paymentStatus: 'paid',
+            paymentMethod: selectedPaymentMethod,
+            paymentStatus: selectedPaymentMethod === 'cod' ? 'pending' : 'paid',
             paymentReference,
             notes,
         });
@@ -211,7 +217,7 @@ router.get('/', async (req, res) => {
 
 router.post('/create-razorpay-order', async (req, res) => {
     try {
-        const { addressId } = req.body;
+        const { addressId, paymentMethod } = req.body;
         console.info('[orderRoutes] Initiating Razorpay order', { userId: req.user._id });
 
         const user = await User.findById(req.user._id).populate('cart.product');
@@ -229,7 +235,9 @@ router.post('/create-razorpay-order', async (req, res) => {
 
         const subtotal = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
         const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
-        const grandTotal = subtotal + taxAmount;
+        const selectedPaymentMethod = paymentMethod || 'razorpay';
+        const codCharge = selectedPaymentMethod === 'cod' ? COD_CHARGE : 0;
+        const grandTotal = subtotal + taxAmount + codCharge;
         const amountInPaise = Math.round(grandTotal * 100);
 
         if (amountInPaise <= 0) {
@@ -275,7 +283,8 @@ router.post('/verify-payment', async (req, res) => {
             razorpay_payment_id,
             razorpay_signature,
             addressId,
-            notes
+            notes,
+            paymentMethod
         } = req.body;
 
         const body = razorpay_order_id + '|' + razorpay_payment_id;
@@ -317,7 +326,9 @@ router.post('/verify-payment', async (req, res) => {
         // For robustness, one might store these details temporarily or just trust the cart now.
 
         const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
-        const grandTotal = subtotal + taxAmount;
+        const selectedPaymentMethod = paymentMethod || 'razorpay';
+        const codCharge = selectedPaymentMethod === 'cod' ? COD_CHARGE : 0;
+        const grandTotal = subtotal + taxAmount + codCharge;
 
         const order = await Order.create({
             user: req.user._id,
@@ -325,9 +336,10 @@ router.post('/verify-payment', async (req, res) => {
             shippingAddress: snapshotAddress(selectedAddress),
             subtotal,
             taxAmount,
+            codCharge,
             grandTotal,
             status: 'confirmed',
-            paymentMethod: 'razorpay',
+            paymentMethod: selectedPaymentMethod,
             paymentStatus: 'paid',
             paymentReference: razorpay_payment_id,
             notes,

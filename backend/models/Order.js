@@ -121,6 +121,11 @@ const orderSchema = new mongoose.Schema(
             min: 0,
             default: 0,
         },
+        codCharge: {
+            type: Number,
+            min: 0,
+            default: 0,
+        },
         status: {
             type: String,
             enum: ['pending', 'confirmed', 'processing', 'completed', 'cancelled'],
@@ -128,6 +133,7 @@ const orderSchema = new mongoose.Schema(
         },
         paymentMethod: {
             type: String,
+            enum: ['upi', 'razorpay', 'cod'],
             default: 'upi',
         },
         paymentStatus: {
