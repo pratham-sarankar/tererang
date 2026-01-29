@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
@@ -36,17 +36,25 @@ import Checkout from "./pages/Checkout";
 import ProductDetail from "./pages/ProductDetail";
 import AddressBook from "./pages/AddressBook";
 
-
-
+// Layout wrapper to conditionally render Navbar
+function Layout({ children }) {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  
+  return (
+    <>
+      {!isAdminRoute && <Navbar />}
+      {children}
+    </>
+  );
+}
 
 function App() {
-  const [showPopup] = useState(false);
   return (
     <CartProvider>
       <Router>
-        {/* <Navbar /> */}
-        {!showPopup && <Navbar />}
-        <Routes>
+        <Layout>
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />   {/* ✅ Changed /Home → / */}
           <Route path="/shop" element={<Shop />} />
@@ -91,6 +99,7 @@ function App() {
             element={<h2 style={{ padding: "20px" }}>404 - Page Not Found</h2>}
           />
         </Routes>
+        </Layout>
       </Router>
     </CartProvider>
   );
