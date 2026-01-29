@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../css/Login.css';
+import '../css/AdminLogin.css';
 import { apiUrl } from '../config/env.js';
+import { Lock, User } from 'lucide-react';
 
 export default function AdminLogin() {
     const [credentials, setCredentials] = useState({
@@ -53,44 +54,75 @@ export default function AdminLogin() {
     };
 
     return (
-        <div className="login-container">
-            <div className="login-form">
-                <h2>Admin Login</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="username">Username</label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            value={credentials.username}
-                            onChange={handleChange}
-                            required
-                            placeholder="Enter admin username"
-                        />
+        <div className="admin-login-container">
+            <div className="admin-login-card">
+                <div className="admin-login-header">
+                    <div className="admin-login-icon">
+                        <Lock size={32} />
+                    </div>
+                    <h1 className="admin-login-title">Admin Panel</h1>
+                    <p className="admin-login-subtitle">Sign in to manage your store</p>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="admin-login-form">
+                    <div className="admin-form-group">
+                        <label htmlFor="username" className="admin-form-label">
+                            Username
+                        </label>
+                        <div className="admin-input-wrapper">
+                            <User className="admin-input-icon" size={18} />
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                value={credentials.username}
+                                onChange={handleChange}
+                                required
+                                placeholder="Enter your username"
+                                className="admin-input"
+                            />
+                        </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={credentials.password}
-                            onChange={handleChange}
-                            required
-                            placeholder="Enter password"
-                        />
+                    <div className="admin-form-group">
+                        <label htmlFor="password" className="admin-form-label">
+                            Password
+                        </label>
+                        <div className="admin-input-wrapper">
+                            <Lock className="admin-input-icon" size={18} />
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                value={credentials.password}
+                                onChange={handleChange}
+                                required
+                                placeholder="Enter your password"
+                                className="admin-input"
+                            />
+                        </div>
                     </div>
 
-                    {error && <div className="error-message">{error}</div>}
+                    {error && (
+                        <div className="admin-error-message">
+                            <span className="admin-error-icon">⚠</span>
+                            {error}
+                        </div>
+                    )}
 
                     <button 
                         type="submit" 
-                        className="login-btn"
+                        className="admin-login-button"
                         disabled={loading}
                     >
-                        {loading ? 'Logging in...' : 'Login'}
+                        {loading ? (
+                            <>
+                                <span className="admin-spinner"></span>
+                                Signing in...
+                            </>
+                        ) : (
+                            'Sign in'
+                        )}
                     </button>
                 </form>
             </div>
