@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShieldCheck, Smartphone, CheckCircle, Wallet, Loader2, MapPin, Plus, Pencil, Star, Clock3, Mail, CreditCard, Banknote } from 'lucide-react';
+import { ShieldCheck, CheckCircle, Wallet, Loader2, MapPin, Plus, Pencil, Star, Clock3, Mail, CreditCard, Banknote } from 'lucide-react';
 import { useCart } from '../context/cartContextStore.js';
-import { apiUrl, GST_RATE, GST_RATE_LABEL, COD_CHARGE } from '../config/env.js';
+import { apiUrl, GST_RATE, COD_CHARGE } from '../config/env.js';
 import AddressForm from '../components/AddressForm.jsx';
 import { createAddress, listAddresses, setDefaultAddress, updateAddress } from '../utils/addressApi.js';
 import { useRazorpay } from '../hooks/useRazorpay.js';
@@ -255,6 +255,13 @@ const Checkout = () => {
     return () => clearTimeout(timer);
   }, [statusMessage]);
 
+  // Reset COD agreement when switching payment methods
+  useEffect(() => {
+    if (paymentMethod !== 'cod') {
+      setCodAgreed(false);
+    }
+  }, [paymentMethod]);
+
 
   const verifyPayment = async (razorpayData, orderDetails) => {
     try {
@@ -466,8 +473,6 @@ const Checkout = () => {
 
   const subtotalAmount = useMemo(() => Number(cartTotal || 0), [cartTotal]);
   const gstAmount = useMemo(() => Number((subtotalAmount * GST_RATE).toFixed(2)), [subtotalAmount]);
-  // COD charge is NOT added to order total - it's paid separately upfront
-  const codChargeAmount = 0;
   const payableWithGst = useMemo(() => subtotalAmount + gstAmount, [subtotalAmount, gstAmount]);
 
   const resolveImage = (product) => {
