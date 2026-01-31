@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShieldCheck, Smartphone, CheckCircle, Wallet, Loader2, MapPin, Plus, Pencil, Star, Clock3, Mail, CreditCard } from 'lucide-react';
+import { ShieldCheck, CheckCircle, Wallet, Loader2, MapPin, Plus, Pencil, Star, Clock3, Mail, CreditCard, Banknote } from 'lucide-react';
 import { useCart } from '../context/cartContextStore.js';
-import { apiUrl, GST_RATE, GST_RATE_LABEL } from '../config/env.js';
+import { apiUrl, GST_RATE, COD_CHARGE } from '../config/env.js';
 import AddressForm from '../components/AddressForm.jsx';
 import { createAddress, listAddresses, setDefaultAddress, updateAddress } from '../utils/addressApi.js';
 import { useRazorpay } from '../hooks/useRazorpay.js';
@@ -61,6 +61,8 @@ const Checkout = () => {
   const [emailStatus, setEmailStatus] = useState(null);
   const [emailSaving, setEmailSaving] = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('razorpay'); // 'razorpay' or 'cod'
+  const [codAgreed, setCodAgreed] = useState(false);
 
   const token = useMemo(() => (typeof window !== 'undefined' ? localStorage.getItem('token') : null), []);
   const expectedDelivery = useMemo(() => {
@@ -253,6 +255,13 @@ const Checkout = () => {
     return () => clearTimeout(timer);
   }, [statusMessage]);
 
+  // Reset COD agreement when switching payment methods
+  useEffect(() => {
+    if (paymentMethod !== 'cod') {
+      setCodAgreed(false);
+    }
+  }, [paymentMethod]);
+
 
   const verifyPayment = async (razorpayData, orderDetails) => {
     try {
@@ -267,7 +276,8 @@ const Checkout = () => {
           razorpay_payment_id: razorpayData.razorpay_payment_id,
           razorpay_signature: razorpayData.razorpay_signature,
           addressId: selectedAddressId,
-          notes
+          notes,
+          paymentMethod
         })
       });
 
@@ -276,7 +286,10 @@ const Checkout = () => {
         throw new Error(data.message || 'Payment verification failed');
       }
 
-      setStatusMessage({ type: 'success', text: 'Payment successful! Order placed.' });
+      const successMessage = paymentMethod === 'cod' 
+        ? 'COD fee paid! Order placed. Pay remaining amount on delivery.' 
+        : 'Payment successful! Order placed.';
+      setStatusMessage({ type: 'success', text: successMessage });
       await refreshCart();
       setTimeout(() => navigate('/MyOrder'), 1500);
 
@@ -367,6 +380,96 @@ const Checkout = () => {
     }
   };
 
+  const handleCodOrder = async () => {
+    if (!cartItems?.length) {
+      setStatusMessage({ type: 'error', text: 'Your cart is empty.' });
+      return;
+    }
+
+    if (!selectedAddressId) {
+      setStatusMessage({ type: 'error', text: 'Please add or select a delivery address.' });
+      return;
+    }
+
+    if (userLoading) {
+      setStatusMessage({ type: 'error', text: 'Please wait, syncing profile...' });
+      return;
+    }
+
+    if (!userProfile?.email) {
+      setStatusMessage({ type: 'error', text: 'Please add your email address.' });
+      return;
+    }
+
+    if (!codAgreed) {
+      setStatusMessage({ type: 'error', text: 'Please agree to the COD terms to continue.' });
+      return;
+    }
+
+    setSubmitting(true);
+    setStatusMessage(null);
+
+    // Load Razorpay script for COD fee payment
+    const isLoaded = await loadRazorpay();
+    if (!isLoaded) {
+      setStatusMessage({ type: 'error', text: 'Failed to load Razorpay SDK. Check connection.' });
+      setSubmitting(false);
+      return;
+    }
+
+    try {
+      // 1. Create Razorpay order for ₹59 COD fee
+      const response = await fetch(apiUrl('/api/orders/create-razorpay-order'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          addressId: selectedAddressId,
+          paymentMethod: 'cod'
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to initiate COD fee payment');
+      }
+
+      // 2. Open Razorpay for ₹59 payment
+      const options = {
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: "TereRang",
+        description: "COD Handling Fee",
+        order_id: data.id,
+        image: "https://tererang.in/logo.png",
+        handler: function (response) {
+          // After successful ₹59 payment, verify and place the COD order
+          verifyPayment(response, data);
+        },
+        prefill: data.prefill,
+        theme: {
+          color: "#14B8A6"
+        },
+        modal: {
+          ondismiss: function () {
+            setSubmitting(false);
+            setStatusMessage({ type: 'error', text: 'COD fee payment cancelled' });
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
+    } catch (error) {
+      setStatusMessage({ type: 'error', text: error.message });
+      setSubmitting(false);
+    }
+  };
+
 
   const subtotalAmount = useMemo(() => Number(cartTotal || 0), [cartTotal]);
   const gstAmount = useMemo(() => Number((subtotalAmount * GST_RATE).toFixed(2)), [subtotalAmount]);
@@ -404,30 +507,137 @@ const Checkout = () => {
                 <CreditCard size={32} className="text-teal-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Secure Payment</h3>
-                <p className="text-gray-400 text-sm">Powered by Razorpay</p>
+                <h3 className="text-xl font-bold">Select Payment Method</h3>
+                <p className="text-gray-400 text-sm">Choose how you want to pay</p>
               </div>
             </div>
 
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-start gap-3">
-                <CheckCircle size={20} className="text-teal-400 shrink-0 mt-0.5" />
-                <span className="text-gray-300 text-sm">Accepts UPI, Cards, Netbanking, and Wallets.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <ShieldCheck size={20} className="text-teal-400 shrink-0 mt-0.5" />
-                <span className="text-gray-300 text-sm">100% Secure & Encrypted transaction.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle size={20} className="text-teal-400 shrink-0 mt-0.5" />
-                <span className="text-gray-300 text-sm">Instant confirmation & invoice via email.</span>
-              </li>
-            </ul>
+            <div className="space-y-3 mb-6">
+              <div
+                onClick={() => setPaymentMethod('razorpay')}
+                className={`cursor-pointer rounded-2xl border p-4 transition ${
+                  paymentMethod === 'razorpay'
+                    ? 'border-teal-400 bg-teal-400/10 shadow-lg'
+                    : 'border-white/10 bg-black/30 hover:border-teal-400/40'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethod === 'razorpay' ? 'border-teal-300' : 'border-white/30'
+                    }`}
+                  >
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ${
+                        paymentMethod === 'razorpay' ? 'bg-teal-300' : 'bg-transparent'
+                      }`}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <CreditCard size={20} className="text-teal-400" />
+                      <p className="font-semibold text-white">Online Payment (Razorpay)</p>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">UPI, Cards, Netbanking, and Wallets</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                onClick={() => setPaymentMethod('cod')}
+                className={`cursor-pointer rounded-2xl border p-4 transition ${
+                  paymentMethod === 'cod'
+                    ? 'border-teal-400 bg-teal-400/10 shadow-lg'
+                    : 'border-white/10 bg-black/30 hover:border-teal-400/40'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethod === 'cod' ? 'border-teal-300' : 'border-white/30'
+                    }`}
+                  >
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ${
+                        paymentMethod === 'cod' ? 'bg-teal-300' : 'bg-transparent'
+                      }`}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <Banknote size={20} className="text-teal-400" />
+                      <p className="font-semibold text-white">Cash on Delivery (COD)</p>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">Pay ₹{COD_CHARGE} now, rest on delivery</p>
+                    <p className="text-xs text-teal-200 mt-1 font-semibold">₹{COD_CHARGE} upfront fee (online payment required)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {paymentMethod === 'razorpay' && (
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start gap-3">
+                  <CheckCircle size={20} className="text-teal-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-300 text-sm">Accepts UPI, Cards, Netbanking, and Wallets.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <ShieldCheck size={20} className="text-teal-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-300 text-sm">100% Secure & Encrypted transaction.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle size={20} className="text-teal-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-300 text-sm">Instant confirmation & invoice via email.</span>
+                </li>
+              </ul>
+            )}
+
+            {paymentMethod === 'cod' && (
+              <div className="mb-8 space-y-4">
+                <div className="bg-amber-900/20 border border-amber-800/40 rounded-2xl p-4">
+                  <p className="text-sm text-amber-200 font-semibold mb-2">Cash on Delivery Terms:</p>
+                  <ul className="space-y-2 text-xs text-gray-300">
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-400 mt-0.5">•</span>
+                      <span>Pay ₹{COD_CHARGE} upfront as COD handling fee via online payment (Razorpay).</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-400 mt-0.5">•</span>
+                      <span>After successful payment, your order will be placed.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-400 mt-0.5">•</span>
+                      <span>Pay the remaining order amount ({formatCurrency(payableWithGst)}) in cash when you receive the order.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-400 mt-0.5">•</span>
+                      <span>Keep exact cash ready for payment on delivery.</span>
+                    </li>
+                  </ul>
+                </div>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={codAgreed}
+                    onChange={(e) => setCodAgreed(e.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-white/30 bg-black/40 text-teal-500 focus:ring-2 focus:ring-teal-400"
+                  />
+                  <span className="text-sm text-gray-300">
+                    I agree to pay ₹{COD_CHARGE} upfront as COD handling fee and the remaining amount ({formatCurrency(payableWithGst)}) on delivery.
+                  </span>
+                </label>
+              </div>
+            )}
 
             <div className="flex items-center justify-between border-t border-white/10 pt-6">
               <div>
-                <p className="text-sm text-gray-400">Total Amount</p>
+                <p className="text-sm text-gray-400">
+                  {paymentMethod === 'cod' ? 'Order Amount (Pay on Delivery)' : 'Total Amount'}
+                </p>
                 <p className="text-3xl font-bold text-white mt-1">{formatCurrency(payableWithGst)}</p>
+                {paymentMethod === 'cod' && (
+                  <p className="text-xs text-amber-200 mt-1">+ ₹{COD_CHARGE} upfront fee (charged now)</p>
+                )}
               </div>
               <Wallet size={32} className="text-gray-600" />
             </div>
@@ -685,10 +895,21 @@ const Checkout = () => {
                 </div>
 
                 <div className="mt-6 space-y-3 border-t border-white/10 pt-4">
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>Total Amount</span>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Subtotal</span>
                     <span>{formatCurrency(subtotalAmount)}</span>
                   </div>
+                  <div className="flex justify-between text-lg font-bold border-t border-white/10 pt-3">
+                    <span>{paymentMethod === 'cod' ? 'Amount on Delivery' : 'Total Amount'}</span>
+                    <span>{formatCurrency(payableWithGst)}</span>
+                  </div>
+                  {paymentMethod === 'cod' && (
+                    <div className="bg-amber-900/10 border border-amber-800/30 rounded-xl p-3 text-xs text-amber-200">
+                      <p className="font-semibold mb-1">COD Payment Details:</p>
+                      <p>• ₹{COD_CHARGE} upfront fee (charged now via Razorpay)</p>
+                      <p>• {formatCurrency(payableWithGst)} to be paid on delivery in cash</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-6 space-y-4">
@@ -705,13 +926,30 @@ const Checkout = () => {
                 </div>
 
                 <button
-                  onClick={handleRazorpayPayment}
-                  disabled={submitting || !selectedAddressId || userLoading || !userProfile?.email}
-                  title={!userProfile?.email ? 'Add your email to continue' : undefined}
+                  onClick={paymentMethod === 'cod' ? handleCodOrder : handleRazorpayPayment}
+                  disabled={submitting || !selectedAddressId || userLoading || !userProfile?.email || (paymentMethod === 'cod' && !codAgreed)}
+                  title={
+                    !userProfile?.email 
+                      ? 'Add your email to continue' 
+                      : paymentMethod === 'cod' && !codAgreed 
+                      ? 'Please agree to COD terms to continue'
+                      : undefined
+                  }
                   className="mt-6 flex items-center justify-center gap-2 w-full bg-gradient-to-r from-teal-400 to-blue-500 text-black font-extrabold py-4 rounded-2xl shadow-[0_10px_40px_rgba(20,184,166,0.35)] hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {submitting ? <Loader2 className="animate-spin" size={18} /> : <CreditCard size={20} />}
-                  {submitting ? 'Processing...' : `Pay ${formatCurrency(payableWithGst)}`}
+                  {submitting ? (
+                    <Loader2 className="animate-spin" size={18} />
+                  ) : paymentMethod === 'cod' ? (
+                    <Banknote size={20} />
+                  ) : (
+                    <CreditCard size={20} />
+                  )}
+                  {submitting 
+                    ? 'Processing...' 
+                    : paymentMethod === 'cod' 
+                    ? `Pay ₹${COD_CHARGE} COD Fee`
+                    : `Pay ${formatCurrency(payableWithGst)}`
+                  }
                 </button>
 
                 <p className="text-xs text-center text-gray-400 mt-3">
