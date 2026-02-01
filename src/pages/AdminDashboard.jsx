@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/AdminDashboard.css';
 import { apiUrl, imageUrl } from '../config/env.js';
+import Sidebar from '../components/Sidebar.jsx';
+import ProductsTable from '../components/ProductsTable.jsx';
+import { Plus } from 'lucide-react';
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'processing', 'completed', 'cancelled'];
 const PAYMENT_STATUSES = ['pending', 'paid'];
@@ -68,6 +71,7 @@ export default function AdminDashboard() {
         globalDiscountEnabled: false,
     });
     const [settingsSaving, setSettingsSaving] = useState(false);
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
     const navigate = useNavigate();
 
     const logoutAndRedirect = () => {
@@ -581,6 +585,7 @@ export default function AdminDashboard() {
                                     <option value="skirt">Skirt</option>
                                     <option value="coat">Coat</option>
                                     <option value="ethnicWear">Ethnic Wear</option>
+                                    <option value="wedding">Wedding Collection</option>
                                 </select>
                             </div>
                             <div className="form-group">
@@ -686,58 +691,20 @@ export default function AdminDashboard() {
                 <div className="loading">Loading products...</div>
             ) : (
                 <div className="products-section">
-                    <h2>Products ({products.length})</h2>
-                    <div className="products-grid">
-                        {products.map((product) => (
-                            <div key={product._id} className="product-card">
-                                <img
-                                    src={
-                                        // Use imageUrls as primary source (images field no longer in API response)
-                                        (product.imageUrls && product.imageUrls[0]) ||
-                                        product.image ||
-                                        null
-                                    }
-                                    alt={product.name}
-                                    className="product-image"
-                                />
-                                <div className="product-info">
-                                    <h3>{product.name}</h3>
-                                    <p className="product-price">{formatCurrency(product.price)}</p>
-                                    <p className="product-category">{product.category}</p>
-                                    <p className={`product-stock ${product.inStock ? 'in-stock' : 'out-of-stock'}`}>
-                                        {product.inStock ? 'In Stock' : 'Out of Stock'}
-                                    </p>
-                                    {Array.isArray(product.sizeStock) && product.sizeStock.length > 0 && (
-                                        <p className="product-size-stock">
-                                            {product.sizeStock.map((entry) => `${entry.size}: ${entry.quantity}`).join(' • ')}
-                                        </p>
-                                    )}
-                                    {product.description && (
-                                        <p className="product-description">{product.description}</p>
-                                    )}
-                                    <div className="product-actions">
-                                        <button
-                                            className="edit-btn"
-                                            onClick={() => handleEditProduct(product)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className="delete-btn"
-                                            onClick={() => handleDeleteProduct(product._id)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="section-header">
+                        <h2>Products ({products.length})</h2>
                     </div>
-
-                    {products.length === 0 && (
+                    {products.length === 0 ? (
                         <div className="no-products">
                             <p>No products found. Add some products to get started!</p>
                         </div>
+                    ) : (
+                        <ProductsTable
+                            products={products}
+                            onEdit={handleEditProduct}
+                            onDelete={handleDeleteProduct}
+                            imageUrl={resolveImagePath}
+                        />
                     )}
                 </div>
             )}
@@ -1033,55 +1000,50 @@ export default function AdminDashboard() {
         </div>
     );
 
+    const getPageTitle = () => {
+        const titles = {
+            products: 'Products',
+            orders: 'Orders',
+            settings: 'Settings'
+        };
+        return titles[activeTab] || 'Dashboard';
+    };
+
     return (
-        <div className="admin-dashboard">
-            <div className="dashboard-header">
-                <div>
-                    <h1>Admin Dashboard</h1>
-                    <div className="dashboard-tabs">
-                        <button
-                            type="button"
-                            className={activeTab === 'products' ? 'active' : ''}
-                            onClick={() => setActiveTab('products')}
-                        >
-                            Products
-                        </button>
-                        <button
-                            type="button"
-                            className={activeTab === 'orders' ? 'active' : ''}
-                            onClick={() => setActiveTab('orders')}
-                        >
-                            Orders
-                        </button>
-                        <button
-                            type="button"
-                            className={activeTab === 'settings' ? 'active' : ''}
-                            onClick={() => setActiveTab('settings')}
-                        >
-                            Settings
-                        </button>
+        <div className="admin-layout">
+            <Sidebar
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                onLogout={handleLogout}
+                isMobileOpen={isMobileOpen}
+                setIsMobileOpen={setIsMobileOpen}
+            />
+            <div className="admin-main-content">
+                <div className="admin-dashboard">
+                    <div className="dashboard-header">
+                        <div>
+                            <h1>{getPageTitle()}</h1>
+                        </div>
+                        <div className="header-actions">
+                            {activeTab === 'products' && (
+                                <button
+                                    className="add-btn"
+                                    onClick={() => setShowAddForm((prev) => !prev)}
+                                >
+                                    <Plus size={18} />
+                                    {showAddForm ? 'Cancel' : 'Add Product'}
+                                </button>
+                            )}
+                        </div>
                     </div>
-                </div>
-                <div className="header-actions">
-                    {activeTab === 'products' && (
-                        <button
-                            className="add-btn"
-                            onClick={() => setShowAddForm((prev) => !prev)}
-                        >
-                            {showAddForm ? 'Cancel' : 'Add Product'}
-                        </button>
-                    )}
-                    <button className="logout-btn" onClick={handleLogout}>
-                        Logout
-                    </button>
+
+                    {error && <div className="error-message">{error}</div>}
+
+                    {activeTab === 'products' && renderProductSection()}
+                    {activeTab === 'orders' && renderOrderSection()}
+                    {activeTab === 'settings' && renderSettingsSection()}
                 </div>
             </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            {activeTab === 'products' && renderProductSection()}
-            {activeTab === 'orders' && renderOrderSection()}
-            {activeTab === 'settings' && renderSettingsSection()}
         </div>
     );
 }

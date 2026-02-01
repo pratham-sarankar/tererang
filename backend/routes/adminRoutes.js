@@ -34,14 +34,15 @@ router.post('/login', async (req, res) => {
         }
 
         // Generate token
+        // NOTE: Admin token has no expiration - it remains valid until logout or JWT_SECRET changes.
+        // This design choice prevents auth errors but requires secure token handling.
         const token = jwt.sign(
             {
                 adminId: admin._id,
                 username: admin.username,
                 role: admin.role
             },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
+            process.env.JWT_SECRET
         );
 
         res.json({

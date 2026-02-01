@@ -10,6 +10,7 @@ const serializeOrder = (order) => ({
     id: order._id,
     subtotal: order.subtotal,
     taxAmount: order.taxAmount,
+    codCharge: order.codCharge,
     grandTotal: order.grandTotal,
     status: order.status,
     paymentMethod: order.paymentMethod,
