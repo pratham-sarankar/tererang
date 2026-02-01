@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Loader2 } from 'lucide-react';
 import { useCart } from '../context/cartContextStore.js';
@@ -25,7 +25,7 @@ const resolveProductImage = (product) => {
 
 const Cart = () => {
   const navigate = useNavigate();
-  const token = useMemo(() => (typeof window !== 'undefined' ? localStorage.getItem('token') : null), []);
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const { cartItems, cartCount, cartTotal, loading, removeCartItem, updateCartItem, refreshCart } = useCart();
   const [feedback, setFeedback] = useState(null);
   const [removingItemId, setRemovingItemId] = useState(null);
@@ -64,7 +64,7 @@ const Cart = () => {
     try {
       setUpdatingItemId(itemId);
       await updateCartItem(itemId, { quantity: newQuantity });
-      setFeedback({ type: 'success', text: 'Quantity updated' });
+      // Only show feedback on success if needed, error feedback is more important
     } catch (error) {
       setFeedback({ type: 'error', text: error.message || 'Failed to update quantity' });
       await refreshCart();

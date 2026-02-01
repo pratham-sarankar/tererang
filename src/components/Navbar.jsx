@@ -39,6 +39,7 @@ const Navbar = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartFeedback, setCartFeedback] = useState(null);
   const [removingItemId, setRemovingItemId] = useState(null);
+  const [isMobileView, setIsMobileView] = useState(false);
 
   const dropdownRef = useRef(null);
   const loginRef = useRef(null);
@@ -46,6 +47,18 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { cartItems, cartCount, cartTotal, loading: cartLoading, removeCartItem, error: cartError } = useCart();
+
+  // Detect mobile view on mount and resize
+  useEffect(() => {
+    const checkMobileView = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    
+    checkMobileView();
+    window.addEventListener('resize', checkMobileView);
+    
+    return () => window.removeEventListener('resize', checkMobileView);
+  }, []);
 
   // Check authentication status on component mount and route changes
   useEffect(() => {
@@ -268,7 +281,7 @@ const Navbar = () => {
               onClick={() => {
                 // On mobile (< md breakpoint), navigate to cart page
                 // On desktop, toggle cart overlay
-                if (window.innerWidth < 768) {
+                if (isMobileView) {
                   navigate('/cart');
                 } else {
                   setIsCartOpen((prev) => !prev);
