@@ -35,6 +35,7 @@ import { CartProvider } from "./context/CartContext.jsx";
 import Checkout from "./pages/Checkout";
 import ProductDetail from "./pages/ProductDetail";
 import AddressBook from "./pages/AddressBook";
+import Cart from "./pages/Cart";
 
 // Layout wrapper to conditionally render Navbar
 function Layout({ children }) {
@@ -88,6 +89,7 @@ function App() {
           <Route path="ReturnPolicy" element={<ReturnPolicy />} />
           <Route path="DesignerSuit" element={<DesignerSuit />} />
           <Route path="/privacy-policy" element={<Privacy />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/addresses" element={<AddressBook />} />
           <Route path="/product/:productId" element={<ProductDetail />} />

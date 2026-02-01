@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 // 💡 IMPORTANT: Ensure 'Final Logo.jpg' is now a transparent PNG file 
 // (or rename and import the new transparent PNG file)
 import tereRang from "../assets/logo.png";
@@ -40,13 +40,27 @@ const Navbar = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartFeedback, setCartFeedback] = useState(null);
   const [removingItemId, setRemovingItemId] = useState(null);
+  const [isMobileView, setIsMobileView] = useState(false);
   const [isProductsAccordionOpen, setIsProductsAccordionOpen] = useState(false); // New state for mobile accordion
 
   const dropdownRef = useRef(null);
   const loginRef = useRef(null);
   const cartRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { cartItems, cartCount, cartTotal, loading: cartLoading, removeCartItem, error: cartError } = useCart();
+
+  // Detect mobile view on mount and resize
+  useEffect(() => {
+    const checkMobileView = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    
+    checkMobileView();
+    window.addEventListener('resize', checkMobileView);
+    
+    return () => window.removeEventListener('resize', checkMobileView);
+  }, []);
 
   // Check authentication status on component mount and route changes
   useEffect(() => {
