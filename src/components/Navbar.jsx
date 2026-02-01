@@ -690,24 +690,9 @@ const Navbar = () => {
                       <Link to="/products/EthnicWear" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-all text-sm ml-2">
                         <span className="mr-2"><GiPoncho size={18} /></span> Winter Ethnic Wear
                       </Link>
-
-                      {/* Coming Soon in Accordion */}
-                      <div className="pt-2 mt-2 border-t border-gray-100">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-4">Coming Soon</p>
-                        {[
-                          { name: 'Wedding Collection', icon: <GiDiamondRing size={16} /> },
-                          { name: 'Sharara Suits', icon: <GiKimono size={16} /> },
-                          { name: 'Skirt Sets', icon: <GiSkirt size={16} /> }
-                        ].map((item) => (
-                          <div key={item.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 text-gray-400 transition-all text-sm ml-2 opacity-70">
-                            <div className="flex items-center">
-                              <span className="mr-2 grayscale">{item.icon}</span>
-                              <span>{item.name}</span>
-                            </div>
-                            <span className="text-[8px] bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 uppercase">Soon</span>
-                          </div>
-                        ))}
-                      </div>
+                      <Link to="/products/wedding" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-all text-sm ml-2">
+                        <span className="mr-2"><GiDiamondRing size={18} /></span> Wedding Collection
+                      </Link>
                     </div>
                   </div>
                 </div>
