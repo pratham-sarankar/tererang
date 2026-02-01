@@ -7,7 +7,5 @@ import jwt from 'jsonwebtoken';
  * @returns {string} JWT token
  */
 export const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'fallback_secret', {
-    expiresIn: '30d',
-  });
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'fallback_secret');
 };

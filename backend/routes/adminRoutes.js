@@ -40,8 +40,7 @@ router.post('/login', async (req, res) => {
                 username: admin.username,
                 role: admin.role
             },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
+            process.env.JWT_SECRET
         );
 
         res.json({
