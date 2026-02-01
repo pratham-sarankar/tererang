@@ -20,6 +20,7 @@ import Coat from "./products/Coat";
 import EthnicWear from "./products/EthnicWear";
 import ShararaData from "./products/ShararaData";
 import Skirt from "./products/Skirt";
+import WeddingCollection from "./products/WeddingCollection";
 import Shipping from "./products/Shipping";
 import OrderTracker from "./products/OrderTracker";
 import FaqPage from "./products/FaqPage";
@@ -76,6 +77,7 @@ function App() {
           <Route path="/products/Coat" element={<Coat />} />
           <Route path="/products/ShararaData" element={<ShararaData />} />
           <Route path="/products/Skirt" element={<Skirt />} />
+          <Route path="/products/wedding" element={<WeddingCollection />} />
           <Route path="/Shipping" element={<Shipping />} />
           <Route path="/OrderTracker" element={<OrderTracker />} />
           <Route path="/FaqPage" element={<FaqPage />} />

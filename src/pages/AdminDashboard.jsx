@@ -585,6 +585,7 @@ export default function AdminDashboard() {
                                     <option value="skirt">Skirt</option>
                                     <option value="coat">Coat</option>
                                     <option value="ethnicWear">Ethnic Wear</option>
+                                    <option value="wedding">Wedding Collection</option>
                                 </select>
                             </div>
                             <div className="form-group">
