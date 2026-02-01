@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, CheckCircle, Wallet, Loader2, MapPin, Plus, Pencil, Star, Clock3, Mail, CreditCard, Banknote } from 'lucide-react';
 import { useCart } from '../context/cartContextStore.js';
-import { apiUrl, GST_RATE, COD_CHARGE } from '../config/env.js';
+import { apiUrl, imageUrl, GST_RATE, COD_CHARGE } from '../config/env.js';
 import AddressForm from '../components/AddressForm.jsx';
 import { createAddress, listAddresses, setDefaultAddress, updateAddress } from '../utils/addressApi.js';
 import { useRazorpay } from '../hooks/useRazorpay.js';
@@ -43,7 +43,8 @@ const Checkout = () => {
   const { loadRazorpay } = useRazorpay();
 
   const initialStoredUser = useMemo(() => readStoredUser(), []);
-  const [paymentReference, setPaymentReference] = useState(''); // Kept for legacy compatibility if needed
+  // Kept for legacy compatibility if needed
+  // const [paymentReference, setPaymentReference] = useState('');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
@@ -263,7 +264,7 @@ const Checkout = () => {
   }, [paymentMethod]);
 
 
-  const verifyPayment = async (razorpayData, orderDetails) => {
+  const verifyPayment = async (razorpayData) => {
     try {
       const response = await fetch(apiUrl('/api/orders/verify-payment'), {
         method: 'POST',
