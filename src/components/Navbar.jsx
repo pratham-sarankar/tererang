@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 // 💡 IMPORTANT: Ensure 'Final Logo.jpg' is now a transparent PNG file 
 // (or rename and import the new transparent PNG file)
 import tereRang from "./Final Logo.jpg";
@@ -44,6 +44,7 @@ const Navbar = () => {
   const loginRef = useRef(null);
   const cartRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { cartItems, cartCount, cartTotal, loading: cartLoading, removeCartItem, error: cartError } = useCart();
 
   // Check authentication status on component mount and route changes
@@ -264,7 +265,15 @@ const Navbar = () => {
           {/* 🛒 Cart */}
           <div className="relative" ref={cartRef}>
             <button
-              onClick={() => setIsCartOpen((prev) => !prev)}
+              onClick={() => {
+                // On mobile (< md breakpoint), navigate to cart page
+                // On desktop, toggle cart overlay
+                if (window.innerWidth < 768) {
+                  navigate('/cart');
+                } else {
+                  setIsCartOpen((prev) => !prev);
+                }
+              }}
               className={`relative h-10 w-10 flex items-center justify-center rounded-full border border-gray-700 hover:border-teal-400 transition ${isCartOpen ? 'text-teal-400' : ''}`}
               aria-label="Shopping cart"
             >
@@ -277,7 +286,7 @@ const Navbar = () => {
             </button>
 
             {isCartOpen && (
-              <div className="absolute right-0 mt-3 w-80 bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 z-50 p-5">
+              <div className="absolute right-0 mt-3 w-80 bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 z-50 p-5 hidden md:block">
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-sm text-gray-400">My Cart</p>
