@@ -88,7 +88,7 @@ const Navbar = () => {
         const response = await fetch(apiUrl('/api/settings'));
         if (response.ok) {
           const data = await response.json();
-          if (data.settings && data.settings.promotionalText) {
+          if (data.settings && 'promotionalText' in data.settings) {
             setPromotionalText(data.settings.promotionalText);
           }
         }
