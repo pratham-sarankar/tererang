@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import traditionalImg from '../assets/traditional_ethnic_wear.png';
+import traditionalImg from '../assets/banner_1.jpeg';
 import modernImg from '../assets/modern_ethnic_fusion.png';
 
 const SplitBanner = () => {
@@ -14,12 +14,12 @@ const SplitBanner = () => {
                 <img
                     src={traditionalImg}
                     alt="Traditional Ethnic Wear"
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    className="w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent group-hover:bg-black/20 transition-colors duration-500"></div>
                 <div className="absolute bottom-8 left-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
-                    <p className="text-sm uppercase tracking-widest mb-1">Timeless</p>
-                    <h3 className="text-2xl font-semibold">Heritage Collection</h3>
+                    <p className="text-sm uppercase tracking-widest mb-1">Tererang</p>
+                    <h3 className="text-2xl font-semibold">Wedding Collection</h3>
                 </div>
             </div>
 
