@@ -139,7 +139,7 @@ const Navbar = () => {
     { name: 'Designer Suits', to: '/products/suit', enabled: true, emoji: '👗' },
     { name: 'Elegant Coat Sets', to: '/products/coat', enabled: true, emoji: '🧥' },
     { name: 'Winter Ethnic Wear', to: '/products/EthnicWear', enabled: true, emoji: '🧣' },
-    { name: 'Wedding Collection', to: '/products/festiveSuits', enabled: false },
+    { name: 'Wedding Collection', to: '/products/wedding', enabled: true, emoji: '💒' },
   ];
 
   return (
