@@ -17,7 +17,7 @@ const settingsSchema = new mongoose.Schema({
     // Promotional text for navbar
     promotionalText: {
         type: String,
-        default: 'FREE DELIVERY ABOVE ₹999',
+        default: '',
     },
 }, {
     timestamps: true,
@@ -30,7 +30,7 @@ settingsSchema.statics.getSettings = async function () {
         settings = await this.create({
             globalDiscountPercentage: 0,
             globalDiscountEnabled: false,
-            promotionalText: 'FREE DELIVERY ABOVE ₹999',
+            promotionalText: '',
         });
     }
     return settings;

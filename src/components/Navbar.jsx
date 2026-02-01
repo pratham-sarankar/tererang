@@ -42,7 +42,7 @@ const Navbar = () => {
   const [removingItemId, setRemovingItemId] = useState(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isProductsAccordionOpen, setIsProductsAccordionOpen] = useState(false); // New state for mobile accordion
-  const [promotionalText, setPromotionalText] = useState('FREE DELIVERY ABOVE ₹999');
+  const [promotionalText, setPromotionalText] = useState('');
 
   const dropdownRef = useRef(null);
   const loginRef = useRef(null);
@@ -88,6 +88,7 @@ const Navbar = () => {
         const response = await fetch(apiUrl('/api/settings'));
         if (response.ok) {
           const data = await response.json();
+          console.log(data);
           if (data.settings && 'promotionalText' in data.settings) {
             setPromotionalText(data.settings.promotionalText);
           }
@@ -179,16 +180,18 @@ const Navbar = () => {
     { name: 'Wedding Collection', to: '/products/wedding', enabled: true, icon: <GiDiamondRing /> },
   ];
 
+  const hasPromotionalText = promotionalText && promotionalText.trim() !== "";
+
   return (
     <>
       {/* Discount Strip */}
-      {promotionalText && (
+      {hasPromotionalText && (
         <div className="text-white text-center py-2 text-sm font-semibold sticky top-0 z-50 flex justify-center items-center gap-2" style={{ backgroundColor: '#b81582' }}>
           {promotionalText}
         </div>
       )}
 
-      <nav className="bg-white text-gray-900 shadow-lg sticky top-8 z-50">
+      <nav className={`bg-white text-gray-900 shadow-lg sticky ${hasPromotionalText ? 'top-8' : 'top-0'} z-50`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex justify-between items-center">
 
           {/* ✅ LOGO SECTION - UPDATED CSS */}
