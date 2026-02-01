@@ -141,7 +141,7 @@ const Navbar = () => {
     { name: 'Designer Suits', to: '/products/suit', enabled: true, icon: <GiKimono /> },
     { name: 'Elegant Coat Sets', to: '/products/coat', enabled: true, icon: <GiLabCoat /> },
     { name: 'Winter Ethnic Wear', to: '/products/EthnicWear', enabled: true, icon: <GiPoncho /> },
-    { name: 'Wedding Collection', to: '/products/festiveSuits', enabled: false },
+    { name: 'Wedding Collection', to: '/products/wedding', enabled: true, icon: <GiDiamondRing /> },
   ];
 
   return (
