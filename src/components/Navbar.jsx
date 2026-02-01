@@ -55,10 +55,10 @@ const Navbar = () => {
     const checkMobileView = () => {
       setIsMobileView(window.innerWidth < 768);
     };
-    
+
     checkMobileView();
     window.addEventListener('resize', checkMobileView);
-    
+
     return () => window.removeEventListener('resize', checkMobileView);
   }, []);
 
@@ -162,7 +162,7 @@ const Navbar = () => {
     <>
       {/* Discount Strip */}
       <div className="text-white text-center py-2 text-sm font-semibold sticky top-0 z-50 flex justify-center items-center gap-2" style={{ backgroundColor: '#b81582' }}>
-        <Gift size={16} /> FREE DELIVERY ABOVE ₹999
+        FREE DELIVERY ABOVE ₹999
       </div>
 
       <nav className="bg-white text-gray-900 shadow-lg sticky top-8 z-50">
