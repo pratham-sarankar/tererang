@@ -66,7 +66,7 @@ const policySections = [
           <li>Please keep the packaging secure for the scheduled pickup.</li>
         </ol>
         <div className="p-3 bg-cyan-100 border border-cyan-300 rounded-lg text-cyan-700 text-sm mt-4">
-          For any questions or assistance regarding a defective item, please email us at support@terarang.com or call +91-9548971147.
+          For any questions or assistance regarding a defective item, please email us at tererang.official@gmail.com or call +91-9548971147.
         </div>
       </div>
     ),
@@ -91,9 +91,8 @@ const PolicyAccordionItem = ({ icon, title, content, isOpen, toggleAccordion }) 
         <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'transform rotate-180 text-cyan-700' : 'text-gray-500'}`} />
       </button>
       <div
-        className={`overflow-hidden transition-all duration-500 ease-in-out ${
-          isOpen ? 'max-h-[500px] opacity-100 p-4 sm:p-5' : 'max-h-0 opacity-0'
-        } bg-white`}
+        className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100 p-4 sm:p-5' : 'max-h-0 opacity-0'
+          } bg-white`}
       >
         {content}
       </div>
@@ -140,13 +139,13 @@ const App = () => {
             ))}
           </div>
         </div>
-        
+
         {/* Footer/Guarantee Section */}
         <div className="p-6 sm:p-8 bg-gray-100 text-center border-t border-gray-200">
-            <p className="text-lg font-medium text-cyan-700">
-                <CheckCircle className="w-5 h-5 inline mr-2" />
-                We guarantee 100% Original, Quality-Checked Products.
-            </p>
+          <p className="text-lg font-medium text-cyan-700">
+            <CheckCircle className="w-5 h-5 inline mr-2" />
+            We guarantee 100% Original, Quality-Checked Products.
+          </p>
         </div>
 
       </div>

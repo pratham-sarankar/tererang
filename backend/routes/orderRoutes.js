@@ -16,11 +16,13 @@ const resolveGstRate = () => {
     return 0;
 };
 const GST_RATE = resolveGstRate();
+const COD_CHARGE = 59; // Fixed COD charge of ₹59
 
 const serializeOrder = (order) => ({
     id: order._id,
     subtotal: order.subtotal,
     taxAmount: order.taxAmount,
+    codCharge: order.codCharge,
     grandTotal: order.grandTotal,
     status: order.status,
     paymentMethod: order.paymentMethod,
@@ -65,11 +67,12 @@ const snapshotAddress = (addressDoc) => ({
 
 router.post('/', async (req, res) => {
     try {
-        const { paymentReference, notes, addressId } = req.body;
+        const { paymentReference, notes, addressId, paymentMethod } = req.body;
         console.info('[orderRoutes] Incoming order placement request', {
             userId: req.user._id,
             paymentReference,
             addressId,
+            paymentMethod,
         });
 
         const user = await User.findById(req.user._id).populate('cart.product');
@@ -125,6 +128,9 @@ router.post('/', async (req, res) => {
         });
 
         const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
+        const selectedPaymentMethod = paymentMethod || 'upi';
+        // COD charge is paid separately upfront via Razorpay, but tracked here for financial records
+        const codCharge = selectedPaymentMethod === 'cod' ? COD_CHARGE : 0;
         const grandTotal = subtotal + taxAmount;
 
         const order = await Order.create({
@@ -133,9 +139,10 @@ router.post('/', async (req, res) => {
             shippingAddress: snapshotAddress(selectedAddress),
             subtotal,
             taxAmount,
+            codCharge,
             grandTotal,
-            paymentMethod: 'upi',
-            paymentStatus: 'paid',
+            paymentMethod: selectedPaymentMethod,
+            paymentStatus: selectedPaymentMethod === 'cod' ? 'pending' : 'paid',
             paymentReference,
             notes,
         });
@@ -211,26 +218,41 @@ router.get('/', async (req, res) => {
 
 router.post('/create-razorpay-order', async (req, res) => {
     try {
-        const { addressId } = req.body;
-        console.info('[orderRoutes] Initiating Razorpay order', { userId: req.user._id });
+        const { paymentMethod } = req.body;
+        console.info('[orderRoutes] Initiating Razorpay order', { userId: req.user._id, paymentMethod });
 
         const user = await User.findById(req.user._id).populate('cart.product');
         if (!user || !user.cart?.length) {
             return res.status(400).json({ message: 'Cart is empty' });
         }
 
-        const items = user.cart.map((item) => {
-            const productDoc = item.product;
-            return {
-                price: productDoc?.price || 0,
-                quantity: item.quantity || 1,
-            };
-        });
+        let amountInPaise;
+        let receiptPrefix;
 
-        const subtotal = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
-        const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
-        const grandTotal = subtotal + taxAmount;
-        const amountInPaise = Math.round(grandTotal * 100);
+        // If COD is selected, charge only the ₹59 COD fee upfront
+        if (paymentMethod === 'cod') {
+            amountInPaise = COD_CHARGE * 100; // ₹59 in paise
+            receiptPrefix = 'cod_fee';
+            console.info('[orderRoutes] Creating Razorpay order for COD fee', {
+                userId: req.user._id,
+                codFee: COD_CHARGE
+            });
+        } else {
+            // For regular online payment, charge the full order amount
+            const items = user.cart.map((item) => {
+                const productDoc = item.product;
+                return {
+                    price: productDoc?.price || 0,
+                    quantity: item.quantity || 1,
+                };
+            });
+
+            const subtotal = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
+            const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
+            const grandTotal = subtotal + taxAmount;
+            amountInPaise = Math.round(grandTotal * 100);
+            receiptPrefix = 'order';
+        }
 
         if (amountInPaise <= 0) {
             return res.status(400).json({ message: 'Invalid order amount' });
@@ -239,7 +261,7 @@ router.post('/create-razorpay-order', async (req, res) => {
         const options = {
             amount: amountInPaise,
             currency: 'INR',
-            receipt: `order_${Date.now()}`,
+            receipt: `${receiptPrefix}_${Date.now()}`,
             payment_capture: 1
         };
 
@@ -247,14 +269,15 @@ router.post('/create-razorpay-order', async (req, res) => {
 
         console.info('[orderRoutes] Razorpay order created', {
             razorpayOrderId: order.id,
-            amount: order.amount
+            amount: order.amount,
+            type: paymentMethod === 'cod' ? 'COD Fee' : 'Full Payment'
         });
 
         res.json({
             id: order.id,
             currency: order.currency,
             amount: order.amount,
-            keyId: process.env.RAZORPAY_KEY_ID, // Send key config to frontend
+            keyId: process.env.RAZORPAY_KEY_ID,
             prefill: {
                 name: user.name || '',
                 email: user.email || '',
@@ -275,7 +298,8 @@ router.post('/verify-payment', async (req, res) => {
             razorpay_payment_id,
             razorpay_signature,
             addressId,
-            notes
+            notes,
+            paymentMethod
         } = req.body;
 
         const body = razorpay_order_id + '|' + razorpay_payment_id;
@@ -297,6 +321,28 @@ router.post('/verify-payment', async (req, res) => {
             return res.status(400).json({ message: 'Address not found' });
         }
 
+        // For COD orders, verify that the payment was for the COD fee (₹59)
+        // This prevents issues if cart changed between order creation and payment
+        const selectedPaymentMethod = paymentMethod || 'razorpay';
+        if (selectedPaymentMethod === 'cod') {
+            try {
+                const razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
+                const expectedAmount = COD_CHARGE * 100; // ₹59 in paise
+                if (razorpayOrder.amount !== expectedAmount) {
+                    console.warn('[orderRoutes] COD payment amount mismatch', {
+                        expected: expectedAmount,
+                        received: razorpayOrder.amount
+                    });
+                    return res.status(400).json({ 
+                        message: 'Payment amount verification failed. Please try again.' 
+                    });
+                }
+            } catch (fetchError) {
+                console.error('[orderRoutes] Failed to fetch Razorpay order', fetchError);
+                return res.status(500).json({ message: 'Failed to verify payment details' });
+            }
+        }
+
         const items = user.cart.map((item) => {
             const productDoc = item.product;
             return {
@@ -311,12 +357,9 @@ router.post('/verify-payment', async (req, res) => {
         });
 
         const subtotal = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
-        // Recalculate totals to be safe, although payment already happened based on cart
-        // Ideally should match what was paid, but cart might have changed? 
-        // Assuming cart is locked or unlikely to change in seconds. 
-        // For robustness, one might store these details temporarily or just trust the cart now.
-
         const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
+        // COD charge is paid separately upfront via Razorpay, but tracked here for financial records
+        const codCharge = selectedPaymentMethod === 'cod' ? COD_CHARGE : 0;
         const grandTotal = subtotal + taxAmount;
 
         const order = await Order.create({
@@ -325,10 +368,13 @@ router.post('/verify-payment', async (req, res) => {
             shippingAddress: snapshotAddress(selectedAddress),
             subtotal,
             taxAmount,
+            codCharge,
             grandTotal,
             status: 'confirmed',
-            paymentMethod: 'razorpay',
-            paymentStatus: 'paid',
+            paymentMethod: selectedPaymentMethod,
+            // For COD: ₹59 is paid, but order payment is still pending (to be collected on delivery)
+            // For Razorpay: full amount is paid
+            paymentStatus: selectedPaymentMethod === 'cod' ? 'pending' : 'paid',
             paymentReference: razorpay_payment_id,
             notes,
         });
