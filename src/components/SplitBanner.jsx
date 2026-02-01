@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import traditionalImg from '../assets/banner_1.jpeg';
-import modernImg from '../assets/modern_ethnic_fusion.png';
+import modernImg from '../assets/banner_2.jpeg';
 
 const SplitBanner = () => {
     const navigate = useNavigate();
@@ -28,7 +28,7 @@ const SplitBanner = () => {
                 <img
                     src={modernImg}
                     alt="Modern Ethnic Fusion"
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    className="w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-l from-black/40 to-transparent group-hover:bg-black/20 transition-colors duration-500"></div>
                 <div className="absolute bottom-8 right-8 text-right text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
