@@ -158,7 +158,7 @@ const WeddingCollection = () => {
           </div>
         )}
       </div>
-      <Footer></Footer>
+      <Footer />
     </>
   );
 };
