@@ -211,7 +211,7 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
           name="isDefault"
           checked={values.isDefault}
           onChange={handleCheckboxChange}
-          className="h-4 w-4 rounded border-gray-300 text-teal-500 focus:ring-teal-400"
+          className="h-4 w-4 rounded border-gray-300 text-[#b81582] focus:ring-[#b81582]"
         />
         Set as default shipping address
       </label>
@@ -220,7 +220,7 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
         <button
           type="submit"
           disabled={disableSubmit}
-          className="flex-1 rounded-full bg-gradient-to-r from-teal-400 to-blue-500 py-3 font-semibold text-black disabled:opacity-50"
+          className="flex-1 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 py-3 font-bold text-white disabled:opacity-50 hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105 shadow-xl disabled:transform-none"
         >
           {submitting ? 'Saving...' : submitLabel}
         </button>
@@ -229,7 +229,7 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
             type="button"
             onClick={onCancel}
             disabled={disableSubmit}
-            className={`rounded-full border px-5 py-3 text-sm ${secondaryButtonClass}`}
+            className={`rounded-full border px-5 py-3 text-sm font-bold ${secondaryButtonClass} hover:bg-gray-100 transition`}
           >
             Cancel
           </button>

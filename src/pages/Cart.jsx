@@ -79,22 +79,22 @@ const Cart = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-pink-50/50 to-white flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="animate-spin mx-auto mb-4" size={48} />
-          <p className="text-gray-400">Loading your cart...</p>
+          <Loader2 className="animate-spin mx-auto mb-4 text-[#b81582]" size={48} />
+          <p className="text-gray-600">Loading your cart...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50/50 to-white text-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">Shopping Cart</h1>
-          <p className="text-gray-400">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">Shopping Cart</h1>
+          <p className="text-gray-600 text-base">
             {cartHasItems ? `${cartCount} item${cartCount === 1 ? '' : 's'} in your cart` : 'Your cart is empty'}
           </p>
         </div>
@@ -102,8 +102,8 @@ const Cart = () => {
         {/* Feedback Message */}
         {feedback && (
           <div
-            className={`mb-6 p-4 rounded-lg ${
-              feedback.type === 'error' ? 'bg-red-900/50 text-red-200' : 'bg-teal-900/40 text-teal-200'
+            className={`mb-6 p-4 rounded-2xl ${
+              feedback.type === 'error' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-pink-100 text-[#b81582] border border-pink-200'
             }`}
           >
             {feedback.text}
@@ -122,7 +122,7 @@ const Cart = () => {
                 return (
                   <div
                     key={item.id}
-                    className="bg-gray-900 rounded-xl p-4 sm:p-6 border border-gray-800 hover:border-gray-700 transition"
+                    className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-2xl transition-all duration-300"
                   >
                     <div className="flex flex-col sm:flex-row gap-4">
                       {/* Product Image */}
@@ -131,10 +131,10 @@ const Cart = () => {
                           <img
                             src={previewSrc}
                             alt={item.product?.name || 'Product image'}
-                            className="w-full sm:w-32 h-48 sm:h-32 rounded-lg object-cover border border-gray-800"
+                            className="w-full sm:w-32 h-48 sm:h-32 rounded-lg object-cover"
                           />
                         ) : (
-                          <div className="w-full sm:w-32 h-48 sm:h-32 rounded-lg bg-gray-800 flex items-center justify-center text-gray-500">
+                          <div className="w-full sm:w-32 h-48 sm:h-32 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
                             <ShoppingBag size={40} />
                           </div>
                         )}
@@ -143,10 +143,10 @@ const Cart = () => {
                       {/* Product Details */}
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold mb-2">
+                          <h3 className="text-lg font-bold text-gray-900 mb-2">
                             {item.product?.name || 'Unavailable product'}
                           </h3>
-                          <div className="text-sm text-gray-400 space-y-1">
+                          <div className="text-sm text-gray-500 space-y-1">
                             {item.size && <p>Size: {item.size}</p>}
                             {item.height && <p>Height: {item.height}</p>}
                           </div>
@@ -158,18 +158,18 @@ const Cart = () => {
                             <button
                               onClick={() => handleUpdateQuantity(item.id, item.quantity, -1)}
                               disabled={isUpdating || item.quantity <= 1}
-                              className="h-8 w-8 rounded-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
+                              className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition text-gray-900"
                               aria-label="Decrease quantity"
                             >
                               <Minus size={16} />
                             </button>
-                            <span className="text-lg font-semibold min-w-[2rem] text-center">
+                            <span className="text-lg font-bold text-gray-900 min-w-[2rem] text-center">
                               {item.quantity}
                             </span>
                             <button
                               onClick={() => handleUpdateQuantity(item.id, item.quantity, 1)}
                               disabled={isUpdating}
-                              className="h-8 w-8 rounded-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
+                              className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition text-gray-900"
                               aria-label="Increase quantity"
                             >
                               <Plus size={16} />
@@ -178,16 +178,16 @@ const Cart = () => {
 
                           {/* Price and Remove */}
                           <div className="flex items-center justify-between sm:justify-end gap-4">
-                            <p className="text-xl font-bold text-teal-400">
+                            <p className="text-xl font-extrabold text-[#b81582]">
                               {formatCurrency(item.lineTotal)}
                             </p>
                             <button
                               onClick={() => handleRemoveItem(item.id)}
                               disabled={isRemoving}
-                              className="text-gray-400 hover:text-red-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="text-gray-400 hover:text-red-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                               aria-label="Remove item"
                             >
-                              {isRemoving ? <Loader2 className="animate-spin" size={20} /> : <Trash2 size={20} />}
+                              {isRemoving ? <Loader2 className="animate-spin text-[#b81582]" size={20} /> : <Trash2 size={20} />}
                             </button>
                           </div>
                         </div>
@@ -200,22 +200,22 @@ const Cart = () => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 sticky top-24">
-                <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+              <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-2xl transition-all duration-300 sticky top-24">
+                <h2 className="text-xl font-extrabold text-gray-900 mb-6">Order Summary</h2>
 
                 <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-gray-400">
+                  <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({cartCount} item{cartCount === 1 ? '' : 's'})</span>
-                    <span className="text-white font-semibold">{formatCurrency(cartTotal)}</span>
+                    <span className="text-gray-900 font-bold">{formatCurrency(cartTotal)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-400">
+                  <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
-                    <span className="text-white font-semibold">Calculated at checkout</span>
+                    <span className="text-gray-900 font-bold">Calculated at checkout</span>
                   </div>
-                  <div className="border-t border-gray-800 pt-4">
-                    <div className="flex justify-between text-lg font-bold">
-                      <span>Total</span>
-                      <span className="text-teal-400">{formatCurrency(cartTotal)}</span>
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="flex justify-between text-lg font-extrabold">
+                      <span className="text-gray-900">Total</span>
+                      <span className="text-[#b81582]">{formatCurrency(cartTotal)}</span>
                     </div>
                   </div>
                 </div>
@@ -223,20 +223,20 @@ const Cart = () => {
                 <div className="space-y-3">
                   <Link
                     to="/checkout"
-                    className="flex items-center justify-center gap-2 w-full bg-white text-black font-semibold py-3 rounded-full hover:bg-gray-200 transition"
+                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-full hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105 shadow-xl"
                   >
                     Proceed to Checkout
                     <ArrowRight size={18} />
                   </Link>
                   <Link
                     to="/shop"
-                    className="block w-full text-center bg-teal-600 hover:bg-teal-500 text-white font-semibold py-3 rounded-full transition"
+                    className="block w-full text-center border-2 border-pink-100 text-[#b81582] font-bold py-3 rounded-full hover:bg-[#b81582] hover:text-white hover:border-[#b81582] transition"
                   >
                     Continue Shopping
                   </Link>
                 </div>
 
-                <div className="mt-6 text-sm text-gray-400 text-center">
+                <div className="mt-6 text-sm text-gray-500 text-center">
                   <p>Secure checkout guaranteed</p>
                 </div>
               </div>
@@ -245,16 +245,16 @@ const Cart = () => {
         ) : (
           // Empty Cart State
           <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gray-900 border-2 border-gray-800 mb-6">
-              <ShoppingCart size={48} className="text-gray-600" />
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-pink-100/50 border-2 border-pink-100 mb-6">
+              <ShoppingCart size={48} className="text-[#b81582]" />
             </div>
-            <h2 className="text-2xl font-semibold mb-3">Your cart is empty</h2>
-            <p className="text-gray-400 mb-8">
+            <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Your cart is empty</h2>
+            <p className="text-gray-600 mb-8">
               Explore our collections to add something special.
             </p>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold px-8 py-3 rounded-full transition"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-8 py-3 rounded-full hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105 shadow-xl"
             >
               <ShoppingBag size={20} />
               Start Shopping
