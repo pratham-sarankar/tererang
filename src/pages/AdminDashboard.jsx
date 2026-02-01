@@ -69,6 +69,7 @@ export default function AdminDashboard() {
     const [settings, setSettings] = useState({
         globalDiscountPercentage: 0,
         globalDiscountEnabled: false,
+        promotionalText: 'FREE DELIVERY ABOVE ₹999',
     });
     const [settingsSaving, setSettingsSaving] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -982,6 +983,59 @@ export default function AdminDashboard() {
                                         </div>
                                     </>
                                 )}
+                            </div>
+                            <div className="settings-actions">
+                                <button
+                                    type="button"
+                                    className="save-settings-btn"
+                                    onClick={saveSettings}
+                                    disabled={settingsSaving}
+                                >
+                                    {settingsSaving ? 'Saving...' : 'Save Settings'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="settings-card">
+                        <div className="settings-card-header">
+                            <h3>Promotional Banner</h3>
+                            <p className="settings-card-subtitle">
+                                Configure the promotional text displayed in the navbar banner at the top of the website.
+                            </p>
+                        </div>
+                        <div className="settings-card-body">
+                            <div className="form-group">
+                                <label htmlFor="promotionalText">
+                                    Promotional Text
+                                </label>
+                                <input
+                                    type="text"
+                                    id="promotionalText"
+                                    name="promotionalText"
+                                    value={settings.promotionalText}
+                                    onChange={handleSettingsChange}
+                                    placeholder="e.g., FREE DELIVERY ABOVE ₹999"
+                                    className="discount-input"
+                                />
+                                <p className="help-text">
+                                    This text will be displayed at the top of every page. Leave blank to hide the banner.
+                                </p>
+                            </div>
+                            <div className="settings-preview">
+                                <h4>Preview</h4>
+                                <div className="promo-banner-preview" style={{ 
+                                    backgroundColor: '#b81582', 
+                                    color: 'white',
+                                    textAlign: 'center',
+                                    padding: '8px',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    borderRadius: '4px',
+                                    marginTop: '10px'
+                                }}>
+                                    {settings.promotionalText || 'No promotional text set'}
+                                </div>
                             </div>
                             <div className="settings-actions">
                                 <button

@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
 // Update global settings (admin only)
 router.put('/', adminAuth, async (req, res) => {
     try {
-        const { globalDiscountPercentage, globalDiscountEnabled } = req.body;
+        const { globalDiscountPercentage, globalDiscountEnabled, promotionalText } = req.body;
 
         // Validate discount percentage
         if (globalDiscountPercentage !== undefined) {
@@ -33,6 +33,7 @@ router.put('/', adminAuth, async (req, res) => {
             settings = await Settings.create({
                 globalDiscountPercentage: globalDiscountPercentage || 0,
                 globalDiscountEnabled: globalDiscountEnabled || false,
+                promotionalText: promotionalText || 'FREE DELIVERY ABOVE ₹999',
             });
         } else {
             if (globalDiscountPercentage !== undefined) {
@@ -40,6 +41,9 @@ router.put('/', adminAuth, async (req, res) => {
             }
             if (globalDiscountEnabled !== undefined) {
                 settings.globalDiscountEnabled = globalDiscountEnabled;
+            }
+            if (promotionalText !== undefined) {
+                settings.promotionalText = promotionalText;
             }
             await settings.save();
         }

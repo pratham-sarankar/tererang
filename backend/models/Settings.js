@@ -14,6 +14,11 @@ const settingsSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    // Promotional text for navbar
+    promotionalText: {
+        type: String,
+        default: '',
+    },
 }, {
     timestamps: true,
 });
@@ -25,6 +30,7 @@ settingsSchema.statics.getSettings = async function () {
         settings = await this.create({
             globalDiscountPercentage: 0,
             globalDiscountEnabled: false,
+            promotionalText: '',
         });
     }
     return settings;

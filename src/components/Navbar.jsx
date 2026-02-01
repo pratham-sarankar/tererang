@@ -7,7 +7,7 @@ import { Menu, X, User, LogOut, ShoppingCart, Trash2, Gift, Home, ShoppingBag, F
 import { GiAmpleDress, GiKimono, GiLabCoat, GiPoncho, GiDiamondRing, GiSkirt } from "react-icons/gi";
 import { useCart } from "../context/cartContextStore.js";
 import { notifyCartAuthChange } from "../context/cartEvents.js";
-import { imageUrl } from "../config/env.js";
+import { apiUrl, imageUrl } from "../config/env.js";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -42,6 +42,7 @@ const Navbar = () => {
   const [removingItemId, setRemovingItemId] = useState(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isProductsAccordionOpen, setIsProductsAccordionOpen] = useState(false); // New state for mobile accordion
+  const [promotionalText, setPromotionalText] = useState('');
 
   const dropdownRef = useRef(null);
   const loginRef = useRef(null);
@@ -79,6 +80,27 @@ const Navbar = () => {
 
     checkAuthStatus();
   }, [location]);
+
+  // Fetch promotional text from settings
+  useEffect(() => {
+    const fetchPromotionalText = async () => {
+      try {
+        const response = await fetch(apiUrl('/api/settings'));
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          if (data.settings && 'promotionalText' in data.settings) {
+            setPromotionalText(data.settings.promotionalText);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching promotional text:', error);
+        // Keep default promotional text on error
+      }
+    };
+
+    fetchPromotionalText();
+  }, []);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -158,14 +180,18 @@ const Navbar = () => {
     { name: 'Wedding Collection', to: '/products/wedding', enabled: true, icon: <GiDiamondRing /> },
   ];
 
+  const hasPromotionalText = promotionalText && promotionalText.trim() !== "";
+
   return (
     <>
       {/* Discount Strip */}
-      <div className="text-white text-center py-2 text-sm font-semibold sticky top-0 z-50 flex justify-center items-center gap-2" style={{ backgroundColor: '#b81582' }}>
-        FREE DELIVERY ABOVE ₹999
-      </div>
+      {hasPromotionalText && (
+        <div className="text-white text-center py-2 text-sm font-semibold sticky top-0 z-50 flex justify-center items-center gap-2" style={{ backgroundColor: '#b81582' }}>
+          {promotionalText}
+        </div>
+      )}
 
-      <nav className="bg-white text-gray-900 shadow-lg sticky top-8 z-50">
+      <nav className={`bg-white text-gray-900 shadow-lg sticky ${hasPromotionalText ? 'top-8' : 'top-0'} z-50`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex justify-between items-center">
 
           {/* ✅ LOGO SECTION - UPDATED CSS */}
