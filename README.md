@@ -155,7 +155,7 @@ Create a `backend/.env` file with the following variables:
 ```env
 MONGODB_URI=mongodb://localhost:27017/tererang
 JWT_SECRET=your_secure_random_string
-PORT=5000
+PORT=3001
 NODE_ENV=development
 ```
 
@@ -169,6 +169,12 @@ VITE_UPI_PAYEE_NAME=Tere Rang
 ```
 
 Adjust the values to match your deployment (for example, set `VITE_UPI_ID` to the live UPI handle that should appear on the checkout page).
+
+The local API uses port 3001 because macOS AirPlay can occupy port 5000 and
+return `403 Forbidden` responses. Backend settings are loaded from `backend/.env`
+whether you start the server from the project root or the backend directory.
+If you change the port, update both `PORT` and `VITE_BACKEND_URL` (and
+`VITE_ASSET_BASE_URL` if set), then restart the backend and Vite.
 
 ## 🧪 Testing
 

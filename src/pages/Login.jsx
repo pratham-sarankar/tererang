@@ -1,50 +1,29 @@
 // src/pages/Login.jsx
 import React, { useState } from "react";
 import "../css/Login.css";
-import { apiUrl } from "../config/env.js";
-import { notifyCartAuthChange } from "../context/cartEvents.js";
+import { usePhoneAuth } from "../hooks/usePhoneAuth.js";
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [name, setName] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-
-  // Build API root from environment configuration helper
-  const API_URL = apiUrl('/api').replace(/\/$/, '');
+  const { recaptchaContainerRef, sendOtp, confirmOtp, loading } = usePhoneAuth();
 
   const handleSendOTP = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
-    setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/auth/send-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ phoneNumber }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setOtpSent(true);
-        const extra = data.delivery?.simulated ? " (SMS simulated in development)" : "";
-        setMessage(`${data.message}${extra}`);
-      } else {
-        setError(data.message || "Failed to send OTP");
-      }
+      await sendOtp(phoneNumber);
+      setOtpSent(true);
+      setMessage("OTP sent successfully");
     } catch (err) {
-      setError("Network error. Please make sure the backend server is running.");
+      setError(err.message || "Failed to send OTP");
       console.error("Error sending OTP:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -52,39 +31,18 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setMessage("");
-    setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/auth/verify-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ phoneNumber, otp, name }),
-      });
+      await confirmOtp(otp, name);
+      setMessage("Login Successful ✅");
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store token in localStorage
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        notifyCartAuthChange();
-        
-        setMessage("Login Successful ✅");
-        
-        // Redirect to home page after 1 second
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1000);
-      } else {
-        setError(data.message || "Failed to verify OTP");
-      }
+      // Redirect to home page after 1 second
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
     } catch (err) {
-      setError("Network error. Please make sure the backend server is running.");
+      setError(err.message || "Failed to verify OTP");
       console.error("Error verifying OTP:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -101,11 +59,11 @@ const Login = () => {
         <h2>Login to Tererang</h2>
 
         {error && (
-          <div style={{ 
-            padding: "10px", 
-            marginBottom: "15px", 
-            backgroundColor: "#fee", 
-            border: "1px solid #fcc", 
+          <div style={{
+            padding: "10px",
+            marginBottom: "15px",
+            backgroundColor: "#fee",
+            border: "1px solid #fcc",
             borderRadius: "6px",
             color: "#c33",
             fontSize: "14px"
@@ -115,11 +73,11 @@ const Login = () => {
         )}
 
         {message && (
-          <div style={{ 
-            padding: "10px", 
-            marginBottom: "15px", 
-            backgroundColor: "#efe", 
-            border: "1px solid #cfc", 
+          <div style={{
+            padding: "10px",
+            marginBottom: "15px",
+            backgroundColor: "#efe",
+            border: "1px solid #cfc",
             borderRadius: "6px",
             color: "#3c3",
             fontSize: "14px"
@@ -185,8 +143,8 @@ const Login = () => {
               {loading ? "Verifying..." : "Verify & Login"}
             </button>
 
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={handleReset}
               className="btn-login"
               style={{ marginTop: "10px", backgroundColor: "#ddd", color: "#333" }}
@@ -201,6 +159,7 @@ const Login = () => {
           Don't have an account? <a href="/register">Register</a>
         </p>
       </form>
+      <div ref={recaptchaContainerRef} />
     </div>
   );
 };

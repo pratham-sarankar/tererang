@@ -287,8 +287,8 @@ const Checkout = () => {
         throw new Error(data.message || 'Payment verification failed');
       }
 
-      const successMessage = paymentMethod === 'cod' 
-        ? 'COD fee paid! Order placed. Pay remaining amount on delivery.' 
+      const successMessage = paymentMethod === 'cod'
+        ? 'COD fee paid! Order placed. Pay remaining amount on delivery.'
         : 'Payment successful! Order placed.';
       setStatusMessage({ type: 'success', text: successMessage });
       await refreshCart();
@@ -340,7 +340,7 @@ const Checkout = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ addressId: selectedAddressId })
+        body: JSON.stringify({ addressId: selectedAddressId, paymentMethod: 'razorpay' })
       });
 
       const data = await response.json();
@@ -358,7 +358,7 @@ const Checkout = () => {
         order_id: data.id,
         image: "https://tererang.in/logo.png", // Fallback or use real logo if available
         handler: function (response) {
-          verifyPayment(response, data);
+          verifyPayment(response);
         },
         prefill: data.prefill,
         theme: {
@@ -426,7 +426,7 @@ const Checkout = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           addressId: selectedAddressId,
           paymentMethod: 'cod'
         })
@@ -448,7 +448,7 @@ const Checkout = () => {
         image: "https://tererang.in/logo.png",
         handler: function (response) {
           // After successful ₹59 payment, verify and place the COD order
-          verifyPayment(response, data);
+          verifyPayment(response);
         },
         prefill: data.prefill,
         theme: {
@@ -518,22 +518,19 @@ const Checkout = () => {
             <div className="space-y-3 mb-6">
               <div
                 onClick={() => setPaymentMethod('razorpay')}
-                className={`cursor-pointer rounded-2xl border p-4 transition ${
-                  paymentMethod === 'razorpay'
+                className={`cursor-pointer rounded-2xl border p-4 transition ${paymentMethod === 'razorpay'
                     ? 'border-[#b81582] bg-pink-100/50 shadow-lg'
                     : 'border-gray-200 bg-white hover:border-pink-200'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === 'razorpay' ? 'border-[#b81582]' : 'border-gray-300'
-                    }`}
+                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'razorpay' ? 'border-[#b81582]' : 'border-gray-300'
+                      }`}
                   >
                     <span
-                      className={`h-2.5 w-2.5 rounded-full ${
-                        paymentMethod === 'razorpay' ? 'bg-[#b81582]' : 'bg-transparent'
-                      }`}
+                      className={`h-2.5 w-2.5 rounded-full ${paymentMethod === 'razorpay' ? 'bg-[#b81582]' : 'bg-transparent'
+                        }`}
                     />
                   </div>
                   <div className="flex-1">
@@ -548,22 +545,19 @@ const Checkout = () => {
 
               <div
                 onClick={() => setPaymentMethod('cod')}
-                className={`cursor-pointer rounded-2xl border p-4 transition ${
-                  paymentMethod === 'cod'
+                className={`cursor-pointer rounded-2xl border p-4 transition ${paymentMethod === 'cod'
                     ? 'border-[#b81582] bg-pink-100/50 shadow-lg'
                     : 'border-gray-200 bg-white hover:border-pink-200'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === 'cod' ? 'border-[#b81582]' : 'border-gray-300'
-                    }`}
+                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-[#b81582]' : 'border-gray-300'
+                      }`}
                   >
                     <span
-                      className={`h-2.5 w-2.5 rounded-full ${
-                        paymentMethod === 'cod' ? 'bg-[#b81582]' : 'bg-transparent'
-                      }`}
+                      className={`h-2.5 w-2.5 rounded-full ${paymentMethod === 'cod' ? 'bg-[#b81582]' : 'bg-transparent'
+                        }`}
                     />
                   </div>
                   <div className="flex-1">
@@ -932,11 +926,11 @@ const Checkout = () => {
                   onClick={paymentMethod === 'cod' ? handleCodOrder : handleRazorpayPayment}
                   disabled={submitting || !selectedAddressId || userLoading || !userProfile?.email || (paymentMethod === 'cod' && !codAgreed)}
                   title={
-                    !userProfile?.email 
-                      ? 'Add your email to continue' 
-                      : paymentMethod === 'cod' && !codAgreed 
-                      ? 'Please agree to COD terms to continue'
-                      : undefined
+                    !userProfile?.email
+                      ? 'Add your email to continue'
+                      : paymentMethod === 'cod' && !codAgreed
+                        ? 'Please agree to COD terms to continue'
+                        : undefined
                   }
                   className="mt-6 flex items-center justify-center gap-2 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-extrabold py-4 rounded-full shadow-xl hover:from-purple-700 hover:to-pink-700 hover:scale-105 transition transform disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
                 >
@@ -947,11 +941,11 @@ const Checkout = () => {
                   ) : (
                     <CreditCard size={20} />
                   )}
-                  {submitting 
-                    ? 'Processing...' 
-                    : paymentMethod === 'cod' 
-                    ? `Pay ₹${COD_CHARGE} COD Fee`
-                    : `Pay ${formatCurrency(payableWithGst)}`
+                  {submitting
+                    ? 'Processing...'
+                    : paymentMethod === 'cod'
+                      ? `Pay ₹${COD_CHARGE} COD Fee`
+                      : `Pay ${formatCurrency(payableWithGst)}`
                   }
                 </button>
 

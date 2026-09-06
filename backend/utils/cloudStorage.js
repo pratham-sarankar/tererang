@@ -1,14 +1,9 @@
-import { Storage } from '@google-cloud/storage';
 import multer from 'multer';
 import path from 'path';
+import { storage } from '../config/firebase.js';
 
-// Initialize Google Cloud Storage
-const storage = new Storage({
-    projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-    keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE, // Path to service account key file
-});
-
-const bucket = storage.bucket(process.env.GOOGLE_CLOUD_STORAGE_BUCKET);
+// Bucket backed by the Firebase Admin SDK (same underlying GCS Bucket API)
+const bucket = storage.bucket();
 
 // Custom storage engine for multer to work with Google Cloud Storage
 class GoogleCloudStorage {

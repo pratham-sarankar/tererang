@@ -30,7 +30,7 @@ Backend API for Tererang e-commerce platform with phone number authentication po
 
 - `MONGODB_URI`: Your MongoDB connection string
 - `JWT_SECRET`: A secure random string for JWT signing
-- `PORT`: Server port (default: 5000)
+- `PORT`: Server port (default: 3001)
 - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`: Credentials from your Twilio console
 - `TWILIO_VERIFY_SERVICE_SID`: The Verify Service ID (starts with `VA...`) for OTP delivery
 - `TWILIO_DEFAULT_COUNTRY_CODE`: (Optional) Country code prefix, defaults to `+91`

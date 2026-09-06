@@ -321,28 +321,6 @@ router.post('/verify-payment', async (req, res) => {
             return res.status(400).json({ message: 'Address not found' });
         }
 
-        // For COD orders, verify that the payment was for the COD fee (₹59)
-        // This prevents issues if cart changed between order creation and payment
-        const selectedPaymentMethod = paymentMethod || 'razorpay';
-        if (selectedPaymentMethod === 'cod') {
-            try {
-                const razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
-                const expectedAmount = COD_CHARGE * 100; // ₹59 in paise
-                if (razorpayOrder.amount !== expectedAmount) {
-                    console.warn('[orderRoutes] COD payment amount mismatch', {
-                        expected: expectedAmount,
-                        received: razorpayOrder.amount
-                    });
-                    return res.status(400).json({ 
-                        message: 'Payment amount verification failed. Please try again.' 
-                    });
-                }
-            } catch (fetchError) {
-                console.error('[orderRoutes] Failed to fetch Razorpay order', fetchError);
-                return res.status(500).json({ message: 'Failed to verify payment details' });
-            }
-        }
-
         const items = user.cart.map((item) => {
             const productDoc = item.product;
             return {
@@ -358,9 +336,28 @@ router.post('/verify-payment', async (req, res) => {
 
         const subtotal = items.reduce((sum, line) => sum + line.price * line.quantity, 0);
         const taxAmount = Number((subtotal * GST_RATE).toFixed(2));
+        const selectedPaymentMethod = paymentMethod || 'razorpay';
         // COD charge is paid separately upfront via Razorpay, but tracked here for financial records
         const codCharge = selectedPaymentMethod === 'cod' ? COD_CHARGE : 0;
         const grandTotal = subtotal + taxAmount;
+
+        // Confirm the amount actually paid matches what's owed, in case the cart changed since order creation
+        const expectedAmount = selectedPaymentMethod === 'cod' ? COD_CHARGE * 100 : Math.round(grandTotal * 100);
+        try {
+            const razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
+            if (razorpayOrder.amount !== expectedAmount) {
+                console.warn('[orderRoutes] Payment amount mismatch', {
+                    expected: expectedAmount,
+                    received: razorpayOrder.amount
+                });
+                return res.status(400).json({
+                    message: 'Payment amount verification failed. Please try again.'
+                });
+            }
+        } catch (fetchError) {
+            console.error('[orderRoutes] Failed to fetch Razorpay order', fetchError);
+            return res.status(500).json({ message: 'Failed to verify payment details' });
+        }
 
         const order = await Order.create({
             user: req.user._id,

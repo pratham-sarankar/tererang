@@ -2,8 +2,8 @@
 import express from 'express';
 import User from '../models/User.js';
 import { generateToken } from '../utils/generateToken.js';
-import { sendLoginOtpSMS, verifyLoginOtp } from '../utils/smsService.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { auth as firebaseAuth } from '../config/firebase.js';
 
 const router = express.Router();
 
@@ -34,54 +34,26 @@ const serializeUser = (user) => ({
 const normalizeEmail = (email) => (typeof email === 'string' ? email.trim().toLowerCase() : '');
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// @route   POST /api/auth/send-otp
-// @desc    Send OTP to phone number
+// @route   POST /api/auth/firebase-login
+// @desc    Verify a Firebase phone-auth ID token and login/register user
 // @access  Public
-router.post('/send-otp', async (req, res) => {
+router.post('/firebase-login', async (req, res) => {
   try {
-    const { phoneNumber } = req.body;
+    const { idToken, name } = req.body;
 
-    if (!phoneNumber) {
-      return res.status(400).json({ message: 'Phone number is required' });
+    if (!idToken) {
+      return res.status(400).json({ message: 'ID token is required' });
     }
 
-    // Validate phone number format (basic validation)
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-      return res.status(400).json({ message: 'Invalid phone number format. Please enter a 10-digit number.' });
+    const decoded = await firebaseAuth.verifyIdToken(idToken);
+    const rawPhone = decoded.phone_number;
+
+    if (!rawPhone) {
+      return res.status(400).json({ message: 'Token does not contain a verified phone number' });
     }
 
-    const delivery = await sendLoginOtpSMS(phoneNumber);
-
-    res.status(200).json({
-      message: 'OTP sent successfully',
-      delivery,
-    });
-  } catch (error) {
-    console.error('Error sending OTP:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-// @route   POST /api/auth/verify-otp
-// @desc    Verify OTP and login user
-// @access  Public
-router.post('/verify-otp', async (req, res) => {
-  try {
-    const { phoneNumber, otp, name } = req.body;
-
-    if (!phoneNumber || !otp) {
-      return res.status(400).json({ message: 'Phone number and OTP are required' });
-    }
-
-    const verification = await verifyLoginOtp(phoneNumber, otp);
-
-    if (!verification.approved) {
-      return res.status(400).json({
-        message: 'Invalid or expired OTP',
-        status: verification.status,
-      });
-    }
+    // Stored without country code, matching existing 10-digit records
+    const phoneNumber = rawPhone.replace(/\D/g, '').slice(-10);
 
     // Find or create user
     let user = await User.findOne({ phoneNumber });
@@ -110,8 +82,8 @@ router.post('/verify-otp', async (req, res) => {
       user: serializeUser(user),
     });
   } catch (error) {
-    console.error('Error verifying OTP:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Error verifying Firebase login:', error);
+    res.status(401).json({ message: 'Invalid or expired token', error: error.message });
   }
 });
 
