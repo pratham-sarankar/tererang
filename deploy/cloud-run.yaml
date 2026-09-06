@@ -1,0 +1,75 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: tererang
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: '3'
+        run.googleapis.com/container-dependencies: '{"frontend":["backend"]}'
+    spec:
+      serviceAccountName: tererang-run@tererang.iam.gserviceaccount.com
+      containerConcurrency: 40
+      timeoutSeconds: 60
+      containers:
+        - name: frontend
+          image: asia-south1-docker.pkg.dev/tererang/tererang/frontend@sha256:587815225dd5199b4dda9eba8cbb0f0fd61b98ecdd284a37af020e183851cbd7
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NGINX_PORT
+              value: '8080'
+            - name: BACKEND_UPSTREAM
+              value: '127.0.0.1:8081'
+          resources:
+            limits:
+              cpu: '1'
+              memory: 256Mi
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 24
+        - name: backend
+          image: asia-south1-docker.pkg.dev/tererang/tererang/backend@sha256:fcc3bf9c1d2d9cfdf52fbe782d9b4ce92b7c059804cb8c5593f331e894ce42fc
+          env:
+            - name: PORT
+              value: '8081'
+            - name: NODE_ENV
+              value: production
+            - name: BACKEND_ENV_FILE
+              value: /secrets/config/backend.env
+            - name: FIREBASE_SERVICE_ACCOUNT_PATH
+              value: /secrets/firebase/serviceAccountKey.json
+          resources:
+            limits:
+              cpu: '1'
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 8081
+            periodSeconds: 5
+            failureThreshold: 24
+          volumeMounts:
+            - name: backend-config
+              mountPath: /secrets/config
+            - name: firebase-key
+              mountPath: /secrets/firebase
+      volumes:
+        - name: backend-config
+          secret:
+            secretName: tererang-backend-env
+            items:
+              - key: '1'
+                path: backend.env
+        - name: firebase-key
+          secret:
+            secretName: tererang-firebase-key
+            items:
+              - key: '1'
+                path: serviceAccountKey.json

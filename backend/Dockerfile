@@ -1,5 +1,5 @@
-# Use Node.js 18 Alpine for smaller image size
-FROM node:18-alpine
+# Use Node.js 22 Alpine for smaller image size
+FROM node:22-alpine
 
 # Set working directory
 WORKDIR /app
@@ -8,13 +8,16 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci --omit=dev
 
 # Copy all files
 COPY . .
 
-# Expose port 5000
-EXPOSE 5000
+ENV NODE_ENV=production
+ENV PORT=8080
+
+# Expose port 8080
+EXPOSE 8080
 
 # Start the application
 CMD ["npm", "start"]

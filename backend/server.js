@@ -18,7 +18,7 @@ import contactRoutes from './routes/contactRoutes.js';
 
 
 // Connect to database
-connectDB();
+await connectDB();
 
 const app = express();
 

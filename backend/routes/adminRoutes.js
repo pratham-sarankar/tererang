@@ -65,6 +65,10 @@ router.post('/login', async (req, res) => {
 
 // Create first admin (for setup - should be protected in production)
 router.post('/create-admin', async (req, res) => {
+    // Production admins must be provisioned through the trusted setup script.
+    if (process.env.NODE_ENV === 'production') {
+        return res.status(404).json({ message: 'Not found' });
+    }
     try {
         const { username, password } = req.body;
 
@@ -118,7 +122,8 @@ router.post('/create-admin', async (req, res) => {
 // Verify admin token
 router.get('/verify', authMiddleware, async (req, res) => {
     try {
-        const admin = await Admin.findById(req.user.adminId).select('-password');
+        // The middleware has already loaded the admin document from the token.
+        const admin = req.user;
         if (!admin) {
             return res.status(404).json({
                 message: 'Admin not found'

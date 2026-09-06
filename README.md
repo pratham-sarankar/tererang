@@ -196,6 +196,37 @@ node backend/test-api.js
 
 ## 🌐 Production Deployment
 
+### Run locally with Docker
+
+With Docker running, configure the frontend `.env` and `backend/.env`, and place
+your Firebase service account at `backend/serviceAccountKey.json`. Then run:
+
+```bash
+docker compose up --build -d
+docker compose ps
+node scripts/docker-smoke.mjs
+```
+
+Open http://localhost:8081. Nginx forwards `/backend/` requests to the backend
+on container port 8080. The backend connects to `MONGODB_URI` from `backend/.env`;
+Compose does not override it or start a database container. For deployment, set
+this to your reachable MongoDB connection URL, including credentials as required.
+For a database running on your Mac with Docker Desktop, use
+`mongodb://host.docker.internal:27017/tererang` and ensure MongoDB accepts that
+connection. `localhost` inside a container refers to the container itself.
+The frontend's public Vite configuration is supplied through a build secret;
+backend environment settings and the Firebase key are supplied only at runtime.
+After changing frontend `.env` values, run `docker compose build --no-cache frontend`
+and `docker compose up -d` (BuildKit secrets do not invalidate cached layers).
+Set `DOCKER_WEB_PORT` to override the default host port 8081. Docker build arguments
+`VITE_BACKEND_URL` and `VITE_ASSET_BASE_URL` default to `/backend`.
+
+Use `docker compose down` to stop the application containers. The external
+database is managed independently. After changing `backend/.env`, run
+`docker compose up -d --force-recreate backend` to load the new settings.
+If migrating from the previous bundled MongoDB setup, its existing Docker
+volume is preserved; data is not automatically migrated to the configured URL.
+
 Before deploying to production:
 
 1. **Update environment variables**
