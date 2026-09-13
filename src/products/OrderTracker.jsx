@@ -8,7 +8,7 @@ const mockFetchOrderStatus = async (trackingId) => {
   // return data;
 
   // नेटवर्क देरी का अनुकरण करने के लिए
-  await new Promise(resolve => setTimeout(resolve, 1500)); 
+  await new Promise(resolve => setTimeout(resolve, 1500));
 
   if (trackingId === "12345") {
     return {
@@ -67,8 +67,8 @@ const mockFetchOrderStatus = async (trackingId) => {
 // Loading Spinner Component
 const Spinner = () => (
   <div className="flex justify-center items-center py-4">
-    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
-    <p className="ml-3 text-indigo-700 font-medium">Fetching status...</p>
+    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+    <p className="ml-3 text-primary font-medium">Fetching status...</p>
   </div>
 );
 
@@ -113,11 +113,11 @@ const OrderTrackingPage = () => {
 
     return (
       <div className="relative mt-8 mb-12">
-        {/* Full grey line for the background */}
-        <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-300 transform -translate-y-1/2 mx-8"></div>
-        {/* Active indigo line */}
-        <div 
-          className="absolute top-1/2 left-0 h-1 bg-indigo-600 transform -translate-y-1/2 mx-8 transition-all duration-700 ease-in-out" 
+        {/* Full border line for the background */}
+        <div className="absolute top-1/2 left-0 right-0 h-px bg-border transform -translate-y-1/2 mx-8"></div>
+        {/* Active sage line */}
+        <div
+          className="absolute top-1/2 left-0 h-px bg-primary transform -translate-y-1/2 mx-8 transition-all duration-700 ease-in-out"
           style={{ width: `${activeLineWidth}%` }}
         ></div>
 
@@ -128,28 +128,28 @@ const OrderTrackingPage = () => {
             const isCurrent = stepNumber === orderData.currentStep;
 
             return (
-              <div 
-                key={step.name} 
-                className={`flex flex-col items-center w-1/5 text-center px-2 z-10 
+              <div
+                key={step.name}
+                className={`flex flex-col items-center w-1/5 text-center px-2 z-10
                             ${index === 0 ? 'items-start' : (index === totalSteps - 1 ? 'items-end' : '')}`}
               >
                 {/* Circle */}
-                <div 
-                  className={`w-10 h-10 rounded-full flex items-center justify-center 
-                              text-white text-base font-semibold transition-all duration-500 
-                              ${isActive ? 'bg-indigo-600 shadow-lg' : 'bg-gray-300'}`}
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center
+                              text-white text-base font-medium transition-all duration-500 border
+                              ${isActive ? 'bg-primary border-primary shadow-sm' : 'bg-card border-border text-muted-foreground'}`}
                 >
                   {stepNumber}
                 </div>
                 {/* Step Name */}
-                <p className={`mt-3 text-sm font-medium transition-colors duration-500 
-                              ${isActive ? 'text-indigo-800' : 'text-gray-600'}
-                              ${isCurrent ? 'font-bold text-lg text-indigo-900' : ''}`}
+                <p className={`mt-3 text-sm font-medium transition-colors duration-500
+                              ${isActive ? 'text-primary' : 'text-muted-foreground'}
+                              ${isCurrent ? 'font-medium text-base text-foreground' : ''}`}
                 >
                   {step.name}
                 </p>
-                {step.date && 
-                  <p className="text-xs text-gray-500 mt-1">{step.date}</p>
+                {step.date &&
+                  <p className="text-xs text-muted-foreground mt-1">{step.date}</p>
                 }
               </div>
             );
@@ -160,11 +160,11 @@ const OrderTrackingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 flex items-center justify-center p-4 sm:p-6">
-      <div className="max-w-5xl w-full bg-white shadow-2xl rounded-xl p-8 sm:p-12 border border-indigo-200">
-        <h1 className="text-5xl font-extrabold text-center text-indigo-800 mb-8 sm:mb-12">
-          <span className="block text-3xl font-light text-gray-600 mb-2">My Order</span>
-          Track Your Delivery
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6">
+      <div className="max-w-5xl w-full bg-card shadow-sm rounded-sm p-8 sm:p-12 border border-border">
+        <h1 className="text-5xl font-serif lowercase tracking-wide text-center text-foreground mb-8 sm:mb-12">
+          <span className="block text-3xl font-light text-muted-foreground mb-2 lowercase">my order</span>
+          track your delivery
         </h1>
 
         {/* Tracking Input Section */}
@@ -174,16 +174,16 @@ const OrderTrackingPage = () => {
             placeholder="Enter your Tracking ID (e.g., 12345 or 67890)"
             value={trackingId}
             onChange={(e) => setTrackingId(e.target.value)}
-            className="flex-grow p-4 border-2 border-indigo-400 rounded-lg text-lg text-gray-800 
-                       focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 shadow-sm
-                       placeholder-gray-400"
+            className="flex-grow p-4 border border-border rounded-sm text-lg text-foreground
+                       focus:ring-primary focus:border-primary transition duration-200 shadow-sm
+                       placeholder:text-muted-foreground"
           />
           <button
             onClick={handleTrackOrder}
             disabled={isLoading}
-            className="px-8 py-4 bg-indigo-600 text-white text-xl font-bold rounded-lg 
-                       hover:bg-indigo-700 disabled:bg-indigo-400 transition duration-300 
-                       transform hover:scale-105 active:scale-95 shadow-md"
+            className="px-8 py-4 bg-primary text-white text-xl font-medium lowercase tracking-wide rounded-sm
+                       hover:bg-primary/90 disabled:bg-primary/50 transition duration-300
+                       shadow-sm"
           >
             {isLoading ? 'Tracking...' : 'Track Order'}
           </button>
@@ -194,51 +194,51 @@ const OrderTrackingPage = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="p-5 bg-red-100 text-red-700 font-medium rounded-lg mb-8 border border-red-300 text-center">
+          <div className="p-5 bg-secondary text-destructive font-medium rounded-sm mb-8 border border-border text-center">
             <p className="text-lg">{error}</p>
           </div>
         )}
 
         {/* Order Details Display */}
         {orderData && (
-          <div className="bg-indigo-50 p-6 sm:p-10 rounded-xl shadow-inner border border-indigo-200">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 border-b pb-6 border-indigo-200">
+          <div className="bg-secondary p-6 sm:p-10 rounded-sm border border-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 border-b pb-6 border-border">
               <div>
-                <p className="text-gray-600 text-sm font-medium">Tracking ID:</p>
-                <p className="text-indigo-800 text-xl font-bold">{orderData.trackingId}</p>
+                <p className="text-muted-foreground text-sm font-medium">Tracking ID:</p>
+                <p className="text-primary text-xl font-medium">{orderData.trackingId}</p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm font-medium">Order Number:</p>
-                <p className="text-indigo-800 text-xl font-bold">{orderData.orderNumber}</p>
+                <p className="text-muted-foreground text-sm font-medium">Order Number:</p>
+                <p className="text-primary text-xl font-medium">{orderData.orderNumber}</p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm font-medium">Current Status:</p>
-                <p className={`text-2xl font-extrabold ${orderData.status === 'Delivered' ? 'text-green-600' : 'text-indigo-700'}`}>
+                <p className="text-muted-foreground text-sm font-medium">Current Status:</p>
+                <p className={`text-2xl font-serif lowercase ${orderData.status === 'Delivered' ? 'text-accent' : 'text-primary'}`}>
                   {orderData.status}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm font-medium">Estimated Delivery:</p>
-                <p className="text-indigo-800 text-xl font-bold">{orderData.estimatedDelivery}</p>
+                <p className="text-muted-foreground text-sm font-medium">Estimated Delivery:</p>
+                <p className="text-primary text-xl font-medium">{orderData.estimatedDelivery}</p>
               </div>
             </div>
 
-            <p className="text-gray-700 text-base mb-8 italic text-center sm:text-left">{orderData.message}</p>
-            
+            <p className="text-foreground text-base mb-8 italic text-center sm:text-left">{orderData.message}</p>
+
             {/* Timeline Display */}
             {renderTimeline()}
 
             {/* Additional Details */}
-            <div className="mt-10 border-t pt-6 border-indigo-200">
-              <h3 className="text-2xl font-bold text-indigo-800 mb-4">Delivery Details</h3>
-              <p className="text-gray-700 mb-2">
-                <span className="font-semibold">Delivery Address:</span> {orderData.deliveryAddress}
+            <div className="mt-10 border-t pt-6 border-border">
+              <h3 className="text-2xl font-serif lowercase tracking-wide text-foreground mb-4">delivery details</h3>
+              <p className="text-foreground mb-2">
+                <span className="font-medium">Delivery Address:</span> {orderData.deliveryAddress}
               </p>
 
-              <h3 className="text-2xl font-bold text-indigo-800 mt-6 mb-4">Order Items</h3>
+              <h3 className="text-2xl font-serif lowercase tracking-wide text-foreground mt-6 mb-4">order items</h3>
               <ul className="list-disc list-inside space-y-2">
                 {orderData.items.map((item, index) => (
-                  <li key={index} className="text-gray-700">
+                  <li key={index} className="text-foreground">
                     {item.name} (Qty: {item.qty}) - ${item.price.toFixed(2)}
                   </li>
                 ))}

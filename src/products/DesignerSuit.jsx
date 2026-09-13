@@ -1,13 +1,13 @@
 import React from 'react';
-import { ShoppingCart, Heart, ArrowLeft, Zap, Gift, Ruler, CheckCircle, Share2 } from 'lucide-react';
 import ProductImage from '../components/ProductImage.jsx';
+import { Footer } from '../components/Footer.jsx';
+import { ShoppingBag } from 'lucide-react';
 
-// Icon mapping helper for highlights
 const shararaData = [
   {
     id: 1,
     title: "Royal Blue Sharara Suit",
-    brand: "Tererang",
+    brand: "tererang",
     oldPrice: "₹5,999",
     newPrice: "₹4,299",
     image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
@@ -15,7 +15,7 @@ const shararaData = [
   {
     id: 2,
     title: "Classic Black Sharara Suit",
-    brand: "Tererang",
+    brand: "tererang",
     oldPrice: "₹6,499",
     newPrice: "₹4,799",
     image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
@@ -23,7 +23,7 @@ const shararaData = [
   {
     id: 3,
     title: "Golden Embroidered Sharara",
-    brand: "Tererang",
+    brand: "tererang",
     oldPrice: "₹7,499",
     newPrice: "₹5,499",
     image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
@@ -31,7 +31,7 @@ const shararaData = [
   {
     id: 4,
     title: "Peach Designer Sharara",
-    brand: "Tererang",
+    brand: "tererang",
     oldPrice: "₹8,499",
     newPrice: "₹6,199",
     image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
@@ -39,7 +39,7 @@ const shararaData = [
   {
     id: 5,
     title: "Red Wedding Sharara Suit",
-    brand: "Tererang",
+    brand: "tererang",
     oldPrice: "₹9,499",
     newPrice: "₹6,999",
     image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
@@ -47,119 +47,80 @@ const shararaData = [
   {
     id: 6,
     title: "Green Georgette Sharara",
-    brand: "Tererang",
+    brand: "tererang",
     oldPrice: "₹6,999",
     newPrice: "₹5,299",
     image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
   },
-  {
-    id: 7,
-    title: "Yellow Silk Sharara Suit",
-    brand: "Tererang",
-    oldPrice: "₹8,999",
-    newPrice: "₹7,199",
-    image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
-  },
-  {
-    id: 8,
-    title: "Purple Heavy Sharara",
-    brand: "Tererang",
-    oldPrice: "₹9,999",
-    newPrice: "₹7,499",
-    image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
-  },
-  {
-    id: 9,
-    title: "White Bridal Sharara Suit",
-    brand: "Tererang",
-    oldPrice: "₹10,499",
-    newPrice: "₹8,299",
-    image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
-  },
-  {
-    id: 10,
-    title: "Pink Stylish Sharara Suit",
-    brand: "Tererang",
-    oldPrice: "₹7,499",
-    newPrice: "₹5,599",
-    image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
-  },
-  {
-    id: 11,
-    title: "Pink Stylish Sharara Suit",
-    brand: "Tererang",
-    oldPrice: "₹7,499",
-    newPrice: "₹5,599",
-    image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
-  },
-  {
-    id: 12,
-    title: "Pink Stylish Sharara Suit",
-    brand: "Tererang",
-    oldPrice: "₹7,499",
-    newPrice: "₹5,599",
-    image: "https://www.lavanyathelabel.com/cdn/shop/files/LBL101KS584_2_700x.jpg?v=1755064787",
-  },
-
 ];
 
 const ShararaSuits = () => {
   return (
-    <div className="bg-gradient-to-r from-pink-50 via-white to-pink-50 min-h-screen py-12 px-8">
-      {/* Page Title */}
-      <h1 className="text-center text-5xl font-extrabold text-pink-700 mb-14 tracking-wide drop-shadow-lg">
-        ✨ Sharara Suit Collection ✨
-      </h1>
-
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
-        {shararaData.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-transform transform hover:-translate-y-2 w-full"
-          >
-            {/* Image + Badge */}
-            <div className="relative">
-              <span className="absolute top-3 left-3 bg-pink-600 text-white px-3 py-1 rounded-md text-xs font-bold shadow-md">
-                Hot
-              </span>
-              <ProductImage
-                src={item.image}
-                alt={item.title}
-                className="rounded-t-2xl w-full h-[400px] object-cover"
-              />
-            </div>
-
-            {/* Content */}
-            <div className="p-6 text-center">
-              <h2 className="text-xl font-semibold text-gray-800">
-                {item.title}
-              </h2>
-              <p className="text-sm text-gray-500">{item.brand}</p>
-
-              <div className="mt-2">
-                <span className="line-through text-gray-400 mr-2">
-                  {item.oldPrice}
-                </span>
-                <span className="text-2xl text-pink-600 font-bold">
-                  {item.newPrice}
-                </span>
-              </div>
-
-              {/* Buttons */}
-              <div className="mt-6 flex flex-col gap-3">
-                <button className="w-full border-2 border-pink-600 text-pink-600 hover:bg-pink-600 hover:text-white font-medium py-2 rounded-lg transition duration-200">
-                  Choose Options
-                </button>
-                {/* <button className="w-full bg-pink-600 text-white hover:bg-pink-700 font-medium py-2 rounded-lg transition duration-200"> */}
-              
-                {/* </button> */}
-              </div>
-            </div>
+    <>
+      <div className="bg-background text-foreground min-h-screen">
+        {/* Page Header */}
+        <div className="py-16 sm:py-20 text-center bg-secondary border-b border-border">
+          <div className="max-w-3xl mx-auto px-6">
+            <p className="text-accent uppercase tracking-[0.3em] text-xs font-medium mb-3">
+              festive edit
+            </p>
+            <h1 className="text-4xl sm:text-5xl font-serif lowercase text-foreground mb-4 tracking-wide">
+              sharara suit collection
+            </h1>
+            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+              handcrafted georgette and silk shararas woven with timeless artistry.
+            </p>
           </div>
-        ))}
+        </div>
+
+        {/* Products Grid */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+            {shararaData.map((item) => (
+              <div
+                key={item.id}
+                className="group bg-card rounded-md overflow-hidden border border-border/80 hover:border-primary/50 transition-all duration-300 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="relative w-full aspect-[3/4] overflow-hidden bg-secondary">
+                    <ProductImage
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                  </div>
+
+                  <div className="p-4 sm:p-5 flex flex-col">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium mb-1">
+                      {item.brand}
+                    </span>
+                    <h3 className="font-serif text-base sm:text-lg text-foreground line-clamp-1 group-hover:text-primary transition-colors lowercase">
+                      {item.title}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0">
+                  <div className="flex items-baseline gap-2 mb-3">
+                    <span className="text-base sm:text-lg font-medium text-foreground">{item.newPrice}</span>
+                    <span className="text-xs line-through text-muted-foreground">{item.oldPrice}</span>
+                  </div>
+
+                  <button
+                    className="w-full border border-primary text-foreground hover:bg-primary hover:text-white py-2.5 px-4 text-xs lowercase tracking-wider font-medium transition-colors duration-300 flex items-center justify-center gap-2"
+                    type="button"
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5" />
+                    <span>view options</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 

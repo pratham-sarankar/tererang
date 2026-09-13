@@ -28,20 +28,20 @@ const faqData = [
 // Accordion Item Component
 const AccordionItem = ({ faq, isOpen, toggleAccordion, Icon }) => {
   return (
-    <div className="border-b border-indigo-200 bg-white rounded-xl shadow-lg mb-4 overflow-hidden">
+    <div className="border border-border bg-card rounded-sm shadow-sm mb-4 overflow-hidden">
       {/* Question Header */}
       <button
         className="flex justify-between items-center w-full p-6 text-left focus:outline-none transition duration-300"
         onClick={toggleAccordion}
       >
         <div className="flex items-center">
-          {Icon && <Icon className="w-6 h-6 mr-4 text-indigo-500 flex-shrink-0" />}
-          <span className={`text-lg font-semibold ${isOpen ? 'text-indigo-700' : 'text-gray-800'}`}>
+          {Icon && <Icon className="w-6 h-6 mr-4 text-primary flex-shrink-0" />}
+          <span className={`text-lg font-serif lowercase tracking-wide ${isOpen ? 'text-primary' : 'text-foreground'}`}>
             {faq.question}
           </span>
         </div>
         <ChevronDown
-          className={`w-5 h-5 ml-4 transform transition-transform duration-300 ${isOpen ? 'rotate-180 text-indigo-500' : 'text-gray-400'}`}
+          className={`w-5 h-5 ml-4 transform transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'text-muted-foreground'}`}
         />
       </button>
 
@@ -50,7 +50,7 @@ const AccordionItem = ({ faq, isOpen, toggleAccordion, Icon }) => {
         className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
       >
         <div className="overflow-hidden">
-          <p className="px-6 pb-6 pt-0 text-gray-600 leading-relaxed border-t border-indigo-100 mt-4 mx-6">
+          <p className="px-6 pb-6 text-muted-foreground leading-relaxed border-t border-border mt-4 mx-6">
             {faq.answer}
           </p>
         </div>
@@ -79,15 +79,15 @@ const FaqPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4 sm:p-8 font-sans">
+    <div className="min-h-screen bg-background p-4 sm:p-8 font-sans">
       <div className="max-w-4xl mx-auto py-12">
 
         {/* Header Section */}
         <header className="text-center mb-12">
-          <h1 className="text-5xl font-extrabold text-indigo-700 mb-4">
-            Your Questions, Our Answers
+          <h1 className="text-5xl font-serif lowercase tracking-wide text-foreground mb-4">
+            your questions, our answers
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-muted-foreground">
             Frequently Asked Questions (FAQs) about Tererang.
             We know you want to trust a new store, so we've made everything clear and simple.
           </p>
@@ -107,20 +107,20 @@ const FaqPage = () => {
         </div>
 
         {/* Call to Action (CTA) */}
-        <div className="mt-12 text-center p-8 bg-indigo-100 rounded-xl shadow-inner border border-indigo-300">
-          <h2 className="text-2xl font-bold text-indigo-800 mb-3">
-            Didn't Find Your Answer?
+        <div className="mt-12 text-center p-8 bg-secondary rounded-sm border border-border">
+          <h2 className="text-2xl font-serif lowercase tracking-wide text-foreground mb-3">
+            didn't find your answer?
           </h2>
-          <p className="text-gray-700 mb-4">
+          <p className="text-muted-foreground mb-4">
             Our dedicated support team is ready to assist you.
           </p>
           <a
             href="mailto:tererangofficial@gmail.com"
-            className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-full 
-                       hover:bg-indigo-700 transition duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="inline-flex items-center px-6 py-3 bg-primary text-white font-medium lowercase tracking-wide rounded-sm
+                       hover:bg-primary/90 transition duration-300 shadow-sm"
           >
             <Mail className="w-5 h-5 mr-2" />
-            Contact Us
+            contact us
           </a>
         </div>
 

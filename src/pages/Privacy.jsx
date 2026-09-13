@@ -4,34 +4,34 @@ import { Footer } from '../components/Footer';
 const PrivacyPolicy = () => {
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-12 px-6">
+      <div className="min-h-screen bg-background py-12 px-6">
         {/* Header */}
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-extrabold text-pink-700 mb-4">
-              Privacy Policy
+            <h1 className="text-5xl font-serif lowercase tracking-wide text-foreground mb-4">
+              privacy policy
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-muted-foreground text-lg">
               Last updated: November 20, 2025
             </p>
           </div>
 
           {/* Introduction */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border-l-4 border-pink-600">
-            <p className="text-gray-700 leading-relaxed">
-              At <span className="font-semibold text-pink-700">Tererang</span>, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
+          <div className="bg-card rounded-sm shadow-sm p-8 mb-8 border border-border border-l-4 border-l-primary">
+            <p className="text-muted-foreground leading-relaxed text-sm">
+              At <span className="font-medium text-accent">Tererang</span>, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
             </p>
           </div>
 
           {/* Information We Collect */}
-          <section className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+          <section className="bg-card rounded-sm shadow-sm p-8 mb-6 border border-border">
             <div className="flex items-center mb-4">
-              <i className="fas fa-database text-3xl text-pink-600 mr-4"></i>
-              <h2 className="text-2xl font-bold text-gray-800">Information We Collect</h2>
+              <i className="fas fa-database text-3xl text-primary mr-4"></i>
+              <h2 className="text-2xl font-serif lowercase tracking-wide text-foreground">information we collect</h2>
             </div>
-            <div className="space-y-4 text-gray-700">
+            <div className="space-y-4 text-muted-foreground text-sm leading-relaxed">
               <div>
-                <h3 className="font-semibold text-lg text-pink-700 mb-2">Personal Information</h3>
+                <h3 className="font-serif lowercase tracking-wide text-lg text-accent mb-2">personal information</h3>
                 <p className="leading-relaxed">
                   We collect information that you provide directly to us, including:
                 </p>
@@ -43,7 +43,7 @@ const PrivacyPolicy = () => {
                 </ul>
               </div>
               <div>
-                <h3 className="font-semibold text-lg text-pink-700 mb-2">Automatically Collected Information</h3>
+                <h3 className="font-serif lowercase tracking-wide text-lg text-accent mb-2">automatically collected information</h3>
                 <p className="leading-relaxed">
                   When you visit our website, we may automatically collect:
                 </p>
@@ -58,12 +58,12 @@ const PrivacyPolicy = () => {
           </section>
 
           {/* How We Use Your Information */}
-          <section className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+          <section className="bg-card rounded-sm shadow-sm p-8 mb-6 border border-border">
             <div className="flex items-center mb-4">
-              <i className="fas fa-cogs text-3xl text-pink-600 mr-4"></i>
-              <h2 className="text-2xl font-bold text-gray-800">How We Use Your Information</h2>
+              <i className="fas fa-cogs text-3xl text-primary mr-4"></i>
+              <h2 className="text-2xl font-serif lowercase tracking-wide text-foreground">how we use your information</h2>
             </div>
-            <div className="text-gray-700">
+            <div className="text-muted-foreground text-sm">
               <p className="leading-relaxed mb-3">
                 We use the information we collect for the following purposes:
               </p>
@@ -80,30 +80,30 @@ const PrivacyPolicy = () => {
           </section>
 
           {/* Information Sharing */}
-          <section className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+          <section className="bg-card rounded-sm shadow-sm p-8 mb-6 border border-border">
             <div className="flex items-center mb-4">
-              <i className="fas fa-share-alt text-3xl text-pink-600 mr-4"></i>
-              <h2 className="text-2xl font-bold text-gray-800">Information Sharing and Disclosure</h2>
+              <i className="fas fa-share-alt text-3xl text-primary mr-4"></i>
+              <h2 className="text-2xl font-serif lowercase tracking-wide text-foreground">information sharing and disclosure</h2>
             </div>
-            <div className="text-gray-700">
+            <div className="text-muted-foreground text-sm">
               <p className="leading-relaxed mb-3">
                 We do not sell your personal information. We may share your information with:
               </p>
               <ul className="list-disc list-inside ml-4 space-y-2">
-                <li><span className="font-semibold">Service Providers:</span> Third-party companies that help us operate our business (e.g., shipping partners, payment processors)</li>
-                <li><span className="font-semibold">Legal Requirements:</span> When required by law or to protect our rights</li>
-                <li><span className="font-semibold">Business Transfers:</span> In connection with a merger, sale, or acquisition</li>
+                <li><span className="font-medium text-foreground">Service Providers:</span> Third-party companies that help us operate our business (e.g., shipping partners, payment processors)</li>
+                <li><span className="font-medium text-foreground">Legal Requirements:</span> When required by law or to protect our rights</li>
+                <li><span className="font-medium text-foreground">Business Transfers:</span> In connection with a merger, sale, or acquisition</li>
               </ul>
             </div>
           </section>
 
           {/* Data Security */}
-          <section className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+          <section className="bg-card rounded-sm shadow-sm p-8 mb-6 border border-border">
             <div className="flex items-center mb-4">
-              <i className="fas fa-shield-alt text-3xl text-pink-600 mr-4"></i>
-              <h2 className="text-2xl font-bold text-gray-800">Data Security</h2>
+              <i className="fas fa-shield-alt text-3xl text-primary mr-4"></i>
+              <h2 className="text-2xl font-serif lowercase tracking-wide text-foreground">data security</h2>
             </div>
-            <div className="text-gray-700">
+            <div className="text-muted-foreground text-sm">
               <p className="leading-relaxed">
                 We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet or electronic storage is 100% secure, and we cannot guarantee absolute security.
               </p>
@@ -111,12 +111,12 @@ const PrivacyPolicy = () => {
           </section>
 
           {/* Your Rights */}
-          <section className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+          <section className="bg-card rounded-sm shadow-sm p-8 mb-6 border border-border">
             <div className="flex items-center mb-4">
-              <i className="fas fa-user-shield text-3xl text-pink-600 mr-4"></i>
-              <h2 className="text-2xl font-bold text-gray-800">Your Rights</h2>
+              <i className="fas fa-user-shield text-3xl text-primary mr-4"></i>
+              <h2 className="text-2xl font-serif lowercase tracking-wide text-foreground">your rights</h2>
             </div>
-            <div className="text-gray-700">
+            <div className="text-muted-foreground text-sm">
               <p className="leading-relaxed mb-3">
                 You have the right to:
               </p>
@@ -128,18 +128,18 @@ const PrivacyPolicy = () => {
                 <li>Withdraw consent where we rely on it</li>
               </ul>
               <p className="mt-4 leading-relaxed">
-                To exercise these rights, please contact us at <a href="mailto:tererangofficial@gmail.com" className="text-pink-600 hover:text-pink-700 font-semibold">tererangofficial@gmail.com</a>
+                To exercise these rights, please contact us at <a href="mailto:tererangofficial@gmail.com" className="text-primary hover:text-primary/90 font-medium">tererangofficial@gmail.com</a>
               </p>
             </div>
           </section>
 
           {/* Cookies */}
-          <section className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+          <section className="bg-card rounded-sm shadow-sm p-8 mb-6 border border-border">
             <div className="flex items-center mb-4">
-              <i className="fas fa-cookie-bite text-3xl text-pink-600 mr-4"></i>
-              <h2 className="text-2xl font-bold text-gray-800">Cookies and Tracking</h2>
+              <i className="fas fa-cookie-bite text-3xl text-primary mr-4"></i>
+              <h2 className="text-2xl font-serif lowercase tracking-wide text-foreground">cookies and tracking</h2>
             </div>
-            <div className="text-gray-700">
+            <div className="text-muted-foreground text-sm">
               <p className="leading-relaxed">
                 We use cookies and similar tracking technologies to enhance your browsing experience, analyze site traffic, and understand where our visitors are coming from. You can control cookies through your browser settings, but disabling them may affect your ability to use certain features of our website.
               </p>
@@ -147,12 +147,12 @@ const PrivacyPolicy = () => {
           </section>
 
           {/* Changes to Privacy Policy */}
-          <section className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+          <section className="bg-card rounded-sm shadow-sm p-8 mb-6 border border-border">
             <div className="flex items-center mb-4">
-              <i className="fas fa-sync-alt text-3xl text-pink-600 mr-4"></i>
-              <h2 className="text-2xl font-bold text-gray-800">Changes to This Privacy Policy</h2>
+              <i className="fas fa-sync-alt text-3xl text-primary mr-4"></i>
+              <h2 className="text-2xl font-serif lowercase tracking-wide text-foreground">changes to this privacy policy</h2>
             </div>
-            <div className="text-gray-700">
+            <div className="text-muted-foreground text-sm">
               <p className="leading-relaxed">
                 We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date. We encourage you to review this Privacy Policy periodically for any changes.
               </p>
@@ -160,36 +160,36 @@ const PrivacyPolicy = () => {
           </section>
 
           {/* Contact Information */}
-          <section className="bg-gradient-to-r from-pink-100 to-pink-50 rounded-2xl shadow-lg p-8 mb-6 border-2 border-pink-300">
+          <section className="bg-secondary rounded-sm shadow-sm p-8 mb-6 border border-border border-l-4 border-l-primary">
             <div className="flex items-center mb-4">
-              <i className="fas fa-envelope text-3xl text-pink-600 mr-4"></i>
-              <h2 className="text-2xl font-bold text-gray-800">Contact Us</h2>
+              <i className="fas fa-envelope text-3xl text-primary mr-4"></i>
+              <h2 className="text-2xl font-serif lowercase tracking-wide text-foreground">contact us</h2>
             </div>
-            <div className="text-gray-700">
+            <div className="text-muted-foreground text-sm">
               <p className="leading-relaxed mb-3">
                 If you have any questions or concerns about this Privacy Policy or our data practices, please contact us:
               </p>
               <div className="space-y-2">
                 <p className="flex items-center">
-                  <i className="fas fa-map-marker-alt text-pink-600 mr-3"></i>
+                  <i className="fas fa-map-marker-alt text-primary mr-3"></i>
                   <span>Moradabad, Uttar Pradesh, India</span>
                 </p>
                 <p className="flex items-center">
-                  <i className="fas fa-phone text-pink-600 mr-3"></i>
+                  <i className="fas fa-phone text-primary mr-3"></i>
                   <span>+91 9548971147</span>
                 </p>
                 <p className="flex items-center">
-                  <i className="fas fa-envelope text-pink-600 mr-3"></i>
-                  <a href="mailto:tererangofficial@gmail.com" className="text-pink-600 hover:text-pink-700 font-semibold">tererangofficial@gmail.com</a>
+                  <i className="fas fa-envelope text-primary mr-3"></i>
+                  <a href="mailto:tererangofficial@gmail.com" className="text-primary hover:text-primary/90 font-medium">tererangofficial@gmail.com</a>
                 </p>
               </div>
             </div>
           </section>
 
           {/* Agreement */}
-          <div className="bg-pink-600 text-white rounded-2xl shadow-xl p-6 text-center">
-            <p className="text-lg leading-relaxed">
-              By using our website and services, you acknowledge that you have read and understood this Privacy Policy and agree to its terms.
+          <div className="bg-primary text-white rounded-sm shadow-sm p-6 text-center">
+            <p className="text-base leading-relaxed lowercase tracking-wide">
+              by using our website and services, you acknowledge that you have read and understood this privacy policy and agree to its terms.
             </p>
           </div>
         </div>

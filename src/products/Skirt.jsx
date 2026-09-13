@@ -13,10 +13,10 @@ const skirtData = Array.from({ length: 20 }).map((_, idx) => ({
 
 const Skirt = () => {
   return (
-    <div className="bg-gradient-to-r from-pink-50 via-white to-pink-50 min-h-screen py-12 px-8">
+    <div className="bg-background min-h-screen py-12 px-8">
       {/* Page Title */}
-      <h1 className="text-center text-5xl font-extrabold text-pink-700 mb-14 tracking-wide drop-shadow-lg">
-        ✨ Skirt Collection ✨
+      <h1 className="text-center text-5xl font-serif lowercase tracking-wide text-foreground mb-14">
+        skirt collection
       </h1>
 
       {/* Products Grid */}
@@ -24,44 +24,41 @@ const Skirt = () => {
         {skirtData.map((item) => (
           <div
             key={item.id}
-            className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-transform transform hover:-translate-y-2 w-full"
+            className="bg-card rounded-sm shadow-sm border border-border overflow-hidden w-full"
           >
             {/* Image + Badge */}
             <div className="relative">
-              <span className="absolute top-3 left-3 bg-pink-600 text-white px-3 py-1 rounded-md text-xs font-bold shadow-md">
-                New
+              <span className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-sm text-xs lowercase tracking-wide font-medium shadow-sm">
+                new
               </span>
               <ProductImage
                 src={item.image}
                 alt={item.title}
-                className="rounded-t-2xl w-full h-[400px] object-cover"
+                className="rounded-t-sm w-full h-[400px] object-cover"
               />
             </div>
 
             {/* Content */}
             <div className="p-6 text-center">
-              <h2 className="text-xl font-semibold text-gray-800">
+              <h2 className="text-xl font-serif lowercase tracking-wide text-foreground">
                 {item.title}
               </h2>
-              <p className="text-sm text-gray-500">{item.brand}</p>
+              <p className="text-sm text-muted-foreground lowercase tracking-wide">{item.brand.toLowerCase()}</p>
 
               <div className="mt-2">
-                <span className="line-through text-gray-400 mr-2">
+                <span className="line-through text-muted-foreground mr-2">
                   {item.oldPrice}
                 </span>
-                <span className="text-2xl text-pink-600 font-bold">
+                <span className="text-2xl text-primary font-medium">
                   {item.newPrice}
                 </span>
               </div>
 
               {/* Buttons */}
               <div className="mt-6 flex flex-col gap-3">
-                <button className="w-full border-2 border-pink-600 text-pink-600 hover:bg-pink-600 hover:text-white font-medium py-2 rounded-lg transition duration-200">
-                Choose Options
+                <button className="w-full border border-primary text-foreground hover:bg-primary hover:text-white font-medium py-2 rounded-sm transition duration-200 text-sm lowercase tracking-wide">
+                choose options
                 </button>
-                {/* <button className="w-full bg-pink-600 text-white hover:bg-pink-700 font-medium py-2 rounded-lg transition duration-200">
-                  Buy Now
-                </button> */}
               </div>
             </div>
           </div>
