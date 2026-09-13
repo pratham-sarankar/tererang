@@ -111,16 +111,16 @@ const AddressBook = () => {
         </header>
 
         {feedback && (
-          <div className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${feedback.type === 'error' ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}>
+          <div className={`mb-4 rounded-sm border px-4 py-3 text-sm ${feedback.type === 'error' ? 'border-red-200 bg-red-50 text-destructive' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}>
             {feedback.text}
           </div>
         )}
 
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6">
+        <div className="bg-card rounded-sm border border-border shadow-sm p-6">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <div className="flex items-center gap-2 text-gray-500">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin size={18} />
-              <span className="text-sm font-semibold uppercase tracking-[0.3em]">Saved addresses</span>
+              <span className="text-xs font-medium uppercase tracking-[0.3em]">Saved addresses</span>
             </div>
             {addresses.length > 0 && (
               <button
@@ -129,7 +129,7 @@ const AddressBook = () => {
                   setEditingAddress(null);
                   setShowForm((prev) => !prev);
                 }}
-                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm text-gray-700 hover:border-gray-400"
+                className="inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2 text-sm text-foreground hover:border-primary hover:text-primary transition"
               >
                 <Plus size={16} /> {showForm ? 'Hide form' : 'Add address'}
               </button>
@@ -137,30 +137,30 @@ const AddressBook = () => {
           </div>
 
           {loading ? (
-            <div className="flex h-40 items-center justify-center text-gray-400">
+            <div className="flex h-40 items-center justify-center text-muted-foreground">
               <Loader2 className="mr-2 animate-spin" size={20} />
               Loading addresses...
             </div>
           ) : addresses.length ? (
             <div className="space-y-4">
               {addresses.map((address) => (
-                <div key={address.id} className="rounded-2xl border border-gray-200 p-5 flex flex-col gap-3 md:flex-row md:items-center">
+                <div key={address.id} className="rounded-sm border border-border bg-card p-5 flex flex-col gap-3 md:flex-row md:items-center shadow-sm">
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-gray-900">{address.contactName}</p>
-                      <span className="text-sm text-gray-500">{address.phoneNumber}</span>
+                      <p className="font-medium text-foreground">{address.contactName}</p>
+                      <span className="text-sm text-muted-foreground">{address.phoneNumber}</span>
                       {address.isDefault && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2 py-0.5 text-xs text-teal-700">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary font-medium">
                           <Star size={12} /> Default
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {address.line1}
                       {address.line2 ? `, ${address.line2}` : ''}
                       {address.landmark ? `, ${address.landmark}` : ''}, {address.city}, {address.state} {address.postalCode}, {address.country}
                     </p>
-                    {address.label && <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mt-1">{address.label}</p>}
+                    {address.label && <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mt-1">{address.label}</p>}
                   </div>
                   <div className="flex gap-2 text-sm">
                     <button
@@ -169,7 +169,7 @@ const AddressBook = () => {
                         setEditingAddress(address);
                         setShowForm(true);
                       }}
-                      className="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1.5 text-gray-700 hover:border-gray-400"
+                      className="inline-flex items-center gap-1 rounded-sm border border-border px-3 py-1.5 text-foreground hover:border-primary hover:text-primary transition"
                     >
                       <Pencil size={14} /> Edit
                     </button>
@@ -178,7 +178,7 @@ const AddressBook = () => {
                         type="button"
                         onClick={() => handleSetDefault(address.id)}
                         disabled={saving}
-                        className="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1.5 text-gray-700 hover:border-gray-400 disabled:opacity-50"
+                        className="inline-flex items-center gap-1 rounded-sm border border-border px-3 py-1.5 text-foreground hover:border-primary hover:text-primary transition disabled:opacity-50"
                       >
                         Make default
                       </button>
@@ -187,7 +187,7 @@ const AddressBook = () => {
                       type="button"
                       onClick={() => handleDelete(address.id)}
                       disabled={deletingId === address.id}
-                      className="inline-flex items-center gap-1 rounded-full border border-red-100 px-3 py-1.5 text-red-600 hover:border-red-200 disabled:opacity-50"
+                      className="inline-flex items-center gap-1 rounded-sm border border-red-100 px-3 py-1.5 text-destructive hover:border-red-200 disabled:opacity-50"
                     >
                       <Trash2 size={14} /> Delete
                     </button>
@@ -196,8 +196,8 @@ const AddressBook = () => {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-8 text-center text-gray-500">
-              No addresses yet. Use the form below to add your first delivery location.
+            <div className="rounded-sm border border-dashed border-border bg-secondary p-8 text-center text-muted-foreground">
+              No addresses saved. Use the form below to add your first delivery location.
             </div>
           )}
 
@@ -221,7 +221,7 @@ const AddressBook = () => {
                 setEditingAddress(null);
                 setShowForm(true);
               }}
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm text-gray-700 hover:border-gray-400"
+              className="mt-6 inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2 text-sm text-foreground hover:border-primary hover:text-primary transition"
             >
               <Plus size={16} /> Add address
             </button>
