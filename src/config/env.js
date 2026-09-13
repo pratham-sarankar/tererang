@@ -2,7 +2,8 @@
 // Vite exposes variables prefixed with VITE_ via import.meta.env
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const ASSET_BASE_URL = import.meta.env.VITE_ASSET_BASE_URL || BACKEND_URL;
+const DEFAULT_BACKEND_URL = import.meta.env.DEV ? 'http://localhost:3001' : '/backend';
+const ASSET_BASE_URL = import.meta.env.VITE_ASSET_BASE_URL || BACKEND_URL || DEFAULT_BACKEND_URL;
 
 const DEFAULT_UPI_ID = import.meta.env.VITE_UPI_ID || 'tererang@upi';
 const DEFAULT_UPI_PAYEE_NAME = import.meta.env.VITE_UPI_PAYEE_NAME || 'Tere Rang';
@@ -15,10 +16,10 @@ const GST_RATE_VALUE = 0;
 const GST_RATE_PERCENT_LABEL = `${(GST_RATE_VALUE * 100).toFixed(2).replace(/\.00$/, '')}%`;
 
 if (!BACKEND_URL) {
-    console.warn('[env] VITE_BACKEND_URL is not defined. API calls will fail.');
+    console.warn(`[env] VITE_BACKEND_URL is not defined. Falling back to ${DEFAULT_BACKEND_URL}.`);
 }
 
-export const API_BASE_URL = BACKEND_URL?.replace(/\/$/, '');
+export const API_BASE_URL = (BACKEND_URL || DEFAULT_BACKEND_URL).replace(/\/$/, '');
 export const IMAGE_BASE_URL = ASSET_BASE_URL?.replace(/\/$/, '');
 
 export const apiUrl = (path = '') => `${API_BASE_URL}${path.startsWith('/') ? path : '/' + path}`;
