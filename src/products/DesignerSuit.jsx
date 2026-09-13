@@ -1,7 +1,8 @@
-// src/pages/ShararaSuits.jsx
-import React from "react";
+import React from 'react';
+import { ShoppingCart, Heart, ArrowLeft, Zap, Gift, Ruler, CheckCircle, Share2 } from 'lucide-react';
+import ProductImage from '../components/ProductImage.jsx';
 
-// Dummy data for Sharara Suits
+// Icon mapping helper for highlights
 const shararaData = [
   {
     id: 1,
@@ -122,7 +123,7 @@ const ShararaSuits = () => {
               <span className="absolute top-3 left-3 bg-pink-600 text-white px-3 py-1 rounded-md text-xs font-bold shadow-md">
                 Hot
               </span>
-              <img
+              <ProductImage
                 src={item.image}
                 alt={item.title}
                 className="rounded-t-2xl w-full h-[400px] object-cover"

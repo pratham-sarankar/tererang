@@ -24,6 +24,7 @@ import {
     User,
     X,
 } from 'lucide-react';
+import ProductImage from '../components/ProductImage';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -115,10 +116,7 @@ const getAdminData = () => {
 
 function ProductThumb({ product, src, alt }) {
     const imageSrc = src || getPrimaryProductImage(product);
-    if (!imageSrc) {
-        return <div className="admin-image-placeholder">No image</div>;
-    }
-    return <img src={imageSrc} alt={alt || product?.name || 'Product'} className="admin-product-image" />;
+    return <ProductImage src={imageSrc} alt={alt || product?.name || 'Product'} className="admin-product-image" />;
 }
 
 function EmptyState({ title, description }) {
@@ -1436,7 +1434,7 @@ function ProductSheet({
                         <div className="flex flex-wrap gap-3">
                             {editingProduct.imageUrls.map((url, index) => (
                                 <div key={url} className="group relative rounded-lg border bg-muted/30 p-1">
-                                    <img
+                                    <ProductImage
                                         src={url}
                                         alt={`${editingProduct.name} ${index + 1}`}
                                         className="h-20 w-16 rounded object-cover"

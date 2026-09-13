@@ -1,4 +1,5 @@
 import React from "react";
+import ProductImage from "../components/ProductImage.jsx";
 
 const priceFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -51,7 +52,7 @@ const Card = ({
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-transform duration-300 hover:scale-105 overflow-hidden cursor-pointer border border-gray-100">
       <div className="relative w-full h-80 overflow-hidden">
-        <img
+        <ProductImage
           src={image}
           alt={title}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"

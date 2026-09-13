@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ShoppingCart, Heart, ArrowLeft, Zap, Gift, Ruler, CheckCircle, Share2 } from 'lucide-react';
+import ProductImage from '../components/ProductImage.jsx';
 
 
 // Icon mapping helper for highlights
@@ -89,7 +90,7 @@ const ProductDetail = ({ productId, switchView }) => {
                     </div>
 
                     {/* Main Product Image */}
-                    <img
+                    <ProductImage
                         src={mainImage}
                         alt={product.title}
                         className="rounded-xl w-full max-w-lg h-[600px] object-cover border border-gray-200 transition duration-500 hover:shadow-xl hover:scale-[1.01] mb-6"
@@ -98,12 +99,12 @@ const ProductDetail = ({ productId, switchView }) => {
                     {/* Thumbnail Gallery */}
                     <div className="flex flex-wrap justify-center gap-3 mt-4">
                         {[product.image, ...(product.additionalImages || [])].map((imgUrl, index) => (
-                            <img
+                            <ProductImage
                                 key={index}
                                 src={imgUrl}
                                 alt={`${product.title} - view ${index + 1}`}
-                                className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer transition duration-200 
-                    ${imgUrl === mainImage ? 'border-purple-600 shadow-md' : 'border-gray-200 hover:border-purple-300'}`}
+                                className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer transition duration-200
+                                    ${imgUrl === mainImage ? 'border-purple-600 shadow-md' : 'border-gray-200 hover:border-purple-300'}`}
                                 onClick={() => setMainImage(imgUrl)}
                             />
                         ))}
@@ -226,7 +227,7 @@ const ProductDetail = ({ productId, switchView }) => {
 const ProductCard = ({ product, switchView }) => (
     <div className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition duration-500 overflow-hidden cursor-pointer transform hover:-translate-y-2 group border border-gray-100">
         <div className="relative overflow-hidden" onClick={() => switchView(product.id)}>
-            <img
+            <ProductImage
                 src={product.image}
                 alt={product.title}
                 className="w-full h-80 object-cover transition duration-500 group-hover:scale-110"

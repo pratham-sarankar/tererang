@@ -1,4 +1,5 @@
 import React from "react";
+import ProductImage from "../components/ProductImage.jsx";
 
 // Dummy data for Skirts
 const skirtData = Array.from({ length: 20 }).map((_, idx) => ({
@@ -30,7 +31,7 @@ const Skirt = () => {
               <span className="absolute top-3 left-3 bg-pink-600 text-white px-3 py-1 rounded-md text-xs font-bold shadow-md">
                 New
               </span>
-              <img
+              <ProductImage
                 src={item.image}
                 alt={item.title}
                 className="rounded-t-2xl w-full h-[400px] object-cover"

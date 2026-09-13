@@ -4,6 +4,7 @@ import { ShieldCheck, CheckCircle, Wallet, Loader2, MapPin, Plus, Pencil, Star, 
 import { useCart } from '../context/cartContextStore.js';
 import { apiUrl, imageUrl, GST_RATE, COD_CHARGE } from '../config/env.js';
 import AddressForm from '../components/AddressForm.jsx';
+import ProductImage from '../components/ProductImage.jsx';
 import { createAddress, listAddresses, setDefaultAddress, updateAddress } from '../utils/addressApi.js';
 import { useRazorpay } from '../hooks/useRazorpay.js';
 
@@ -877,11 +878,11 @@ const Checkout = () => {
                 <div className="space-y-4 overflow-y-auto max-h-64 pr-2">
                   {cartItems.map((item) => (
                     <div key={item.id} className="flex gap-3 bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
-                      {resolveImage(item.product) ? (
-                        <img src={resolveImage(item.product)} alt={item.product?.name} className="h-16 w-16 rounded-xl object-cover" />
-                      ) : (
-                        <div className="h-16 w-16 rounded-xl bg-gray-100 flex items-center justify-center text-xs text-gray-500">No Image</div>
-                      )}
+                      <ProductImage
+                        src={resolveImage(item.product)}
+                        alt={item.product?.name}
+                        className="h-16 w-16 rounded-xl object-cover"
+                      />
                       <div className="flex-1">
                         <p className="font-bold text-gray-900">{item.product?.name || 'Product'}</p>
                         <p className="text-xs text-gray-600">Qty {item.quantity} • {item.size || 'Free Size'}{item.height ? ` • ${item.height}` : ''}</p>

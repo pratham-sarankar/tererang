@@ -8,6 +8,7 @@ import { GiAmpleDress, GiKimono, GiLabCoat, GiPoncho, GiDiamondRing, GiSkirt } f
 import { useCart } from "../context/cartContextStore.js";
 import { notifyCartAuthChange } from "../context/cartEvents.js";
 import { apiUrl, imageUrl } from "../config/env.js";
+import ProductImage from "./ProductImage.jsx";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -452,13 +453,11 @@ const Navbar = () => {
                             const previewSrc = resolveProductImage(item.product);
                             return (
                               <div key={item.id} className="flex items-start gap-3 py-3">
-                                {previewSrc ? (
-                                  <img src={previewSrc} alt={item.product?.name || 'Product image'} className="h-16 w-16 rounded-lg object-cover border border-gray-200" />
-                                ) : (
-                                  <div className="h-16 w-16 rounded-lg bg-gray-100 flex items-center justify-center text-[10px] text-gray-500">
-                                    No image
-                                  </div>
-                                )}
+                                <ProductImage
+                                  src={previewSrc}
+                                  alt={item.product?.name || 'Product image'}
+                                  className="h-16 w-16 rounded-lg object-cover border border-gray-200"
+                                />
                                 <div className="flex-1">
                                   <p className="text-sm font-semibold leading-tight text-gray-900">
                                     {item.product?.name || 'Unavailable product'}

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Gift, Heart, Ruler, Share2, ShoppingCart, Zap } from 'lucide-react';
+import ProductImage from '../components/ProductImage';
 import { apiUrl } from '../config/env.js';
 import { useCart } from '../context/cartContextStore.js';
 import { mapProductForDisplay } from '../utils/productPresentation.js';
@@ -235,7 +236,7 @@ const ProductDetailPage = () => {
             </div>
           ) : null}
 
-          <img
+          <ProductImage
             src={mainImage}
             alt={product.title}
             className="rounded-xl w-full max-w-lg h-[600px] object-cover border border-gray-200 transition duration-500 hover:shadow-xl hover:scale-[1.01] mb-6"
@@ -243,7 +244,7 @@ const ProductDetailPage = () => {
 
           <div className="flex flex-wrap justify-center gap-3 mt-4">
             {product.gallery.map((imgUrl) => (
-              <img
+              <ProductImage
                 key={imgUrl}
                 src={imgUrl}
                 alt={`${product.title} thumbnail`}

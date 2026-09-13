@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Loader2 } from 'lucide-react';
+import ProductImage from '../components/ProductImage.jsx';
 import { useCart } from '../context/cartContextStore.js';
 import { imageUrl } from '../config/env.js';
 
@@ -127,17 +128,11 @@ const Cart = () => {
                     <div className="flex flex-col sm:flex-row gap-4">
                       {/* Product Image */}
                       <div className="flex-shrink-0">
-                        {previewSrc ? (
-                          <img
-                            src={previewSrc}
-                            alt={item.product?.name || 'Product image'}
-                            className="w-full sm:w-32 h-48 sm:h-32 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="w-full sm:w-32 h-48 sm:h-32 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-                            <ShoppingBag size={40} />
-                          </div>
-                        )}
+                        <ProductImage
+                          src={previewSrc}
+                          alt={item.product?.name || 'Product image'}
+                          className="w-full sm:w-32 h-48 sm:h-32 rounded-lg object-cover"
+                        />
                       </div>
 
                       {/* Product Details */}

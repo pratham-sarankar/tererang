@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Loader2, PackageCheck, MapPin, ShoppingBag, Wallet } from 'lucide-react';
+import ProductImage from '../components/ProductImage.jsx';
 import { apiUrl, imageUrl } from '../config/env.js';
 
 const formatter = new Intl.NumberFormat('en-IN', {
@@ -66,11 +67,11 @@ const OrderCard = ({ order }) => (
         <div className="p-6 space-y-4">
             {order.items.map((item, index) => (
                 <div key={`${order.id}-${index}`} className="flex gap-4 items-center">
-                    {resolveImage(item) ? (
-                        <img src={resolveImage(item)} alt={item.name} className="h-16 w-16 rounded-2xl object-cover" />
-                    ) : (
-                        <div className="h-16 w-16 rounded-2xl bg-gray-100 flex items-center justify-center text-xs text-gray-500">No Image</div>
-                    )}
+                    <ProductImage
+                        src={resolveImage(item)}
+                        alt={item.name}
+                        className="h-16 w-16 rounded-2xl object-cover"
+                    />
                     <div className="flex-1">
                         <p className="font-semibold text-gray-900">{item.name}</p>
                         <p className="text-sm text-gray-500">Qty {item.quantity} • {item.size || 'Free size'}{item.height ? ` • ${item.height}` : ''}</p>

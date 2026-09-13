@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import ProductImage from './ProductImage';
 import '../css/ProductsTable.css';
 
 const ITEMS_PER_PAGE = 10;
@@ -78,17 +79,11 @@ export default function ProductsTable({ products, onEdit, onDelete, imageUrl }) 
                                     <tr key={product._id}>
                                         <td>
                                             <div className="product-image-cell">
-                                                {productImage ? (
-                                                    <img
-                                                        src={productImage}
-                                                        alt={product.name}
-                                                        className="product-thumbnail"
-                                                    />
-                                                ) : (
-                                                    <div className="product-thumbnail-placeholder">
-                                                        No image
-                                                    </div>
-                                                )}
+                                                <ProductImage
+                                                    src={productImage}
+                                                    alt={product.name}
+                                                    className="product-thumbnail"
+                                                />
                                             </div>
                                         </td>
                                         <td>

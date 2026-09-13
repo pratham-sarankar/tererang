@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ShoppingCart, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ProductImage from "../components/ProductImage.jsx";
 import { apiUrl } from "../config/env.js";
 import { mapProductForDisplay } from "../utils/productPresentation.js";
 import { Footer } from "../components/Footer.jsx";
@@ -15,7 +16,7 @@ const CategoryProductCard = ({ product, onSelect }) => (
         )}
 
         <div className="relative overflow-hidden" onClick={() => onSelect(product)}>
-            <img
+            <ProductImage
                 src={product.image}
                 alt={product.title}
                 className="w-full h-80 object-cover transition duration-700 group-hover:scale-105"

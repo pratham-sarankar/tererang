@@ -1,6 +1,17 @@
 import { imageUrl } from '../config/env.js';
 
-export const FALLBACK_IMAGE = 'https://via.placeholder.com/400x600?text=Tererang';
+export const FALLBACK_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600" fill="none">
+  <rect width="400" height="600" fill="#F3F4F6"/>
+  <g opacity="0.4" transform="translate(160, 240)">
+    <rect x="0" y="0" width="80" height="80" rx="16" fill="#9CA3AF"/>
+    <path d="M24 54L38 38L56 56M48 48L56 40L68 52" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="34" cy="28" r="6" fill="#FFFFFF"/>
+  </g>
+  <text x="200" y="360" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" fill="#6B7280" letter-spacing="2">TERERANG</text>
+  <text x="200" y="385" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#9CA3AF">Image unavailable</text>
+</svg>
+`).replace(/%20/g, ' ')}`;
 
 export const DEFAULT_SIZES = ['S', 'M', 'L', 'XL'];
 export const DEFAULT_HEIGHTS = ["Up to 5'3''", "5'4''-5'6''", "5'6'' and above"];
