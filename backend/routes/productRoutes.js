@@ -280,6 +280,178 @@ router.put('/:id', authMiddleware, upload.array('images', 8), async (req, res) =
     }
 });
 
+// Delete individual image from product (admin only)
+router.delete('/:id/images/:imageIndex', authMiddleware, async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({
+                message: 'Product not found'
+            });
+        }
+
+        const imageIndex = parseInt(req.params.imageIndex, 10);
+
+        // Validate index
+        if (isNaN(imageIndex) || imageIndex < 0 || imageIndex >= product.images.length) {
+            return res.status(400).json({
+                message: 'Invalid image index'
+            });
+        }
+
+        // Get filename for GCS deletion
+        const filenameToDelete = product.images[imageIndex];
+
+        // Delete from GCS (log but don't fail if file doesn't exist)
+        try {
+            await deleteFileFromGCS(filenameToDelete);
+        } catch (error) {
+            console.error(`Error deleting file ${filenameToDelete} from GCS:`, error);
+            // Continue with database update even if GCS delete fails
+        }
+
+        // Remove from both arrays at the same index
+        product.images.splice(imageIndex, 1);
+        product.imageUrls.splice(imageIndex, 1);
+
+        // Handle edge case: if no images left, clear all image fields
+        if (product.images.length === 0) {
+            product.image = '';
+            product.images = [];
+            product.imageUrls = [];
+        } else {
+            // Sync primary image from first URL
+            product.image = product.imageUrls[0];
+        }
+
+        await product.save();
+
+        res.json(product);
+
+    } catch (error) {
+        console.error('Delete image error:', error);
+        res.status(500).json({
+            message: 'Internal server error'
+        });
+    }
+});
+
+// Add images to existing product (admin only)
+router.post('/:id/images', authMiddleware, upload.array('images', 10), async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({
+                message: 'Product not found'
+            });
+        }
+
+        // Validate that files were uploaded
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({
+                message: 'No images provided'
+            });
+        }
+
+        // Append new images to existing arrays
+        const newFilenames = req.files.map(f => f.filename);
+        const newUrls = req.files.map(f => f.publicUrl);
+
+        product.images = [...product.images, ...newFilenames];
+        product.imageUrls = [...product.imageUrls, ...newUrls];
+
+        // Set primary image if it was empty
+        if (!product.image || product.image.length === 0) {
+            product.image = product.imageUrls[0];
+        }
+
+        await product.save();
+
+        res.json(product);
+
+    } catch (error) {
+        console.error('Add images error:', error);
+
+        // Delete uploaded files if operation fails
+        if (req.files && req.files.length > 0) {
+            await Promise.all(
+                req.files.map(async (file) => {
+                    try {
+                        await deleteFileFromGCS(file.filename);
+                    } catch (unlinkError) {
+                        console.error('Error deleting file from GCS:', unlinkError);
+                    }
+                })
+            );
+        }
+
+        res.status(500).json({
+            message: 'Internal server error'
+        });
+    }
+});
+
+// Reorder product images (admin only)
+router.put('/:id/images/reorder', authMiddleware, async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({
+                message: 'Product not found'
+            });
+        }
+
+        const { newOrder } = req.body;
+
+        // Validate newOrder array
+        if (!Array.isArray(newOrder)) {
+            return res.status(400).json({
+                message: 'newOrder must be an array'
+            });
+        }
+
+        if (newOrder.length !== product.images.length) {
+            return res.status(400).json({
+                message: 'newOrder length must match current images count'
+            });
+        }
+
+        // Validate all indices are valid and unique
+        const validIndices = new Set(newOrder);
+        if (validIndices.size !== newOrder.length) {
+            return res.status(400).json({
+                message: 'newOrder contains duplicate indices'
+            });
+        }
+
+        for (const index of newOrder) {
+            if (!Number.isInteger(index) || index < 0 || index >= product.images.length) {
+                return res.status(400).json({
+                    message: 'Invalid index in newOrder'
+                });
+            }
+        }
+
+        // Reorder both arrays
+        const reorderedImages = newOrder.map(i => product.images[i]);
+        const reorderedUrls = newOrder.map(i => product.imageUrls[i]);
+
+        product.images = reorderedImages;
+        product.imageUrls = reorderedUrls;
+        product.image = reorderedUrls[0];
+
+        await product.save();
+
+        res.json(product);
+
+    } catch (error) {
+        console.error('Reorder images error:', error);
+        res.status(500).json({
+            message: 'Internal server error'
+        });
+    }
+});
+
 // Delete product (admin only)
 router.delete('/:id', authMiddleware, async (req, res) => {
     try {

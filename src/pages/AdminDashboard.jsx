@@ -448,6 +448,143 @@ export default function AdminDashboard() {
         }));
     };
 
+    const deleteProductImage = async (imageIndex) => {
+        if (!editingProduct) return;
+
+        const confirmed = window.confirm('Delete this image? This cannot be undone.');
+        if (!confirmed) return;
+
+        const token = checkAuth();
+        if (!token) return;
+
+        try {
+            setProductSubmitting(true);
+            const response = await fetch(
+                apiUrl(`/api/products/${editingProduct._id}/images/${imageIndex}`),
+                {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to delete image');
+            }
+
+            const updatedProduct = await response.json();
+
+            // Update local state
+            setEditingProduct(updatedProduct);
+
+            // Update products list
+            setProducts(products.map(p =>
+                p._id === updatedProduct._id ? updatedProduct : p
+            ));
+
+            pushToast('Image deleted successfully');
+        } catch (error) {
+            console.error('Delete image error:', error);
+            pushToast('Failed to delete image. Please try again.', 'error');
+        } finally {
+            setProductSubmitting(false);
+        }
+    };
+
+    const moveProductImage = async (fromIndex, direction) => {
+        if (!editingProduct) return;
+
+        const toIndex = direction === 'left' ? fromIndex - 1 : fromIndex + 1;
+        if (toIndex < 0 || toIndex >= editingProduct.imageUrls.length) return;
+
+        const token = checkAuth();
+        if (!token) return;
+
+        try {
+            setProductSubmitting(true);
+
+            // Calculate new order
+            const newOrder = [...Array(editingProduct.imageUrls.length).keys()];
+            [newOrder[fromIndex], newOrder[toIndex]] = [newOrder[toIndex], newOrder[fromIndex]];
+
+            const response = await fetch(
+                apiUrl(`/api/products/${editingProduct._id}/images/reorder`),
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ newOrder })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to reorder images');
+            }
+
+            const updatedProduct = await response.json();
+
+            // Update local state
+            setEditingProduct(updatedProduct);
+
+            // Update products list
+            setProducts(products.map(p =>
+                p._id === updatedProduct._id ? updatedProduct : p
+            ));
+
+            pushToast('Image reordered successfully');
+        } catch (error) {
+            console.error('Reorder image error:', error);
+            pushToast('Failed to reorder image. Please try again.', 'error');
+        } finally {
+            setProductSubmitting(false);
+        }
+    };
+
+    const addMoreImages = async (files) => {
+        if (!editingProduct || !files || files.length === 0) return;
+
+        const token = checkAuth();
+        if (!token) return;
+
+        try {
+            setProductSubmitting(true);
+
+            const formData = new FormData();
+            files.forEach((file) => formData.append('images', file));
+
+            const response = await fetch(
+                apiUrl(`/api/products/${editingProduct._id}/images`),
+                {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${token}` },
+                    body: formData
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to add images');
+            }
+
+            const updatedProduct = await response.json();
+
+            // Update local state
+            setEditingProduct(updatedProduct);
+
+            // Update products list
+            setProducts(products.map(p =>
+                p._id === updatedProduct._id ? updatedProduct : p
+            ));
+
+            pushToast(`${files.length} image(s) added successfully`);
+        } catch (error) {
+            console.error('Add images error:', error);
+            pushToast('Failed to add images. Please try again.', 'error');
+        } finally {
+            setProductSubmitting(false);
+        }
+    };
+
     const submitProduct = async (event) => {
         event.preventDefault();
         const token = checkAuth();
@@ -1066,6 +1203,9 @@ export default function AdminDashboard() {
                 onSizeChange={updateSizeStock}
                 onAddSize={() => setProductForm((prev) => ({ ...prev, sizeStock: [...prev.sizeStock, { size: '', quantity: 0 }] }))}
                 onRemoveSize={(index) => setProductForm((prev) => ({ ...prev, sizeStock: prev.sizeStock.filter((_, rowIndex) => rowIndex !== index) }))}
+                onDeleteImage={deleteProductImage}
+                onMoveImage={moveProductImage}
+                onAddMoreImages={addMoreImages}
             />
 
             <OrderSheet
@@ -1221,13 +1361,29 @@ function OrdersTable({ rows, loading, compact = false, sort, onSort, actionState
     );
 }
 
-function ProductSheet({ open, editingProduct, productForm, productImages, submitting, onClose, onSubmit, onChange, onImageChange, onSizeChange, onAddSize, onRemoveSize }) {
+function ProductSheet({
+    open,
+    editingProduct,
+    productForm,
+    productImages,
+    submitting,
+    onClose,
+    onSubmit,
+    onChange,
+    onImageChange,
+    onSizeChange,
+    onAddSize,
+    onRemoveSize,
+    onDeleteImage,
+    onMoveImage,
+    onAddMoreImages
+}) {
     return (
         <Sheet
             open={open}
             onClose={onClose}
             title={editingProduct ? 'Edit Product' : 'Add Product'}
-            description="Preserves the existing product API payload and image upload behavior."
+            description="Manage product details, stock, images, and pricing."
             footer={<Button className="w-full" type="submit" form="product-form" disabled={submitting}>{submitting && <Loader2 className="h-4 w-4 animate-spin" />}{editingProduct ? 'Update Product' : 'Create Product'}</Button>}
         >
             <form id="product-form" onSubmit={onSubmit} className="space-y-5">
@@ -1269,23 +1425,100 @@ function ProductSheet({ open, editingProduct, productForm, productImages, submit
                         </div>
                     ))}
                 </div>
+
+                {/* Existing Images Management (Only for Editing) */}
                 {editingProduct && Array.isArray(editingProduct.imageUrls) && editingProduct.imageUrls.length > 0 && (
                     <div className="space-y-2">
-                        <Label>Current images</Label>
-                        <div className="flex flex-wrap gap-2">
-                            {editingProduct.imageUrls.map((url) => <ProductThumb key={url} src={url} alt={editingProduct.name} />)}
+                        <div className="flex items-center justify-between">
+                            <Label>Current images ({editingProduct.imageUrls.length})</Label>
+                            <span className="text-xs text-muted-foreground">Hover to reorder or delete</span>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                            {editingProduct.imageUrls.map((url, index) => (
+                                <div key={url} className="group relative rounded-lg border bg-muted/30 p-1">
+                                    <img
+                                        src={url}
+                                        alt={`${editingProduct.name} ${index + 1}`}
+                                        className="h-20 w-16 rounded object-cover"
+                                    />
+                                    {/* Action Buttons Overlay */}
+                                    <div className="absolute inset-0 flex items-center justify-center gap-1 rounded bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
+                                        {/* Move Left */}
+                                        <button
+                                            type="button"
+                                            disabled={index === 0 || submitting}
+                                            onClick={() => onMoveImage(index, 'left')}
+                                            className="rounded p-1 text-white hover:bg-white/20 disabled:opacity-30"
+                                            title="Move image left"
+                                        >
+                                            <ChevronLeft className="h-4 w-4" />
+                                        </button>
+                                        {/* Delete */}
+                                        <button
+                                            type="button"
+                                            disabled={submitting}
+                                            onClick={() => onDeleteImage(index)}
+                                            className="rounded p-1 text-red-400 hover:bg-red-500/20 hover:text-red-300"
+                                            title="Delete image"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                        {/* Move Right */}
+                                        <button
+                                            type="button"
+                                            disabled={index === editingProduct.imageUrls.length - 1 || submitting}
+                                            onClick={() => onMoveImage(index, 'right')}
+                                            className="rounded p-1 text-white hover:bg-white/20 disabled:opacity-30"
+                                            title="Move image right"
+                                        >
+                                            <ChevronRight className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                    {/* Primary Badge */}
+                                    {index === 0 && (
+                                        <span className="absolute -top-2 -left-2 rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground shadow">
+                                            Cover
+                                        </span>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}
+
+                {/* Upload New / Add More Images */}
                 <div className="space-y-2">
-                    <Label>Product Images</Label>
+                    <Label>{editingProduct ? 'Add More Images' : 'Product Images'}</Label>
                     <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center transition-colors hover:bg-muted/60">
                         <UploadCloud className="mb-2 h-7 w-7 text-muted-foreground" />
-                        <span className="text-sm font-medium">Click to choose images</span>
-                        <span className="text-xs text-muted-foreground">New uploads replace existing images when editing.</span>
-                        <input className="sr-only" type="file" accept="image/*" multiple onChange={(event) => onImageChange(Array.from(event.target.files || []))} />
+                        <span className="text-sm font-medium">
+                            {editingProduct ? 'Click to add more images' : 'Click to choose images'}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                            {editingProduct
+                                ? 'Images selected here will be uploaded immediately and appended to current images.'
+                                : 'Select one or more images for the product.'}
+                        </span>
+                        <input
+                            className="sr-only"
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            disabled={submitting}
+                            onChange={(event) => {
+                                const files = Array.from(event.target.files || []);
+                                if (editingProduct) {
+                                    onAddMoreImages(files);
+                                    event.target.value = ''; // Reset file input
+                                } else {
+                                    onImageChange(files);
+                                }
+                            }}
+                        />
                     </label>
-                    {productImages.length > 0 && <p className="text-sm text-muted-foreground">{productImages.length} file(s) selected</p>}
+                    {!editingProduct && productImages.length > 0 && (
+                        <p className="text-sm text-muted-foreground">{productImages.length} file(s) selected</p>
+                    )}
                 </div>
             </form>
         </Sheet>
