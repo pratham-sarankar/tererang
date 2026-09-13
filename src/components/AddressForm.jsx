@@ -53,20 +53,17 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
     onSubmit?.(values);
   };
 
+  // Both variants now map to the luxury cream token system — dark variant preserved only for legacy.
   const isDark = variant === 'dark';
-  const labelClass = isDark ? 'text-gray-300' : 'text-gray-700';
+  const labelClass = isDark ? 'text-muted-foreground' : 'text-foreground text-sm';
   const formClass = isDark
-    ? 'bg-white/5 border-white/10 text-white'
-    : 'bg-white border-gray-200 text-gray-900 shadow-sm';
-  const inputBase = isDark
-    ? 'border bg-black/30 border-white/10 text-white placeholder-gray-400'
-    : 'border bg-white border-gray-300 text-gray-900 placeholder-gray-400';
-  const secondaryButtonClass = isDark
-    ? 'border-white/20 text-gray-200'
-    : 'border-gray-300 text-gray-700';
+    ? 'bg-card border-border text-foreground shadow-sm'
+    : 'bg-card border-border text-foreground shadow-sm';
+  const inputBase = 'border bg-card border-border text-foreground placeholder:text-muted-foreground';
+  const secondaryButtonClass = 'border-border text-foreground hover:bg-secondary';
 
   return (
-    <form onSubmit={handleSubmit} className={`rounded-2xl border p-4 md:p-6 space-y-4 ${formClass}`}>
+    <form onSubmit={handleSubmit} className={`rounded-sm border p-4 md:p-6 space-y-4 ${formClass}`}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={`text-sm ${labelClass}`}>Label</label>
@@ -75,7 +72,7 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
             name="label"
             value={values.label}
             onChange={handleChange}
-            className={`mt-1 w-full rounded-xl px-3 py-2 ${inputBase}`}
+            className={`mt-1 w-full rounded-sm px-3 py-2 ${inputBase}`}
             placeholder="Home, Studio, etc."
           />
         </div>
@@ -86,11 +83,11 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
             name="contactName"
             value={values.contactName}
             onChange={handleChange}
-            className={`mt-1 w-full rounded-xl px-3 py-2 ${errors.contactName ? 'border border-red-500 bg-red-50 text-red-900' : inputBase}`}
+            className={`mt-1 w-full rounded-sm px-3 py-2 ${errors.contactName ? 'border border-red-300 bg-red-50 text-foreground' : inputBase}`}
             placeholder="Full name"
             required
           />
-          {errors.contactName && <p className="text-xs text-red-400 mt-1">{errors.contactName}</p>}
+          {errors.contactName && <p className="text-xs text-destructive mt-1">{errors.contactName}</p>}
         </div>
       </div>
 
@@ -103,11 +100,11 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
             value={values.phoneNumber}
             onChange={handleChange}
             inputMode="numeric"
-            className={`mt-1 w-full rounded-xl px-3 py-2 ${errors.phoneNumber ? 'border border-red-500 bg-red-50 text-red-900' : inputBase}`}
+            className={`mt-1 w-full rounded-sm px-3 py-2 ${errors.phoneNumber ? 'border border-red-300 bg-red-50 text-foreground' : inputBase}`}
             placeholder="10-digit"
             required
           />
-          {errors.phoneNumber && <p className="text-xs text-red-400 mt-1">{errors.phoneNumber}</p>}
+          {errors.phoneNumber && <p className="text-xs text-destructive mt-1">{errors.phoneNumber}</p>}
         </div>
         <div>
           <label className={`text-sm ${labelClass}`}>Postal code *</label>
@@ -117,11 +114,11 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
             value={values.postalCode}
             onChange={handleChange}
             inputMode="numeric"
-            className={`mt-1 w-full rounded-xl px-3 py-2 ${errors.postalCode ? 'border border-red-500 bg-red-50 text-red-900' : inputBase}`}
+            className={`mt-1 w-full rounded-sm px-3 py-2 ${errors.postalCode ? 'border border-red-300 bg-red-50 text-foreground' : inputBase}`}
             placeholder="e.g. 400001"
             required
           />
-          {errors.postalCode && <p className="text-xs text-red-400 mt-1">{errors.postalCode}</p>}
+          {errors.postalCode && <p className="text-xs text-destructive mt-1">{errors.postalCode}</p>}
         </div>
       </div>
 
@@ -132,11 +129,11 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
           name="line1"
           value={values.line1}
           onChange={handleChange}
-          className={`mt-1 w-full rounded-xl px-3 py-2 ${errors.line1 ? 'border border-red-500 bg-red-50 text-red-900' : inputBase}`}
+          className={`mt-1 w-full rounded-sm px-3 py-2 ${errors.line1 ? 'border border-red-300 bg-red-50 text-foreground' : inputBase}`}
           placeholder="House number, street"
           required
         />
-        {errors.line1 && <p className="text-xs text-red-400 mt-1">{errors.line1}</p>}
+        {errors.line1 && <p className="text-xs text-destructive mt-1">{errors.line1}</p>}
       </div>
 
       <div>
@@ -146,7 +143,7 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
           name="line2"
           value={values.line2}
           onChange={handleChange}
-          className={`mt-1 w-full rounded-xl px-3 py-2 ${inputBase}`}
+          className={`mt-1 w-full rounded-sm px-3 py-2 ${inputBase}`}
           placeholder="Apartment, floor, etc."
         />
       </div>
@@ -158,7 +155,7 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
           name="landmark"
           value={values.landmark}
           onChange={handleChange}
-          className={`mt-1 w-full rounded-xl px-3 py-2 ${inputBase}`}
+          className={`mt-1 w-full rounded-sm px-3 py-2 ${inputBase}`}
           placeholder="Near..."
         />
       </div>
@@ -171,11 +168,11 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
             name="city"
             value={values.city}
             onChange={handleChange}
-            className={`mt-1 w-full rounded-xl px-3 py-2 ${errors.city ? 'border border-red-500 bg-red-50 text-red-900' : inputBase}`}
+            className={`mt-1 w-full rounded-sm px-3 py-2 ${errors.city ? 'border border-red-300 bg-red-50 text-foreground' : inputBase}`}
             placeholder="City"
             required
           />
-          {errors.city && <p className="text-xs text-red-400 mt-1">{errors.city}</p>}
+          {errors.city && <p className="text-xs text-destructive mt-1">{errors.city}</p>}
         </div>
         <div>
           <label className={`text-sm ${labelClass}`}>State *</label>
@@ -184,11 +181,11 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
             name="state"
             value={values.state}
             onChange={handleChange}
-            className={`mt-1 w-full rounded-xl px-3 py-2 ${errors.state ? 'border border-red-500 bg-red-50 text-red-900' : inputBase}`}
+            className={`mt-1 w-full rounded-sm px-3 py-2 ${errors.state ? 'border border-red-300 bg-red-50 text-foreground' : inputBase}`}
             placeholder="State"
             required
           />
-          {errors.state && <p className="text-xs text-red-400 mt-1">{errors.state}</p>}
+          {errors.state && <p className="text-xs text-destructive mt-1">{errors.state}</p>}
         </div>
         <div>
           <label className={`text-sm ${labelClass}`}>Country *</label>
@@ -197,21 +194,21 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
             name="country"
             value={values.country}
             onChange={handleChange}
-            className={`mt-1 w-full rounded-xl px-3 py-2 ${errors.country ? 'border border-red-500 bg-red-50 text-red-900' : inputBase}`}
+            className={`mt-1 w-full rounded-sm px-3 py-2 ${errors.country ? 'border border-red-300 bg-red-50 text-foreground' : inputBase}`}
             placeholder="Country"
             required
           />
-          {errors.country && <p className="text-xs text-red-400 mt-1">{errors.country}</p>}
+          {errors.country && <p className="text-xs text-destructive mt-1">{errors.country}</p>}
         </div>
       </div>
 
-      <label className={`inline-flex items-center gap-2 text-sm ${labelClass}`}>
+      <label className={`inline-flex items-center gap-2 text-sm ${isDark ? 'text-muted-foreground' : 'text-foreground text-sm'}`}>
         <input
           type="checkbox"
           name="isDefault"
           checked={values.isDefault}
           onChange={handleCheckboxChange}
-          className="h-4 w-4 rounded border-gray-300 text-[#b81582] focus:ring-[#b81582]"
+          className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
         />
         Set as default shipping address
       </label>
@@ -220,18 +217,18 @@ const AddressForm = ({ initialValue, onSubmit, onCancel, submitting = false, sub
         <button
           type="submit"
           disabled={disableSubmit}
-          className="flex-1 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 py-3 font-bold text-white disabled:opacity-50 hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105 shadow-xl disabled:transform-none"
+          className="flex-1 rounded-sm bg-primary text-white py-3 text-sm font-medium tracking-wide lowercase disabled:opacity-50 hover:bg-primary/90 transition"
         >
-          {submitting ? 'Saving...' : submitLabel}
+          {submitting ? 'saving...' : submitLabel.toLowerCase()}
         </button>
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
             disabled={disableSubmit}
-            className={`rounded-full border px-5 py-3 text-sm font-bold ${secondaryButtonClass} hover:bg-gray-100 transition`}
+            className={`rounded-sm border px-5 py-3 text-sm font-medium tracking-wide lowercase disabled:opacity-50 ${secondaryButtonClass}`}
           >
-            Cancel
+            cancel
           </button>
         )}
       </div>

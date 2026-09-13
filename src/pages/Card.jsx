@@ -1,5 +1,6 @@
 import React from "react";
 import ProductImage from "../components/ProductImage.jsx";
+import { Heart, ShoppingBag } from "lucide-react";
 
 const priceFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -50,43 +51,63 @@ const Card = ({
   const showDiscount = Number.isFinite(derivedDiscount) && derivedDiscount > 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-transform duration-300 hover:scale-105 overflow-hidden cursor-pointer border border-gray-100">
-      <div className="relative w-full h-80 overflow-hidden">
-        <ProductImage
-          src={image}
-          alt={title}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-          loading="lazy"
-        />
-        <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow hover:bg-pink-100 text-xl" aria-label="Save to wishlist">
-          ❤️
-        </button>
-      </div>
-      <div className="p-4">
-        <h3 className="text-md font-semibold text-gray-800">{brand || "Tererang"}</h3>
-        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{title}</p>
-        {description && (
-          <p className="text-xs text-gray-500 mt-1 line-clamp-2">{description}</p>
-        )}
-        <div className="flex items-center gap-2 mt-2">
-          {displayPrice && (
-            <span className="text-lg font-bold text-gray-800">{displayPrice}</span>
-          )}
-          {showOldPrice && (
-            <span className="text-sm line-through text-gray-400">{displayOldPrice}</span>
-          )}
+    <div className="group bg-card rounded-md overflow-hidden border border-border/80 hover:border-primary/50 transition-all duration-300 flex flex-col justify-between">
+      <div>
+        <div className="relative w-full aspect-[3/4] overflow-hidden bg-secondary">
+          <ProductImage
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            loading="lazy"
+          />
           {showDiscount && (
-            <span className="text-xs sm:text-sm text-green-600 font-semibold">
-              {derivedDiscount}% OFF
+            <span className="absolute top-3 left-3 bg-card/90 backdrop-blur-xs text-foreground text-[10px] tracking-wider uppercase font-medium px-2.5 py-1 border border-border">
+              {derivedDiscount}% off
             </span>
           )}
+          <button
+            className="absolute top-3 right-3 bg-card/90 backdrop-blur-xs text-muted-foreground hover:text-accent p-2 rounded-full border border-border shadow-xs transition-colors duration-200"
+            aria-label="Save to wishlist"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <Heart className="w-4 h-4" />
+          </button>
         </div>
+
+        <div className="p-4 sm:p-5 flex flex-col">
+          <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium mb-1">
+            {brand || "tererang"}
+          </span>
+          <h3 className="font-serif text-base sm:text-lg text-foreground line-clamp-1 group-hover:text-primary transition-colors lowercase">
+            {title}
+          </h3>
+          {description && (
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+              {description}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0">
+        <div className="flex items-baseline gap-2 mb-3">
+          {displayPrice && (
+            <span className="text-base sm:text-lg font-medium text-foreground">{displayPrice}</span>
+          )}
+          {showOldPrice && (
+            <span className="text-xs line-through text-muted-foreground">{displayOldPrice}</span>
+          )}
+        </div>
+
         <button
-          className="mt-3 w-full bg-pink-600 text-white py-2 rounded-lg font-medium hover:bg-pink-700 transition"
+          className="w-full border border-primary text-foreground hover:bg-primary hover:text-white py-2.5 px-4 text-xs lowercase tracking-wider font-medium transition-colors duration-300 flex items-center justify-center gap-2"
           onClick={onAddToCart}
           type="button"
         >
-          Add to Cart
+          <ShoppingBag className="w-3.5 h-3.5" />
+          <span>add to bag</span>
         </button>
       </div>
     </div>

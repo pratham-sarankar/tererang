@@ -497,77 +497,77 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50/50 to-white py-16 px-4">
+    <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <section className="bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 p-8">
-          <div className="inline-flex items-center bg-pink-100/50 rounded-full px-3 py-1 mb-2 border border-pink-100">
-            <p className="text-[#b81582] uppercase tracking-wider text-xs font-bold">Checkout</p>
+        <section className="bg-card rounded-sm shadow-sm border border-border p-8">
+          <div className="inline-flex items-center bg-secondary rounded-sm px-3 py-1 mb-2 border border-border">
+            <p className="text-accent uppercase tracking-[0.2em] text-xs">checkout</p>
           </div>
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-6">Complete Your Purchase</h1>
+          <h1 className="text-4xl font-serif lowercase text-foreground mb-6 tracking-wide">complete your purchase</h1>
 
-          <div className="bg-gradient-to-br from-pink-50 to-white rounded-2xl p-8 border border-pink-100">
+          <div className="bg-secondary rounded-sm p-8 border border-border">
             <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-pink-100 rounded-xl">
-                <CreditCard size={32} className="text-[#b81582]" />
+              <div className="p-3 bg-card rounded-sm border border-border">
+                <CreditCard size={32} className="text-primary" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Select Payment Method</h3>
-                <p className="text-gray-600 text-sm">Choose how you want to pay</p>
+                <h3 className="text-xl font-serif lowercase text-foreground">select payment method</h3>
+                <p className="text-muted-foreground text-sm">Choose how you want to pay</p>
               </div>
             </div>
 
             <div className="space-y-3 mb-6">
               <div
                 onClick={() => setPaymentMethod('razorpay')}
-                className={`cursor-pointer rounded-2xl border p-4 transition ${paymentMethod === 'razorpay'
-                    ? 'border-[#b81582] bg-pink-100/50 shadow-lg'
-                    : 'border-gray-200 bg-white hover:border-pink-200'
+                className={`cursor-pointer rounded-sm border p-4 transition ${paymentMethod === 'razorpay'
+                    ? 'border-primary bg-secondary shadow-lg'
+                    : 'border-border bg-card hover:border-border'
                   }`}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'razorpay' ? 'border-[#b81582]' : 'border-gray-300'
+                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'razorpay' ? 'border-primary' : 'border-border'
                       }`}
                   >
                     <span
-                      className={`h-2.5 w-2.5 rounded-full ${paymentMethod === 'razorpay' ? 'bg-[#b81582]' : 'bg-transparent'
+                      className={`h-2.5 w-2.5 rounded-full ${paymentMethod === 'razorpay' ? 'bg-primary' : 'bg-transparent'
                         }`}
                     />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <CreditCard size={20} className="text-[#b81582]" />
-                      <p className="font-bold text-gray-900">Online Payment (Razorpay)</p>
+                      <CreditCard size={20} className="text-primary" />
+                      <p className="font-medium text-foreground">Online Payment (Razorpay)</p>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">UPI, Cards, Netbanking, and Wallets</p>
+                    <p className="text-xs text-muted-foreground mt-1">UPI, Cards, Netbanking, and Wallets</p>
                   </div>
                 </div>
               </div>
 
               <div
                 onClick={() => setPaymentMethod('cod')}
-                className={`cursor-pointer rounded-2xl border p-4 transition ${paymentMethod === 'cod'
-                    ? 'border-[#b81582] bg-pink-100/50 shadow-lg'
-                    : 'border-gray-200 bg-white hover:border-pink-200'
+                className={`cursor-pointer rounded-sm border p-4 transition ${paymentMethod === 'cod'
+                    ? 'border-primary bg-secondary shadow-lg'
+                    : 'border-border bg-card hover:border-border'
                   }`}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-[#b81582]' : 'border-gray-300'
+                    className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-primary' : 'border-border'
                       }`}
                   >
                     <span
-                      className={`h-2.5 w-2.5 rounded-full ${paymentMethod === 'cod' ? 'bg-[#b81582]' : 'bg-transparent'
+                      className={`h-2.5 w-2.5 rounded-full ${paymentMethod === 'cod' ? 'bg-primary' : 'bg-transparent'
                         }`}
                     />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <Banknote size={20} className="text-[#b81582]" />
-                      <p className="font-bold text-gray-900">Cash on Delivery (COD)</p>
+                      <Banknote size={20} className="text-primary" />
+                      <p className="font-medium text-foreground">Cash on Delivery (COD)</p>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">Pay ₹{COD_CHARGE} now, rest on delivery</p>
-                    <p className="text-xs text-[#b81582] mt-1 font-bold">₹{COD_CHARGE} upfront fee (online payment required)</p>
+                    <p className="text-xs text-muted-foreground mt-1">Pay ₹{COD_CHARGE} now, rest on delivery</p>
+                    <p className="text-xs text-primary mt-1 font-bold">₹{COD_CHARGE} upfront fee (online payment required)</p>
                   </div>
                 </div>
               </div>
@@ -576,25 +576,25 @@ const Checkout = () => {
             {paymentMethod === 'razorpay' && (
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-[#b81582] shrink-0 mt-0.5" />
-                  <span className="text-gray-700 text-sm">Accepts UPI, Cards, Netbanking, and Wallets.</span>
+                  <CheckCircle size={20} className="text-primary shrink-0 mt-0.5" />
+                  <span className="text-foreground text-sm">Accepts UPI, Cards, Netbanking, and Wallets.</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <ShieldCheck size={20} className="text-[#b81582] shrink-0 mt-0.5" />
-                  <span className="text-gray-700 text-sm">100% Secure & Encrypted transaction.</span>
+                  <ShieldCheck size={20} className="text-primary shrink-0 mt-0.5" />
+                  <span className="text-foreground text-sm">100% Secure & Encrypted transaction.</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle size={20} className="text-[#b81582] shrink-0 mt-0.5" />
-                  <span className="text-gray-700 text-sm">Instant confirmation & invoice via email.</span>
+                  <CheckCircle size={20} className="text-primary shrink-0 mt-0.5" />
+                  <span className="text-foreground text-sm">Instant confirmation & invoice via email.</span>
                 </li>
               </ul>
             )}
 
             {paymentMethod === 'cod' && (
               <div className="mb-8 space-y-4">
-                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                <div className="bg-amber-50 border border-amber-200 rounded-sm p-4">
                   <p className="text-sm text-amber-800 font-bold mb-2">Cash on Delivery Terms:</p>
-                  <ul className="space-y-2 text-xs text-gray-700">
+                  <ul className="space-y-2 text-xs text-foreground">
                     <li className="flex items-start gap-2">
                       <span className="text-amber-600 mt-0.5">•</span>
                       <span>Pay ₹{COD_CHARGE} upfront as COD handling fee via online payment (Razorpay).</span>
@@ -618,50 +618,50 @@ const Checkout = () => {
                     type="checkbox"
                     checked={codAgreed}
                     onChange={(e) => setCodAgreed(e.target.checked)}
-                    className="mt-1 h-4 w-4 rounded border-gray-300 bg-white text-[#b81582] focus:ring-2 focus:ring-[#b81582]"
+                    className="mt-1 h-4 w-4 rounded border-border bg-card text-primary focus:ring-2 focus:ring-primary"
                   />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-foreground">
                     I agree to pay ₹{COD_CHARGE} upfront as COD handling fee and the remaining amount ({formatCurrency(payableWithGst)}) on delivery.
                   </span>
                 </label>
               </div>
             )}
 
-            <div className="flex items-center justify-between border-t border-gray-200 pt-6">
+            <div className="flex items-center justify-between border-t border-border pt-6">
               <div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {paymentMethod === 'cod' ? 'Order Amount (Pay on Delivery)' : 'Total Amount'}
                 </p>
-                <p className="text-3xl font-extrabold text-gray-900 mt-1">{formatCurrency(payableWithGst)}</p>
+                <p className="text-3xl font-medium text-foreground mt-1">{formatCurrency(payableWithGst)}</p>
                 {paymentMethod === 'cod' && (
                   <p className="text-xs text-amber-600 mt-1 font-bold">+ ₹{COD_CHARGE} upfront fee (charged now)</p>
                 )}
               </div>
-              <Wallet size={32} className="text-gray-400" />
+              <Wallet size={32} className="text-muted-foreground" />
             </div>
           </div>
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <div className="bg-pink-50 rounded-xl p-4 border border-pink-100">
-              <p className="font-bold mb-1 text-[#b81582]">Fast Refund</p>
-              <p className="text-xs text-gray-600">Instant refund for failed transactions.</p>
+            <div className="bg-secondary rounded-sm p-4 border border-border">
+              <p className="font-bold mb-1 text-primary">Fast Refund</p>
+              <p className="text-xs text-muted-foreground">Instant refund for failed transactions.</p>
             </div>
-            <div className="bg-pink-50 rounded-xl p-4 border border-pink-100">
-              <p className="font-bold mb-1 text-[#b81582]">Buyer Protection</p>
-              <p className="text-xs text-gray-600">Secure payment coverage.</p>
+            <div className="bg-secondary rounded-sm p-4 border border-border">
+              <p className="font-bold mb-1 text-primary">Buyer Protection</p>
+              <p className="text-xs text-muted-foreground">Secure payment coverage.</p>
             </div>
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 p-8 flex flex-col">
-          <div className="pb-8 border-b border-gray-200">
+        <section className="bg-card rounded-sm shadow-sm border border-border p-8 flex flex-col">
+          <div className="pb-8 border-b border-border">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div>
-                <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-[#b81582] font-bold">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-primary font-bold">
                   <MapPin size={16} /> Shipping
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mt-2">Delivery address</h2>
-                <Link to="/addresses" className="text-xs text-[#b81582] underline-offset-4 hover:underline">
+                <h2 className="text-2xl font-serif lowercase text-foreground mt-2 tracking-wide">delivery address</h2>
+                <Link to="/addresses" className="text-xs text-primary underline-offset-4 hover:underline">
                   Manage from profile →
                 </Link>
               </div>
@@ -669,7 +669,7 @@ const Checkout = () => {
                 <button
                   type="button"
                   onClick={showAddressForm ? handleCancelAddress : openCreateAddressForm}
-                  className="inline-flex items-center gap-2 rounded-full border-2 border-pink-100 px-4 py-2 text-sm text-[#b81582] hover:bg-[#b81582] hover:text-white hover:border-[#b81582] transition font-bold"
+                  className="inline-flex items-center gap-2 rounded-full border-2 border-border px-4 py-2 text-sm text-primary hover:bg-primary hover:text-white hover:border-primary transition font-bold"
                 >
                   <Plus size={16} /> {showAddressForm ? 'Close form' : 'Add address'}
                 </button>
@@ -677,14 +677,14 @@ const Checkout = () => {
             </div>
 
             {addressError && (
-              <div className="mb-4 rounded-2xl border border-red-200 bg-red-100 px-4 py-3 text-sm text-red-600">
+              <div className="mb-4 rounded-sm border border-red-200 bg-red-100 px-4 py-3 text-sm text-red-600">
                 {addressError}
               </div>
             )}
 
             {addressLoading ? (
-              <div className="flex h-32 items-center justify-center text-gray-600">
-                <Loader2 className="mr-2 animate-spin text-[#b81582]" size={18} /> Fetching saved addresses...
+              <div className="flex h-32 items-center justify-center text-muted-foreground">
+                <Loader2 className="mr-2 animate-spin text-primary" size={18} /> Fetching saved addresses...
               </div>
             ) : addresses.length ? (
               <div className="space-y-3">
@@ -694,27 +694,27 @@ const Checkout = () => {
                     <div
                       key={address.id}
                       onClick={() => setSelectedAddressId(address.id)}
-                      className={`flex cursor-pointer gap-4 rounded-2xl border px-4 py-4 transition ${isSelected ? 'border-[#b81582] bg-pink-100/50 shadow-lg' : 'border-gray-200 bg-white hover:border-pink-200'}`}
+                      className={`flex cursor-pointer gap-4 rounded-sm border px-4 py-4 transition ${isSelected ? 'border-primary bg-secondary shadow-lg' : 'border-border bg-card hover:border-border'}`}
                     >
-                      <div className={`mt-1 h-5 w-5 rounded-full border-2 ${isSelected ? 'border-[#b81582]' : 'border-gray-300'} flex items-center justify-center`}>
-                        <span className={`h-2.5 w-2.5 rounded-full ${isSelected ? 'bg-[#b81582]' : 'bg-transparent'}`} />
+                      <div className={`mt-1 h-5 w-5 rounded-full border-2 ${isSelected ? 'border-primary' : 'border-border'} flex items-center justify-center`}>
+                        <span className={`h-2.5 w-2.5 rounded-full ${isSelected ? 'bg-primary' : 'bg-transparent'}`} />
                       </div>
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-bold text-gray-900">{address.contactName}</p>
-                          <span className="text-xs text-gray-600">{address.phoneNumber}</span>
+                          <p className="font-bold text-foreground">{address.contactName}</p>
+                          <span className="text-xs text-muted-foreground">{address.phoneNumber}</span>
                           {address.isDefault && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 px-2 py-0.5 text-[11px] text-[#b81582] font-bold">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[11px] text-primary font-bold">
                               <Star size={12} /> Default
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-600 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           {address.line1}
                           {address.line2 ? `, ${address.line2}` : ''}
                           {address.landmark ? `, ${address.landmark}` : ''}, {address.city}, {address.state} {address.postalCode}, {address.country}
                         </p>
-                        {address.label && <p className="text-[11px] uppercase tracking-[0.3em] text-gray-500 mt-1">{address.label}</p>}
+                        {address.label && <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground mt-1">{address.label}</p>}
                       </div>
                       <div className="flex flex-col gap-2 text-xs text-right">
                         <button
@@ -723,7 +723,7 @@ const Checkout = () => {
                             e.stopPropagation();
                             handleEditAddress(address);
                           }}
-                          className="inline-flex items-center justify-end gap-1 text-[#b81582] hover:text-purple-700"
+                          className="inline-flex items-center justify-end gap-1 text-primary hover:text-foreground"
                         >
                           <Pencil size={14} /> Edit
                         </button>
@@ -735,7 +735,7 @@ const Checkout = () => {
                               e.stopPropagation();
                               handleSetDefaultAddress(address.id);
                             }}
-                            className="inline-flex items-center justify-end gap-1 text-gray-600 hover:text-[#b81582] disabled:opacity-50"
+                            className="inline-flex items-center justify-end gap-1 text-muted-foreground hover:text-primary disabled:opacity-50"
                           >
                             Make default
                           </button>
@@ -746,7 +746,7 @@ const Checkout = () => {
                 })}
               </div>
             ) : (
-              <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-4 py-5 text-sm text-gray-600">
+              <div className="rounded-sm border border-dashed border-border bg-secondary px-4 py-5 text-sm text-muted-foreground">
                 No delivery address saved yet. Add one below to continue.
               </div>
             )}
@@ -768,7 +768,7 @@ const Checkout = () => {
               <button
                 type="button"
                 onClick={openCreateAddressForm}
-                className="mt-4 inline-flex items-center gap-2 rounded-full border-2 border-pink-100 px-4 py-2 text-sm text-[#b81582] hover:bg-[#b81582] hover:text-white hover:border-[#b81582] transition font-bold"
+                className="mt-4 inline-flex items-center gap-2 rounded-full border-2 border-border px-4 py-2 text-sm text-primary hover:bg-primary hover:text-white hover:border-primary transition font-bold"
               >
                 <Plus size={16} /> Add address
               </button>
@@ -776,15 +776,15 @@ const Checkout = () => {
           </div>
 
           <div className="flex-1 flex flex-col mt-8">
-            <div className={`mb-6 rounded-2xl border px-4 py-4 ${requiresEmail ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white'}`}>
+            <div className={`mb-6 rounded-sm border px-4 py-4 ${requiresEmail ? 'border-red-300 bg-red-50' : 'border-border bg-card'}`}>
               <div className="flex items-start gap-3">
-                <Mail size={20} className={`${requiresEmail ? 'text-red-500' : 'text-[#b81582]'}`} />
+                <Mail size={20} className={`${requiresEmail ? 'text-destructive' : 'text-primary'}`} />
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-gray-900">Email for order updates</p>
-                  <p className="text-xs text-gray-600">We share invoices, dispatch alerts, and support updates on this email.</p>
+                  <p className="text-sm font-bold text-foreground">Email for order updates</p>
+                  <p className="text-xs text-muted-foreground">We share invoices, dispatch alerts, and support updates on this email.</p>
                   {userLoading ? (
-                    <div className="flex items-center text-gray-600 text-xs mt-3">
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin text-[#b81582]" /> Checking your profile...
+                    <div className="flex items-center text-muted-foreground text-xs mt-3">
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> Checking your profile...
                     </div>
                   ) : showEmailForm ? (
                     <div className="mt-4 space-y-3">
@@ -792,12 +792,12 @@ const Checkout = () => {
                         type="email"
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
-                        className="w-full bg-white border border-gray-300 rounded-2xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#b81582]"
+                        className="w-full bg-card border border-border rounded-sm px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                         placeholder="you@example.com"
                         disabled={emailSaving}
                       />
                       {emailStatus && (
-                        <p className={`text-xs ${emailStatus.type === 'error' ? 'text-red-600' : 'text-[#b81582]'}`}>
+                        <p className={`text-xs ${emailStatus.type === 'error' ? 'text-red-600' : 'text-primary'}`}>
                           {emailStatus.text}
                         </p>
                       )}
@@ -809,7 +809,7 @@ const Checkout = () => {
                           type="button"
                           onClick={handleSaveEmail}
                           disabled={emailSaving}
-                          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 text-sm font-bold disabled:opacity-60 hover:from-purple-700 hover:to-pink-700 transition"
+                          className="inline-flex items-center gap-2 rounded-full bg-primary text-white px-4 py-2 text-sm font-bold disabled:opacity-60 hover:bg-primary/90 transition"
                         >
                           {emailSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle size={16} />}
                           {emailSaving ? 'Saving...' : 'Save email'}
@@ -822,7 +822,7 @@ const Checkout = () => {
                               setEmailInput(userProfile?.email || '');
                               setEmailStatus(null);
                             }}
-                            className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm text-gray-900 hover:bg-gray-100"
+                            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-foreground hover:bg-secondary"
                           >
                             Cancel
                           </button>
@@ -831,14 +831,14 @@ const Checkout = () => {
                     </div>
                   ) : (
                     <div className="mt-3 flex flex-wrap items-center gap-3">
-                      <span className="rounded-full bg-pink-100 px-3 py-1 text-xs font-bold text-[#b81582]">{userProfile?.email}</span>
+                      <span className="rounded-full bg-secondary px-3 py-1 text-xs font-bold text-primary">{userProfile?.email}</span>
                       <button
                         type="button"
                         onClick={() => {
                           setEditingEmail(true);
                           setEmailStatus(null);
                         }}
-                        className="text-xs text-[#b81582] underline-offset-4 hover:underline font-bold"
+                        className="text-xs text-primary underline-offset-4 hover:underline font-bold"
                       >
                         Change
                       </button>
@@ -848,61 +848,61 @@ const Checkout = () => {
               </div>
             </div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">Order Summary</h2>
+              <h2 className="text-2xl font-serif lowercase text-foreground tracking-wide">order summary</h2>
               {selectedAddressId ? (
-                <span className="text-xs text-[#b81582] font-bold">Delivering to selected address</span>
+                <span className="text-xs text-primary font-bold">Delivering to selected address</span>
               ) : (
                 <span className="text-xs text-red-600 font-bold">Select an address to continue</span>
               )}
             </div>
 
             {statusMessage && (
-              <div className={`mb-4 rounded-2xl px-4 py-3 text-sm ${statusMessage.type === 'error' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-pink-100 text-[#b81582] border border-pink-200'}`}>
+              <div className={`mb-4 rounded-sm px-4 py-3 text-sm ${statusMessage.type === 'error' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-secondary text-primary border border-border'}`}>
                 {statusMessage.text}
               </div>
             )}
 
             {loading ? (
-              <div className="flex items-center justify-center h-40 text-gray-600">
-                <Loader2 className="animate-spin mr-2 text-[#b81582]" size={18} />
+              <div className="flex items-center justify-center h-40 text-muted-foreground">
+                <Loader2 className="animate-spin mr-2 text-primary" size={18} />
                 Loading your bag...
               </div>
             ) : cartItems?.length ? (
               <>
-                <div className="mb-4 rounded-2xl border border-pink-100 bg-pink-50 px-4 py-3 flex items-center gap-3">
-                  <Clock3 size={20} className="text-[#b81582]" />
+                <div className="mb-4 rounded-sm border border-border bg-secondary px-4 py-3 flex items-center gap-3">
+                  <Clock3 size={20} className="text-primary" />
                   <div>
-                    <p className="text-sm font-bold text-gray-900">Expected delivery by {expectedDelivery.dateLabel}</p>
+                    <p className="text-sm font-bold text-foreground">Expected delivery by {expectedDelivery.dateLabel}</p>
                   </div>
                 </div>
                 <div className="space-y-4 overflow-y-auto max-h-64 pr-2">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex gap-3 bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
+                    <div key={item.id} className="flex gap-3 bg-card rounded-sm p-4 border border-border shadow-sm">
                       <ProductImage
                         src={resolveImage(item.product)}
                         alt={item.product?.name}
-                        className="h-16 w-16 rounded-xl object-cover"
+                        className="h-16 w-16 rounded-sm object-cover"
                       />
                       <div className="flex-1">
-                        <p className="font-bold text-gray-900">{item.product?.name || 'Product'}</p>
-                        <p className="text-xs text-gray-600">Qty {item.quantity} • {item.size || 'Free Size'}{item.height ? ` • ${item.height}` : ''}</p>
+                        <p className="font-bold text-foreground">{item.product?.name || 'Product'}</p>
+                        <p className="text-xs text-muted-foreground">Qty {item.quantity} • {item.size || 'Free Size'}{item.height ? ` • ${item.height}` : ''}</p>
                       </div>
-                      <p className="font-bold text-gray-900">{formatCurrency(item.lineTotal)}</p>
+                      <p className="font-bold text-foreground">{formatCurrency(item.lineTotal)}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-6 space-y-3 border-t border-gray-200 pt-4">
+                <div className="mt-6 space-y-3 border-t border-border pt-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="text-gray-900 font-bold">{formatCurrency(subtotalAmount)}</span>
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="text-foreground font-bold">{formatCurrency(subtotalAmount)}</span>
                   </div>
-                  <div className="flex justify-between text-lg font-extrabold border-t border-gray-200 pt-3">
-                    <span className="text-gray-900">{paymentMethod === 'cod' ? 'Amount on Delivery' : 'Total Amount'}</span>
-                    <span className="text-[#b81582]">{formatCurrency(payableWithGst)}</span>
+                  <div className="flex justify-between text-lg font-medium border-t border-border pt-3">
+                    <span className="text-foreground">{paymentMethod === 'cod' ? 'Amount on Delivery' : 'Total Amount'}</span>
+                    <span className="text-primary">{formatCurrency(payableWithGst)}</span>
                   </div>
                   {paymentMethod === 'cod' && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+                    <div className="bg-amber-50 border border-amber-200 rounded-sm p-3 text-xs text-amber-800">
                       <p className="font-bold mb-1">COD Payment Details:</p>
                       <p>• ₹{COD_CHARGE} upfront fee (charged now via Razorpay)</p>
                       <p>• {formatCurrency(payableWithGst)} to be paid on delivery in cash</p>
@@ -912,12 +912,12 @@ const Checkout = () => {
 
                 <div className="mt-6 space-y-4">
                   <div>
-                    <label className="text-sm text-gray-700 font-bold block mb-2">Notes for designer (optional)</label>
+                    <label className="text-sm text-foreground font-bold block mb-2">Notes for designer (optional)</label>
                     <textarea
                       rows="3"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      className="w-full bg-white border border-gray-300 rounded-2xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#b81582]"
+                      className="w-full bg-card border border-border rounded-sm px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="Color preferences, delivery instructions..."
                     />
                   </div>
@@ -933,7 +933,7 @@ const Checkout = () => {
                         ? 'Please agree to COD terms to continue'
                         : undefined
                   }
-                  className="mt-6 flex items-center justify-center gap-2 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-extrabold py-4 rounded-full shadow-xl hover:from-purple-700 hover:to-pink-700 hover:scale-105 transition transform disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                  className="mt-6 flex items-center justify-center gap-2 w-full bg-primary text-white font-medium py-4 rounded-sm hover:bg-primary/90 transition text-sm tracking-wide lowercase disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
                     <Loader2 className="animate-spin" size={18} />
@@ -950,23 +950,23 @@ const Checkout = () => {
                   }
                 </button>
 
-                <p className="text-xs text-center text-gray-600 mt-3">
-                  <ShieldCheck size={14} className="inline mr-1 text-[#b81582]" />
+                <p className="text-xs text-center text-muted-foreground mt-3">
+                  <ShieldCheck size={14} className="inline mr-1 text-primary" />
                   Transactions are 100% Secure and Encrypted.
                 </p>
               </>
             ) : (
               <div className="text-center flex flex-col items-center justify-center flex-1">
-                <p className="text-lg font-bold text-gray-900 mb-4">Your cart is empty.</p>
-                <Link to="/shop" className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105 shadow-xl">Browse collection</Link>
+                <p className="text-lg font-bold text-foreground mb-4">Your cart is empty.</p>
+                <Link to="/shop" className="px-6 py-3 rounded-sm bg-primary text-white font-medium hover:bg-primary/90 transition text-sm tracking-wide lowercase">browse collection</Link>
               </div>
             )}
           </div>
         </section>
       </div >
-      <div className="max-w-6xl mx-auto mt-8 text-center text-xs text-gray-600">
+      <div className="max-w-6xl mx-auto mt-8 text-center text-xs text-muted-foreground">
         <span>Read our </span>
-        <Link to="/TermsPage" className="text-[#b81582] font-bold hover:underline underline-offset-4">
+        <Link to="/TermsPage" className="text-primary font-bold hover:underline underline-offset-4">
           Terms and Conditions
         </Link>
         <span> to learn how we protect your data.</span>

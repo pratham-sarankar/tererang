@@ -4,8 +4,18 @@ import traditionalImg from '../assets/banner_1.jpeg';
 import modernImg from '../assets/banner_2.jpeg';
 
 const slides = [
-    { img: traditionalImg, alt: 'Wedding Collection', label: 'Wedding Collection' },
-    { img: modernImg, alt: 'Modern Ethnic Fusion', label: 'Modern Fusion' },
+    {
+        img: traditionalImg,
+        tag: 'handcrafted couture',
+        title: 'timeless silhouettes',
+        desc: 'reimagined indian couture crafted with bespoke precision and artisanal heritage.',
+    },
+    {
+        img: modernImg,
+        tag: 'modern luxury',
+        title: 'understated elegance',
+        desc: 'contemporary grace woven with love, curated to become an unforgettable part of your story.',
+    },
 ];
 
 const SplitBanner = () => {
@@ -22,7 +32,7 @@ const SplitBanner = () => {
 
     const resetTimer = () => {
         clearInterval(timerRef.current);
-        timerRef.current = setInterval(() => setActive(prev => (prev + 1) % slides.length), 4000);
+        timerRef.current = setInterval(() => setActive(prev => (prev + 1) % slides.length), 5500);
     };
 
     useEffect(() => {
@@ -39,118 +49,118 @@ const SplitBanner = () => {
     };
 
     return (
-        <>
-            {/* ── MOBILE HERO — auto-advancing carousel, shown only below md ── */}
+        <section className="relative w-full overflow-hidden bg-background">
+            {/* ── MOBILE HERO (below md) ── */}
             <div
-                className="relative w-full aspect-square md:hidden overflow-hidden font-poppins"
+                className="relative w-full h-[540px] md:hidden overflow-hidden"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
             >
-                {/* Slides strip — translate by active index */}
+                {/* Slides strip */}
                 <div
-                    className="absolute inset-0 flex transition-transform duration-700 ease-in-out"
+                    className="absolute inset-0 flex transition-transform duration-1000 ease-out"
                     style={{ transform: `translateX(-${active * (100 / slides.length)}%)`, width: `${slides.length * 100}%` }}
                 >
                     {slides.map((slide, i) => (
                         <div key={i} className="relative h-full" style={{ width: `${100 / slides.length}%` }}>
                             <img
                                 src={slide.img}
-                                alt={slide.alt}
+                                alt={slide.title}
                                 className="w-full h-full object-cover object-top"
                             />
                         </div>
                     ))}
                 </div>
 
-                {/* Persistent gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                {/* Refined gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10 pointer-events-none" />
 
                 {/* Dot indicators */}
-                <div className="absolute top-5 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
                     {slides.map((_, i) => (
                         <button
                             key={i}
                             onClick={() => { goTo(i); resetTimer(); }}
-                            className={`h-1 rounded-full transition-all duration-300 ${i === active ? 'bg-white w-6' : 'bg-white/40 w-3'}`}
+                            className={`h-[2px] transition-all duration-300 ${i === active ? 'bg-white w-6' : 'bg-white/40 w-3'}`}
                             aria-label={`Go to slide ${i + 1}`}
                         />
                     ))}
                 </div>
 
-                {/* Bottom CTA — static, always visible */}
-                <div className="absolute bottom-0 left-0 right-0 px-6 pb-10 text-center text-white z-10">
-                    <p className="text-xs uppercase tracking-[0.3em] text-pink-300 mb-2 font-medium">
-                        New Collection
+                {/* Bottom CTA content */}
+                <div className="absolute bottom-0 left-0 right-0 px-6 pb-12 text-center text-white z-10">
+                    <p className="text-[11px] uppercase tracking-[0.25em] text-accent font-medium mb-2">
+                        {slides[active].tag}
                     </p>
-                    <h1 className="text-5xl font-bold mb-3 leading-tight tracking-tight drop-shadow-xl">
-                        Tererang
+                    <h1 className="text-4xl font-serif lowercase mb-3 tracking-wide leading-tight">
+                        {slides[active].title}
                     </h1>
-                    <p className="text-sm text-gray-200 mb-7 font-light leading-relaxed max-w-xs mx-auto">
-                        Celebrate timeless elegance with a contemporary edge
+                    <p className="text-xs text-white/80 font-light leading-relaxed max-w-xs mx-auto mb-6">
+                        {slides[active].desc}
                     </p>
                     <button
                         onClick={scrollToCollection}
-                        className="inline-flex items-center gap-2 bg-white text-[#b81582] px-8 py-3.5 font-bold text-xs uppercase tracking-widest hover:bg-pink-50 active:scale-95 transition-all duration-200 shadow-2xl"
+                        className="inline-flex items-center gap-2 border border-white/80 bg-white/10 backdrop-blur-sm text-white px-7 py-3 text-xs lowercase tracking-widest hover:bg-white hover:text-foreground transition-all duration-300"
                     >
-                        Explore Collection
-                        <ArrowRight className="w-4 h-4" />
+                        <span>explore collection</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                 </div>
             </div>
 
-            {/* ── DESKTOP HERO — hidden below md ── */}
-            <div className="hidden md:flex relative w-full h-[600px] overflow-hidden font-poppins">
+            {/* ── DESKTOP HERO (md and above) ── */}
+            <div className="hidden md:flex relative w-full h-[640px] lg:h-[720px] overflow-hidden">
                 {/* Left Panel */}
-                <div className="w-1/2 h-full relative group overflow-hidden">
+                <div className="w-1/2 h-full relative group overflow-hidden cursor-pointer" onClick={scrollToCollection}>
                     <img
                         src={traditionalImg}
-                        alt="Traditional Ethnic Wear"
-                        className="w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-110"
+                        alt="Wedding Collection"
+                        className="w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent group-hover:bg-black/20 transition-colors duration-500" />
-                    <div className="absolute bottom-8 left-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
-                        <p className="text-sm uppercase tracking-widest mb-1">Tererang</p>
-                        <h3 className="text-2xl font-semibold">Wedding Collection</h3>
+                    <div className="absolute inset-0 bg-black/25 group-hover:bg-black/15 transition-colors duration-500" />
+                    <div className="absolute bottom-10 left-10 text-white z-10">
+                        <p className="text-xs uppercase tracking-[0.25em] text-accent font-light mb-1">bespoke collection</p>
+                        <h3 className="text-3xl font-serif lowercase tracking-wide">wedding & couture</h3>
                     </div>
                 </div>
 
                 {/* Right Panel */}
-                <div className="w-1/2 h-full relative group overflow-hidden">
+                <div className="w-1/2 h-full relative group overflow-hidden cursor-pointer" onClick={scrollToCollection}>
                     <img
                         src={modernImg}
                         alt="Modern Ethnic Fusion"
-                        className="w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-110"
+                        className="w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-l from-black/40 to-transparent group-hover:bg-black/20 transition-colors duration-500" />
-                    <div className="absolute bottom-8 right-8 text-right text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
-                        <p className="text-sm uppercase tracking-widest mb-1">Contemporary</p>
-                        <h3 className="text-2xl font-semibold">Modern Fusion</h3>
+                    <div className="absolute inset-0 bg-black/25 group-hover:bg-black/15 transition-colors duration-500" />
+                    <div className="absolute bottom-10 right-10 text-right text-white z-10">
+                        <p className="text-xs uppercase tracking-[0.25em] text-accent font-light mb-1">everyday luxury</p>
+                        <h3 className="text-3xl font-serif lowercase tracking-wide">modern fusion</h3>
                     </div>
                 </div>
 
-                {/* Center Overlay Card */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[460px] z-20">
-                    <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-12 text-center rounded-sm shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:bg-white/20 transition-all duration-300 group">
-                        <h2 className="text-5xl font-bold text-white mb-4 drop-shadow-xl tracking-tight leading-tight">
-                            Tererang
+                {/* Center Editorial Plaque */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] z-20 pointer-events-none">
+                    <div className="bg-card/95 backdrop-blur-md border border-border p-10 lg:p-12 text-center rounded-sm shadow-xl pointer-events-auto">
+                        <p className="text-xs uppercase tracking-[0.3em] text-accent mb-3 font-medium">
+                            moradabad atelier
+                        </p>
+                        <h2 className="text-4xl lg:text-5xl font-serif lowercase text-foreground mb-4 tracking-wide">
+                            tererang
                         </h2>
-                        <p className="text-gray-100 text-xl mb-8 font-light tracking-wide drop-shadow-md">
-                            Celebrate timeless elegance with a contemporary edge
+                        <p className="text-muted-foreground text-sm font-light leading-relaxed mb-8 italic font-serif">
+                            "curated with love. crafted with purpose. designed to become part of your story."
                         </p>
                         <button
                             onClick={scrollToCollection}
-                            className="relative inline-flex items-center justify-center px-10 py-4 bg-white text-black font-semibold text-sm uppercase tracking-widest overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:-translate-y-1"
+                            className="inline-flex items-center gap-2.5 border-2 border-primary text-foreground px-8 py-3.5 lowercase tracking-widest text-xs font-medium hover:bg-primary hover:text-white transition-all duration-300"
                         >
-                            <span className="relative z-10 flex items-center gap-2">
-                                Explore Collection
-                                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                            </span>
-                            <div className="absolute inset-0 bg-gray-50 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out" />
+                            <span>explore collection</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                     </div>
                 </div>
             </div>
-        </>
+        </section>
     );
 };
 

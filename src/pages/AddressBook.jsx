@@ -102,12 +102,12 @@ const AddressBook = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4">
+    <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-4xl mx-auto">
         <header className="text-center mb-10">
-          <p className="uppercase tracking-[0.35em] text-xs text-gray-500">Profile</p>
-          <h1 className="text-4xl font-black text-gray-900 mt-3">Manage delivery addresses</h1>
-          <p className="text-gray-500 mt-3">Save multiple addresses to breeze through checkout without retyping details.</p>
+          <p className="uppercase tracking-[0.35em] text-xs text-accent">profile</p>
+          <h1 className="text-4xl font-serif lowercase text-foreground mt-3">manage delivery addresses</h1>
+          <p className="text-muted-foreground mt-3">Save multiple addresses to breeze through checkout without retyping details.</p>
         </header>
 
         {feedback && (

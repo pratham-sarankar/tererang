@@ -65,7 +65,6 @@ const Cart = () => {
     try {
       setUpdatingItemId(itemId);
       await updateCartItem(itemId, { quantity: newQuantity });
-      // Only show feedback on success if needed, error feedback is more important
     } catch (error) {
       setFeedback({ type: 'error', text: error.message || 'Failed to update quantity' });
       await refreshCart();
@@ -80,22 +79,22 @@ const Cart = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-pink-50/50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="animate-spin mx-auto mb-4 text-[#b81582]" size={48} />
-          <p className="text-gray-600">Loading your cart...</p>
+          <Loader2 className="animate-spin mx-auto mb-4 text-primary" size={48} />
+          <p className="text-muted-foreground">Loading your cart...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50/50 to-white text-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-8 sm:py-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">Shopping Cart</h1>
-          <p className="text-gray-600 text-base">
+          <h1 className="text-3xl sm:text-4xl font-serif lowercase text-foreground mb-2 tracking-wide">Shopping Cart</h1>
+          <p className="text-muted-foreground text-base">
             {cartHasItems ? `${cartCount} item${cartCount === 1 ? '' : 's'} in your cart` : 'Your cart is empty'}
           </p>
         </div>
@@ -103,9 +102,10 @@ const Cart = () => {
         {/* Feedback Message */}
         {feedback && (
           <div
-            className={`mb-6 p-4 rounded-2xl ${
-              feedback.type === 'error' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-pink-100 text-[#b81582] border border-pink-200'
-            }`}
+            className={`mb-6 p-4 rounded-sm border text-sm ${feedback.type === 'error'
+              ? 'bg-red-50 text-destructive border-red-200'
+              : 'bg-secondary text-primary border-border'
+              }`}
           >
             {feedback.text}
           </div>
@@ -123,7 +123,7 @@ const Cart = () => {
                 return (
                   <div
                     key={item.id}
-                    className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-2xl transition-all duration-300"
+                    className="bg-card rounded-sm p-4 sm:p-6 border border-border transition-colors"
                   >
                     <div className="flex flex-col sm:flex-row gap-4">
                       {/* Product Image */}
@@ -131,17 +131,17 @@ const Cart = () => {
                         <ProductImage
                           src={previewSrc}
                           alt={item.product?.name || 'Product image'}
-                          className="w-full sm:w-32 h-48 sm:h-32 rounded-lg object-cover"
+                          className="w-full sm:w-32 h-48 sm:h-32 rounded-sm object-cover bg-secondary"
                         />
                       </div>
 
                       {/* Product Details */}
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900 mb-2">
+                          <h3 className="text-base font-serif lowercase text-foreground mb-2">
                             {item.product?.name || 'Unavailable product'}
                           </h3>
-                          <div className="text-sm text-gray-500 space-y-1">
+                          <div className="text-xs text-muted-foreground space-y-1 tracking-wide">
                             {item.size && <p>Size: {item.size}</p>}
                             {item.height && <p>Height: {item.height}</p>}
                           </div>
@@ -153,36 +153,36 @@ const Cart = () => {
                             <button
                               onClick={() => handleUpdateQuantity(item.id, item.quantity, -1)}
                               disabled={isUpdating || item.quantity <= 1}
-                              className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition text-gray-900"
+                              className="h-8 w-8 rounded-sm border border-border bg-card hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition text-foreground"
                               aria-label="Decrease quantity"
                             >
-                              <Minus size={16} />
+                              <Minus size={14} />
                             </button>
-                            <span className="text-lg font-bold text-gray-900 min-w-[2rem] text-center">
+                            <span className="text-base font-medium text-foreground min-w-[2rem] text-center">
                               {item.quantity}
                             </span>
                             <button
                               onClick={() => handleUpdateQuantity(item.id, item.quantity, 1)}
                               disabled={isUpdating}
-                              className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition text-gray-900"
+                              className="h-8 w-8 rounded-sm border border-border bg-card hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition text-foreground"
                               aria-label="Increase quantity"
                             >
-                              <Plus size={16} />
+                              <Plus size={14} />
                             </button>
                           </div>
 
                           {/* Price and Remove */}
                           <div className="flex items-center justify-between sm:justify-end gap-4">
-                            <p className="text-xl font-extrabold text-[#b81582]">
+                            <p className="text-lg font-medium text-foreground">
                               {formatCurrency(item.lineTotal)}
                             </p>
                             <button
                               onClick={() => handleRemoveItem(item.id)}
                               disabled={isRemoving}
-                              className="text-gray-400 hover:text-red-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="text-muted-foreground hover:text-destructive transition disabled:opacity-50 disabled:cursor-not-allowed"
                               aria-label="Remove item"
                             >
-                              {isRemoving ? <Loader2 className="animate-spin text-[#b81582]" size={20} /> : <Trash2 size={20} />}
+                              {isRemoving ? <Loader2 className="animate-spin text-primary" size={18} /> : <Trash2 size={18} />}
                             </button>
                           </div>
                         </div>
@@ -195,22 +195,22 @@ const Cart = () => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-2xl transition-all duration-300 sticky top-24">
-                <h2 className="text-xl font-extrabold text-gray-900 mb-6">Order Summary</h2>
+              <div className="bg-card rounded-sm p-6 border border-border sticky top-24">
+                <h2 className="text-lg font-serif lowercase text-foreground mb-6 tracking-wide">order summary</h2>
 
                 <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-muted-foreground text-sm">
                     <span>Subtotal ({cartCount} item{cartCount === 1 ? '' : 's'})</span>
-                    <span className="text-gray-900 font-bold">{formatCurrency(cartTotal)}</span>
+                    <span className="text-foreground font-medium">{formatCurrency(cartTotal)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-muted-foreground text-sm">
                     <span>Shipping</span>
-                    <span className="text-gray-900 font-bold">Calculated at checkout</span>
+                    <span className="text-foreground font-medium">Calculated at checkout</span>
                   </div>
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="flex justify-between text-lg font-extrabold">
-                      <span className="text-gray-900">Total</span>
-                      <span className="text-[#b81582]">{formatCurrency(cartTotal)}</span>
+                  <div className="border-t border-border pt-4">
+                    <div className="flex justify-between text-base font-medium">
+                      <span className="text-foreground">Total</span>
+                      <span className="text-foreground">{formatCurrency(cartTotal)}</span>
                     </div>
                   </div>
                 </div>
@@ -218,20 +218,20 @@ const Cart = () => {
                 <div className="space-y-3">
                   <Link
                     to="/checkout"
-                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-full hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105 shadow-xl"
+                    className="flex items-center justify-center gap-2 w-full bg-primary text-white font-medium py-3 rounded-sm hover:bg-primary/90 transition text-sm tracking-wide lowercase"
                   >
-                    Proceed to Checkout
-                    <ArrowRight size={18} />
+                    proceed to checkout
+                    <ArrowRight size={16} />
                   </Link>
                   <Link
                     to="/shop"
-                    className="block w-full text-center border-2 border-pink-100 text-[#b81582] font-bold py-3 rounded-full hover:bg-[#b81582] hover:text-white hover:border-[#b81582] transition"
+                    className="block w-full text-center border border-primary text-foreground font-medium py-3 rounded-sm hover:bg-primary hover:text-white transition text-sm tracking-wide lowercase"
                   >
-                    Continue Shopping
+                    continue shopping
                   </Link>
                 </div>
 
-                <div className="mt-6 text-sm text-gray-500 text-center">
+                <div className="mt-6 text-xs text-muted-foreground text-center tracking-wide">
                   <p>Secure checkout guaranteed</p>
                 </div>
               </div>
@@ -240,19 +240,19 @@ const Cart = () => {
         ) : (
           // Empty Cart State
           <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-pink-100/50 border-2 border-pink-100 mb-6">
-              <ShoppingCart size={48} className="text-[#b81582]" />
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-secondary border border-border mb-6">
+              <ShoppingCart size={36} className="text-primary" />
             </div>
-            <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Your cart is empty</h2>
-            <p className="text-gray-600 mb-8">
+            <h2 className="text-xl font-serif lowercase text-foreground mb-3">Your cart is empty</h2>
+            <p className="text-muted-foreground mb-8">
               Explore our collections to add something special.
             </p>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-8 py-3 rounded-full hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105 shadow-xl"
+              className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-sm hover:bg-primary/90 transition text-sm tracking-wide lowercase font-medium"
             >
-              <ShoppingBag size={20} />
-              Start Shopping
+              <ShoppingBag size={16} />
+              start shopping
             </Link>
           </div>
         )}

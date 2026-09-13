@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;600&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -21,22 +21,22 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #18181b;
-  --card: #ffffff;
-  --card-foreground: #18181b;
-  --primary: #b81582;
-  --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #fce7f4;
-  --accent-foreground: #83125c;
-  --destructive: #dc2626;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #b81582;
+  --background: #FAF8F5;
+  --foreground: #2C2825;
+  --card: #FFFFFF;
+  --card-foreground: #2C2825;
+  --primary: #A8B5A0;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F4F1EA;
+  --secondary-foreground: #2C2825;
+  --muted: #E8E5E0;
+  --muted-foreground: #6B6560;
+  --accent: #C9A96E;
+  --accent-foreground: #2C2825;
+  --destructive: #B85C4F;
+  --border: #E8E5E0;
+  --input: #E8E5E0;
+  --ring: #A8B5A0;
 }
 
 * {
@@ -44,9 +44,13 @@
 }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Lato", sans-serif;
   background: var(--background);
   color: var(--foreground);
+}
+
+.font-serif {
+  font-family: "Cormorant Garamond", serif;
 }
 
 /* @tailwind base;

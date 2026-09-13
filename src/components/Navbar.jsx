@@ -185,14 +185,14 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Discount Strip */}
+      {/* Top Announcement Banner */}
       {hasPromotionalText && (
-        <div className="text-white text-center py-2 text-sm font-semibold sticky top-0 z-50 flex justify-center items-center gap-2" style={{ backgroundColor: '#b81582' }}>
+        <div className="bg-secondary text-muted-foreground text-center py-2 text-xs font-light tracking-wide border-b border-border sticky top-0 z-50">
           {promotionalText}
         </div>
       )}
 
-      <nav className={`bg-white text-gray-900 shadow-lg sticky ${hasPromotionalText ? 'top-8' : 'top-0'} z-50`}>
+      <nav className={`bg-card text-foreground shadow-sm border-b border-border sticky ${hasPromotionalText ? 'top-8' : 'top-0'} z-50`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex justify-between items-center">
 
           {/* ✅ LOGO SECTION - UPDATED CSS */}
@@ -203,7 +203,7 @@ const Navbar = () => {
                 alt="Logo"
                 // 🖼️ MODIFIED CSS: Removed 'rounded-xl' and 'shadow-lg' to ensure transparency 
                 // and prevent background bleed. The size is kept as you requested.
-                className="h-40 w-40 mr-3 object-contain hover:scale-110 transition duration-300"
+                className="h-32 w-32 mr-3 object-contain transition duration-300"
               />
             </Link>
           </div>
@@ -213,17 +213,11 @@ const Navbar = () => {
             <li>
               <Link
                 to="/"
-                className={`transition duration-200 relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full ${isActive("/")
-                  ? "text-white"
-                  : "text-gray-700"
-                  }`}
-                style={{
-                  color: isActive("/") ? "#b81582" : undefined,
-                }}
-                onMouseEnter={(e) => (e.target.style.color = "#b81582")}
-                onMouseLeave={(e) => (e.target.style.color = isActive("/") ? "#b81582" : "")}
+                className={`text-sm lowercase tracking-wide transition-colors duration-300 ${
+                  isActive("/") ? "text-primary" : "text-foreground hover:text-primary"
+                }`}
               >
-                Home
+                home
               </Link>
             </li>
 
@@ -236,73 +230,37 @@ const Navbar = () => {
             >
               <button
                 onClick={() => setIsDropdownOpen((s) => !s)}
-                className={`transition duration-200 relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full ${isActive("/products/kurti") ||
+                className={`text-sm lowercase tracking-wide transition-colors duration-300 ${
+                  isActive("/products/kurti") ||
                   isActive("/products/suit") ||
                   isActive("/products/designerSuit") ||
                   isActive("/products/coat")
-                  ? "text-white"
-                  : "text-gray-700"
-                  }`}
-                style={{
-                  color:
-                    isActive("/products/kurti") ||
-                      isActive("/products/suit") ||
-                      isActive("/products/designerSuit") ||
-                      isActive("/products/coat")
-                      ? "#b81582"
-                      : undefined,
-                }}
-                onMouseEnter={(e) => (e.target.style.color = "#b81582")}
-                onMouseLeave={(e) => {
-                  e.target.style.color =
-                    isActive("/products/kurti") ||
-                      isActive("/products/suit") ||
-                      isActive("/products/designerSuit") ||
-                      isActive("/products/coat")
-                      ? "#b81582"
-                      : "";
-                }}
+                    ? "text-primary"
+                    : "text-foreground hover:text-primary"
+                }`}
               >
-                Products
+                collections
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute left-1/2 transform -translate-x-1/2 top-full pt-4 w-[360px] z-50">
-                  {/* Dropdown Container with Glassmorphism */}
-                  <div className="relative bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 transform origin-top ease-out">
-
-                    {/* Decorative Top Border */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-400 via-pink-500 to-purple-500"></div>
-
-                    <ul className="p-3 divide-y divide-gray-100/50">
+                <div className="absolute left-1/2 transform -translate-x-1/2 top-full pt-4 w-[320px] z-50">
+                  <div className="bg-card border border-border rounded-lg shadow-lg overflow-hidden">
+                    <ul className="p-2 divide-y divide-border/50">
                       {productMenu.map((item) => (
                         <li key={item.name}>
                           {item.enabled ? (
                             <Link
                               to={item.to}
                               onClick={() => setIsDropdownOpen(false)}
-                              className="group flex items-center p-3 rounded-xl hover:bg-pink-50 transition-all duration-300 ease-in-out"
+                              className="group flex items-center p-3 rounded-lg hover:bg-secondary/50 transition-colors duration-300"
                             >
-                              {/* Icon Container */}
-                              <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-pink-100 text-xl group-hover:scale-110 transition-transform duration-300 shadow-sm text-pink-600">
-                                {item.icon || <Gift size={20} />}
+                              <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 text-primary">
+                                {item.icon || <Gift size={18} />}
                               </div>
-
-                              {/* Text Content */}
-                              <div className="ml-4 flex-1">
-                                <p className="font-semibold text-gray-800 group-hover:text-pink-600 transition-colors">
-                                  {item.name}
+                              <div className="ml-3 flex-1">
+                                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors lowercase">
+                                  {item.name.toLowerCase()}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-0.5 group-hover:text-pink-400">
-                                  Explore our collection
-                                </p>
-                              </div>
-
-                              {/* Arrow icon */}
-                              <div className="opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300 text-pink-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
                               </div>
                             </Link>
                           ) : (
@@ -329,30 +287,22 @@ const Navbar = () => {
             <li>
               <Link
                 to="/TermsPage"
-                className={`transition duration-200 relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full ${isActive("/TermsPage") ? "text-white" : "text-gray-700"
-                  }`}
-                style={{
-                  color: isActive("/TermsPage") ? "#b81582" : undefined,
-                }}
-                onMouseEnter={(e) => (e.target.style.color = "#b81582")}
-                onMouseLeave={(e) => (e.target.style.color = isActive("/TermsPage") ? "#b81582" : "")}
+                className={`text-sm lowercase tracking-wide transition-colors duration-300 ${
+                  isActive("/TermsPage") ? "text-primary" : "text-foreground hover:text-primary"
+                }`}
               >
-                Terms & Conditions
+                terms & conditions
               </Link>
             </li>
 
             <li>
               <Link
                 to="/contact"
-                className={`transition duration-200 relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full ${isActive("/contact") ? "text-white" : "text-gray-700"
-                  }`}
-                style={{
-                  color: isActive("/contact") ? "#b81582" : undefined,
-                }}
-                onMouseEnter={(e) => (e.target.style.color = "#b81582")}
-                onMouseLeave={(e) => (e.target.style.color = isActive("/contact") ? "#b81582" : "")}
+                className={`text-sm lowercase tracking-wide transition-colors duration-300 ${
+                  isActive("/contact") ? "text-primary" : "text-foreground hover:text-primary"
+                }`}
               >
-                Contact Us
+                contact us
               </Link>
             </li>
           </ul>
@@ -388,42 +338,34 @@ const Navbar = () => {
               <div className="relative" ref={cartRef}>
                 <button
                   onClick={() => setIsCartOpen((prev) => !prev)}
-                  className="relative h-10 w-10 flex items-center justify-center rounded-full border border-gray-300 transition"
-                  style={{
-                    borderColor: isCartOpen ? "#b81582" : undefined,
-                    color: isCartOpen ? "#b81582" : undefined,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#b81582";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = isCartOpen ? "#b81582" : "";
-                  }}
+                  className={`relative h-10 w-10 flex items-center justify-center rounded-full border transition-colors ${
+                    isCartOpen ? "border-primary text-primary" : "border-border text-foreground hover:border-primary hover:text-primary"
+                  }`}
                   aria-label="Shopping cart"
                 >
-                  <ShoppingCart size={20} />
+                  <ShoppingCart size={18} />
                   {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-1 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 shadow-md" style={{ backgroundColor: '#b81582' }}>
+                    <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
                       {cartBadge}
                     </span>
                   )}
                 </button>
 
                 {isCartOpen && (
-                  <div className="absolute right-0 mt-3 w-80 bg-white text-gray-900 rounded-xl shadow-2xl border border-gray-200 z-50 p-5">
+                  <div className="absolute right-0 mt-3 w-80 bg-card text-foreground rounded-sm shadow-md border border-border z-50 p-5">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="text-sm text-gray-600">My Cart</p>
-                        <p className="text-base font-semibold text-gray-900">{cartHasItems ? `${cartCount} item${cartCount === 1 ? '' : 's'}` : 'No items yet'}</p>
+                        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">my cart</p>
+                        <p className="text-base font-serif lowercase text-foreground">{cartHasItems ? `${cartCount} item${cartCount === 1 ? '' : 's'}` : 'no items yet'}</p>
                       </div>
                       {cartHasItems && (
-                        <span className="text-sm text-gray-600">{formatCurrency(cartTotal)}</span>
+                        <span className="text-sm text-muted-foreground">{formatCurrency(cartTotal)}</span>
                       )}
                     </div>
 
                     {cartFeedback && (
                       <div
-                        className={`mb-3 text-xs rounded-lg px-3 py-2 ${cartFeedback.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                        className={`mb-3 text-xs rounded-sm px-3 py-2 border ${cartFeedback.type === 'error' ? 'bg-red-50 text-destructive border-red-200' : 'bg-secondary text-primary border-border'
                           }`}
                       >
                         {cartFeedback.text}
@@ -431,24 +373,21 @@ const Navbar = () => {
                     )}
 
                     {!isAuthenticated ? (
-                      <div className="text-center text-sm text-gray-600">
-                        <p className="mb-3">Log in to start adding beautiful fits to your cart.</p>
+                      <div className="text-center text-sm text-muted-foreground">
+                        <p className="mb-3 lowercase">log in to start adding beautiful fits to your cart.</p>
                         <Link
                           to="/login"
                           onClick={() => setIsCartOpen(false)}
-                          className="inline-block px-4 py-2 rounded-full text-white font-semibold"
-                          style={{ backgroundColor: '#b81582' }}
-                          onMouseEnter={(e) => (e.target.style.backgroundColor = '#a01478')}
-                          onMouseLeave={(e) => (e.target.style.backgroundColor = '#b81582')}
+                          className="inline-block px-5 py-2 rounded-sm bg-primary text-white font-medium hover:bg-primary/90 transition-colors lowercase tracking-wide text-xs"
                         >
-                          Login to continue
+                          login to continue
                         </Link>
                       </div>
                     ) : cartLoading ? (
-                      <p className="text-sm text-gray-600">Loading cart...</p>
+                      <p className="text-sm text-muted-foreground">loading cart...</p>
                     ) : cartHasItems ? (
                       <>
-                        <div className="max-h-64 overflow-y-auto divide-y divide-gray-200">
+                        <div className="max-h-64 overflow-y-auto divide-y divide-border">
                           {cartItems.map((item) => {
                             const previewSrc = resolveProductImage(item.product);
                             return (
@@ -456,25 +395,25 @@ const Navbar = () => {
                                 <ProductImage
                                   src={previewSrc}
                                   alt={item.product?.name || 'Product image'}
-                                  className="h-16 w-16 rounded-lg object-cover border border-gray-200"
+                                  className="h-16 w-16 rounded-sm object-cover border border-border"
                                 />
                                 <div className="flex-1">
-                                  <p className="text-sm font-semibold leading-tight text-gray-900">
-                                    {item.product?.name || 'Unavailable product'}
+                                  <p className="text-sm font-medium leading-tight text-foreground">
+                                    {item.product?.name || 'unavailable product'}
                                   </p>
-                                  <p className="text-xs text-gray-600 mt-1">
-                                    Qty {item.quantity}
-                                    {item.size ? ` · Size ${item.size}` : ''}
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    qty {item.quantity}
+                                    {item.size ? ` · size ${item.size}` : ''}
                                     {item.height ? ` · ${item.height}` : ''}
                                   </p>
-                                  <p className="text-sm font-semibold mt-1" style={{ color: '#b81582' }}>
+                                  <p className="text-sm font-medium mt-1 text-primary">
                                     {formatCurrency(item.lineTotal)}
                                   </p>
                                 </div>
                                 <button
                                   onClick={() => handleRemoveFromCart(item.id)}
                                   disabled={removingItemId === item.id}
-                                  className={`text-gray-400 hover:text-red-600 transition ${removingItemId === item.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                  className={`text-muted-foreground hover:text-destructive transition ${removingItemId === item.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                                   aria-label="Remove item"
                                 >
                                   <Trash2 size={16} />
@@ -483,34 +422,31 @@ const Navbar = () => {
                             );
                           })}
                         </div>
-                        <div className="mt-4 border-t border-gray-200 pt-4 text-sm">
+                        <div className="mt-4 border-t border-border pt-4 text-sm">
                           <div className="flex items-center justify-between mb-3">
-                            <span className="text-gray-600">Subtotal</span>
-                            <span className="font-semibold text-gray-900">{formatCurrency(cartTotal)}</span>
+                            <span className="text-muted-foreground lowercase">subtotal</span>
+                            <span className="font-medium text-foreground">{formatCurrency(cartTotal)}</span>
                           </div>
                           <div className="space-y-2">
                             <Link
                               to="/checkout"
                               onClick={() => setIsCartOpen(false)}
-                              className="block w-full text-center text-white font-semibold py-2 rounded-full transition"
-                              style={{ backgroundColor: '#b81582' }}
-                              onMouseEnter={(e) => (e.target.style.backgroundColor = '#a01478')}
-                              onMouseLeave={(e) => (e.target.style.backgroundColor = '#b81582')}
+                              className="block w-full text-center bg-primary text-white font-medium py-2 rounded-sm hover:bg-primary/90 transition-colors lowercase tracking-wide text-xs"
                             >
-                              Proceed to checkout
+                              proceed to checkout
                             </Link>
                             <Link
                               to="/shop"
                               onClick={() => setIsCartOpen(false)}
-                              className="block w-full text-center bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-2 rounded-full"
+                              className="block w-full text-center bg-secondary hover:bg-muted text-foreground font-medium py-2 rounded-sm border border-border transition-colors lowercase tracking-wide text-xs"
                             >
-                              Continue shopping
+                              continue shopping
                             </Link>
                           </div>
                         </div>
                       </>
                     ) : (
-                      <p className="text-sm text-gray-600">Your cart is empty. Explore our collections to add something special.</p>
+                      <p className="text-sm text-muted-foreground">your cart is empty. explore our collections to add something special.</p>
                     )}
                   </div>
                 )}
@@ -522,57 +458,48 @@ const Navbar = () => {
                 <div ref={loginRef} className="relative">
                   <button
                     onClick={() => setIsLoginMenuOpen((s) => !s)}
-                    className="flex items-center space-x-2 text-white px-4 py-1.5 rounded-full font-medium transition"
-                    style={{ backgroundColor: '#b81582' }}
-                    onMouseEnter={(e) => (e.target.style.backgroundColor = '#a01478')}
-                    onMouseLeave={(e) => (e.target.style.backgroundColor = '#b81582')}
+                    className="flex items-center gap-2 border border-border bg-card text-foreground px-4 py-1.5 rounded-sm font-medium hover:border-primary hover:text-primary transition-colors lowercase tracking-wide text-xs"
                   >
                     <User size={16} />
-                    <span>{user?.name || user?.phoneNumber || 'User'}</span>
+                    <span>{user?.name || user?.phoneNumber || 'user'}</span>
                   </button>
 
                   {isLoginMenuOpen && (
-                    <div className="absolute right-0 mt-3 w-64 bg-white text-gray-900 rounded-xl shadow-2xl border border-gray-200 z-50 p-5">
+                    <div className="absolute right-0 mt-3 w-64 bg-card text-foreground rounded-sm shadow-md border border-border z-50 p-5">
                       <div className="flex items-center mb-3">
-                        <User className="mr-2" size={20} />
+                        <User className="mr-2 text-primary" size={20} />
                         <div>
-                          <h4 className="text-lg font-bold text-gray-900">{user?.name || 'Welcome'}</h4>
-                          <p className="text-sm text-gray-600">{user?.phoneNumber}</p>
+                          <h4 className="text-base font-serif lowercase text-foreground">{user?.name || 'welcome'}</h4>
+                          <p className="text-sm text-muted-foreground">{user?.phoneNumber}</p>
                         </div>
                       </div>
 
-                      <hr className="border-gray-200 mb-3" />
+                      <hr className="border-border mb-3" />
 
                       <ul className="space-y-2 text-sm">
                         <li>
                           <Link
                             to="/MyOrder"
                             onClick={() => setIsLoginMenuOpen(false)}
-                            className="flex items-center text-gray-700 transition"
-                            style={{ color: '#b81582' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = '#b81582')}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = '#b81582')}
+                            className="flex items-center text-primary hover:opacity-80 transition-opacity lowercase"
                           >
-                            <Package className="mr-2" size={16} /> My Orders
+                            <Package className="mr-2" size={16} /> my orders
                           </Link>
                         </li>
                         <li>
                           <Link
                             to="/addresses"
                             onClick={() => setIsLoginMenuOpen(false)}
-                            className="flex items-center text-gray-700 transition"
-                            style={{ color: '#b81582' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = '#b81582')}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = '#b81582')}
+                            className="flex items-center text-primary hover:opacity-80 transition-opacity lowercase"
                           >
-                            <MapPin className="mr-2" size={16} /> Addresses
+                            <MapPin className="mr-2" size={16} /> addresses
                           </Link>
                         </li>
                         {/* <li>
                       <Link
                         to="/AlwaysOffers"
                         onClick={() => setIsLoginMenuOpen(false)}
-                        className="flex items-center hover:text-pink-600 transition"
+                        className="flex items-center hover:text-primary transition-colors lowercase"
                       >
                         🎁 Offers
                       </Link>
@@ -580,10 +507,10 @@ const Navbar = () => {
                         <li>
                           <button
                             onClick={handleLogout}
-                            className="w-full text-left flex items-center space-x-2 hover:text-red-600 transition text-red-600"
+                            className="w-full text-left flex items-center space-x-2 text-destructive hover:opacity-80 transition-opacity lowercase"
                           >
                             <LogOut size={16} />
-                            <span>Logout</span>
+                            <span>logout</span>
                           </button>
                         </li>
                       </ul>
@@ -595,58 +522,46 @@ const Navbar = () => {
                 <div ref={loginRef} className="relative">
                   <button
                     onClick={() => setIsLoginMenuOpen((s) => !s)}
-                    className="flex items-center space-x-2 text-white px-4 py-1.5 rounded-full font-medium transition"
-                    style={{ backgroundColor: '#b81582' }}
-                    onMouseEnter={(e) => (e.target.style.backgroundColor = '#a01478')}
-                    onMouseLeave={(e) => (e.target.style.backgroundColor = '#b81582')}
+                    className="flex items-center gap-2 border border-primary text-primary px-4 py-1.5 rounded-sm font-medium hover:bg-primary hover:text-white transition-colors lowercase tracking-wide text-xs"
                   >
                     <User size={16} />
-                    <span>Login</span>
+                    <span>login</span>
                   </button>
 
                   {isLoginMenuOpen && (
-                    <div className="absolute right-0 mt-3 w-60 bg-white text-gray-900 rounded-xl shadow-2xl border border-gray-200 z-50 p-5">
-                      <h4 className="text-lg font-bold mb-2 text-gray-900">Welcome</h4>
-                      <p className="text-sm text-gray-600 mb-3">
-                        Access your account and manage orders
+                    <div className="absolute right-0 mt-3 w-60 bg-card text-foreground rounded-sm shadow-md border border-border z-50 p-5">
+                      <h4 className="text-base font-serif lowercase mb-2">welcome</h4>
+                      <p className="text-sm text-muted-foreground mb-3 lowercase">
+                        access your account and manage orders
                       </p>
 
                       <Link
                         to="/login"
                         onClick={() => setIsLoginMenuOpen(false)}
-                        className="block text-center py-2 rounded-lg font-semibold transition mb-3 text-white"
-                        style={{ backgroundColor: '#b81582' }}
-                        onMouseEnter={(e) => (e.target.style.backgroundColor = '#a01478')}
-                        onMouseLeave={(e) => (e.target.style.backgroundColor = '#b81582')}
+                        className="block text-center py-2 rounded-sm font-medium transition-colors mb-3 bg-primary text-white hover:bg-primary/90 lowercase tracking-wide text-xs"
                       >
-                        Login / Signup
+                        login / signup
                       </Link>
 
-                      <hr className="border-gray-200 mb-3" />
+                      <hr className="border-border mb-3" />
 
                       <ul className="space-y-2 text-sm">
                         <li>
                           <Link
                             to="/MyOrder"
                             onClick={() => setIsLoginMenuOpen(false)}
-                            className="text-gray-700 transition"
-                            style={{ color: '#b81582' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = '#b81582')}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = '#b81582')}
+                            className="flex items-center text-primary hover:opacity-80 transition-opacity lowercase"
                           >
-                            <Package className="mr-2" size={16} /> My Orders
+                            <Package className="mr-2" size={16} /> my orders
                           </Link>
                         </li>
                         <li>
                           <Link
                             to="/AlwaysOffers"
                             onClick={() => setIsLoginMenuOpen(false)}
-                            className="text-gray-700 transition"
-                            style={{ color: '#b81582' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = '#b81582')}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = '#b81582')}
+                            className="flex items-center text-primary hover:opacity-80 transition-opacity lowercase"
                           >
-                            <Tag className="mr-2" size={16} /> Offers
+                            <Tag className="mr-2" size={16} /> offers
                           </Link>
                         </li>
                       </ul>
@@ -659,10 +574,7 @@ const Navbar = () => {
             {/* 📱 Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-3xl text-gray-700 transition"
-              style={{ color: '#b81582' }}
-              onMouseEnter={(e) => (e.target.style.color = '#b81582')}
-              onMouseLeave={(e) => (e.target.style.color = 'rgb(55, 65, 81)')}
+              className="md:hidden text-2xl text-foreground hover:text-primary transition-colors"
             >
               {isMobileMenuOpen ? <X /> : <Menu />}
             </button>
@@ -670,109 +582,119 @@ const Navbar = () => {
         </div>
 
         {/* ✅ MOBILE MENU */}
-        {/* ✅ MOBILE MENU OVERLAY & DRAWER */}
+        {/* Mobile Menu Overlay */}
         <div className={`fixed inset-0 z-[60] md:hidden transition-all duration-300 ${isMobileMenuOpen ? 'visible' : 'invisible pointer-events-none'}`}>
           {/* Backdrop */}
           <div
-            className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}`}
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
-          {/* Drawer */}
-          <div className={`absolute top-0 right-0 h-full w-[85%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          {/* Full-width drawer */}
+          <div className={`absolute top-0 right-0 h-full w-[88%] max-w-sm bg-card shadow-lg transform transition-transform duration-300 ease-out flex flex-col border-l border-border ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
 
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-pink-50/50">
-              <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-purple-600">Menu</h2>
+            <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+              <h2 className="text-lg font-serif lowercase tracking-wide">menu</h2>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 rounded-full hover:bg-white hover:shadow-md text-gray-500 hover:text-pink-600 transition-all duration-200"
+                className="p-2 rounded-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
               >
-                <X size={24} />
+                <X size={22} />
               </button>
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto py-4 px-5 space-y-6">
+            <div className="flex-1 overflow-y-auto py-6 px-6 space-y-5">
 
-              {/* Product Links */}
-              <div className="space-y-3">
-                <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-3 rounded-xl bg-gray-50 hover:bg-pink-50 text-gray-700 hover:text-pink-600 transition-all font-medium">
-                  <span className="mr-3 text-lg"><Home size={20} /></span> Home
+              <div className="space-y-1">
+                <Link
+                  to="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center p-3 rounded-sm text-foreground hover:bg-secondary transition-colors font-medium text-sm lowercase tracking-wide"
+                >
+                  <Home size={18} className="mr-3 text-primary" /> home
                 </Link>
 
-                {/* Products Accordion */}
-                <div className="rounded-xl border border-gray-100 overflow-hidden">
+                {/* Collections Accordion */}
+                <div className="rounded-sm border border-border overflow-hidden">
                   <button
                     onClick={() => setIsProductsAccordionOpen(!isProductsAccordionOpen)}
-                    className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-pink-50 text-gray-700 hover:text-pink-600 transition-all font-medium"
+                    className="w-full flex items-center justify-between p-3 bg-secondary text-foreground hover:bg-muted transition-colors font-medium text-sm lowercase tracking-wide"
                   >
                     <div className="flex items-center">
-                      <span className="mr-3 text-lg"><ShoppingBag size={20} /></span> Collections
+                      <ShoppingBag size={18} className="mr-3 text-primary" /> collections
                     </div>
-                    <span className={`transform transition-transform duration-300 ${isProductsAccordionOpen ? 'rotate-180' : ''}`}>
-                      <ChevronDown size={20} />
-                    </span>
+                    <ChevronDown size={18} className={`text-muted-foreground transition-transform duration-300 ${isProductsAccordionOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   <div className={`transition-all duration-300 ease-in-out ${isProductsAccordionOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <div className="bg-white p-2 space-y-2">
-                      <Link to="/products/kurti" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-all text-sm ml-2">
-                        <span className="mr-2"><GiAmpleDress size={18} /></span> Stylish Kurtis
-                      </Link>
-                      <Link to="/products/suit" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-all text-sm ml-2">
-                        <span className="mr-2"><GiKimono size={18} /></span> Designer Suits
-                      </Link>
-                      <Link to="/products/coat" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-all text-sm ml-2">
-                        <span className="mr-2"><GiLabCoat size={18} /></span> Elegant Coat Sets
-                      </Link>
-                      <Link to="/products/EthnicWear" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-all text-sm ml-2">
-                        <span className="mr-2"><GiPoncho size={18} /></span> Winter Ethnic Wear
-                      </Link>
-                      <Link to="/products/wedding" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-all text-sm ml-2">
-                        <span className="mr-2"><GiDiamondRing size={18} /></span> Wedding Collection
-                      </Link>
+                    <div className="bg-card p-2 space-y-1">
+                      {[
+                        { name: 'stylish kurtis', path: '/products/kurti' },
+                        { name: 'designer suits', path: '/products/suit' },
+                        { name: 'elegant coat sets', path: '/products/coat' },
+                        { name: 'winter ethnic wear', path: '/products/EthnicWear' },
+                        { name: 'wedding collection', path: '/products/wedding' },
+                      ].map(item => (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center p-2.5 rounded-sm hover:bg-secondary text-muted-foreground hover:text-primary transition-colors text-sm lowercase tracking-wide ml-2"
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 </div>
 
-                <Link to="/TermsPage" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-3 rounded-xl bg-gray-50 hover:bg-pink-50 text-gray-700 hover:text-pink-600 transition-all font-medium">
-                  <span className="mr-3 text-lg"><FileText size={20} /></span> Terms & Conditions
+                <Link
+                  to="/TermsPage"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center p-3 rounded-sm text-foreground hover:bg-secondary transition-colors font-medium text-sm lowercase tracking-wide"
+                >
+                  <FileText size={18} className="mr-3 text-primary" /> terms & conditions
                 </Link>
-                <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-3 rounded-xl bg-gray-50 hover:bg-pink-50 text-gray-700 hover:text-pink-600 transition-all font-medium">
-                  <span className="mr-3 text-lg"><Phone size={20} /></span> Contact Us
+                <Link
+                  to="/contact"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center p-3 rounded-sm text-foreground hover:bg-secondary transition-colors font-medium text-sm lowercase tracking-wide"
+                >
+                  <Phone size={18} className="mr-3 text-primary" /> contact us
                 </Link>
               </div>
             </div>
 
             {/* Footer / Auth Section */}
-            <div className="p-5 border-t border-gray-100 bg-gray-50 z-20">
+            <div className="px-6 py-5 border-t border-border bg-secondary z-20">
               {isAuthenticated ? (
                 <div className="space-y-3">
                   {/* User Info */}
-                  <div className="flex items-center space-x-3 mb-2">
-                    <div className="h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 shadow-sm border border-pink-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center text-primary">
                       <User size={20} />
                     </div>
                     <div>
-                      <p className="font-bold text-gray-900 leading-tight">{user?.name || 'Welcome'}</p>
-                      <p className="text-xs text-gray-500">{user?.phoneNumber}</p>
+                      <p className="font-medium text-foreground text-sm">{user?.name || 'welcome'}</p>
+                      <p className="text-xs text-muted-foreground">{user?.phoneNumber}</p>
                     </div>
                   </div>
 
                   {/* Action Grid */}
                   <div className="grid grid-cols-3 gap-2">
-                    <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center justify-center p-2 bg-white border border-gray-200 rounded-lg hover:border-pink-300 hover:shadow-sm transition text-center group">
-                      <span className="text-lg mb-1 group-hover:scale-110 transition-transform"><ShoppingCart size={20} /></span>
-                      <span className="text-[10px] font-semibold text-gray-700">Cart ({cartCount})</span>
+                    <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center justify-center p-2.5 bg-card border border-border rounded-sm text-center group hover:border-primary/50 transition-colors">
+                      <ShoppingCart size={18} className="mb-1 text-primary" />
+                      <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-medium">cart ({cartCount})</span>
                     </Link>
-                    <Link to="/MyOrder" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center justify-center p-2 bg-white border border-gray-200 rounded-lg hover:border-pink-300 hover:shadow-sm transition text-center group">
-                      <span className="text-lg mb-1 group-hover:scale-110 transition-transform"><Package size={20} /></span>
-                      <span className="text-[10px] font-semibold text-gray-700">Orders</span>
+                    <Link to="/MyOrder" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center justify-center p-2.5 bg-card border border-border rounded-sm text-center group hover:border-primary/50 transition-colors">
+                      <Package size={18} className="mb-1 text-primary" />
+                      <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-medium">orders</span>
                     </Link>
-                    <Link to="/addresses" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center justify-center p-2 bg-white border border-gray-200 rounded-lg hover:border-pink-300 hover:shadow-sm transition text-center group">
-                      <span className="text-lg mb-1 group-hover:scale-110 transition-transform"><MapPin size={20} /></span>
-                      <span className="text-[10px] font-semibold text-gray-700">Address</span>
+                    <Link to="/addresses" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center justify-center p-2.5 bg-card border border-border rounded-sm text-center group hover:border-primary/50 transition-colors">
+                      <MapPin size={18} className="mb-1 text-primary" />
+                      <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-medium">address</span>
                     </Link>
                   </div>
 
@@ -781,38 +703,36 @@ const Navbar = () => {
                       handleLogout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full py-2 flex items-center justify-center space-x-2 text-red-500 font-medium hover:bg-red-50 rounded-lg transition text-sm"
+                    className="w-full py-2 flex items-center justify-center gap-2 text-destructive font-medium hover:bg-red-50 rounded-sm transition text-sm lowercase"
                   >
                     <LogOut size={14} />
-                    <span>Log Out</span>
+                    <span>logout</span>
                   </button>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {/* Cart Link for Guest */}
                   <Link
                     to="/cart"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl shadow-sm"
+                    className="flex items-center justify-between p-3 bg-card border border-border rounded-sm"
                   >
-                    <div className="flex items-center text-gray-700">
-                      <span className="mr-3 text-xl"><ShoppingCart size={24} /></span>
-                      <span className="font-medium">My Cart</span>
+                    <div className="flex items-center text-foreground text-sm font-medium">
+                      <ShoppingCart size={18} className="mr-3 text-primary" />
+                      <span className="lowercase tracking-wide">my cart</span>
                     </div>
-                    {cartCount > 0 && <span className="bg-pink-100 text-pink-600 text-xs font-bold px-2 py-0.5 rounded-full">{cartCount}</span>}
+                    {cartCount > 0 && (
+                      <span className="bg-primary text-white text-[10px] font-medium px-2 py-0.5 rounded-sm">{cartCount}</span>
+                    )}
                   </Link>
 
-                  <div className="space-y-2">
-                    <p className="text-xs text-gray-400 text-center">Login to manage orders & checkout faster</p>
-                    <Link
-                      to="/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block w-full py-3 text-center rounded-xl font-bold text-white shadow-lg shadow-pink-200 transition transform hover:scale-[1.02]"
-                      style={{ backgroundColor: '#b81582' }}
-                    >
-                      Login / Signup
-                    </Link>
-                  </div>
+                  <p className="text-xs text-muted-foreground text-center lowercase tracking-wide">login to manage orders & checkout faster</p>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block w-full py-3 text-center rounded-sm bg-primary text-white text-sm font-medium tracking-wide lowercase hover:bg-primary/90 transition-colors"
+                  >
+                    login / signup
+                  </Link>
                 </div>
               )}
             </div>
