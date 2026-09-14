@@ -1,8 +1,8 @@
 # Tererang on Cloud Run
 
-Project: `tererang`. Region: `asia-south1`. Service: `tererang`.
+Project: `tererang`. Cloud Run region: `asia-southeast1`. Artifact Registry region: `asia-south1`. Service: `tererang`.
 
-Live URL: https://tererang-213428076034.asia-south1.run.app
+Live URL: https://tererang-213428076034.asia-southeast1.run.app
 
 The initial release uses Razorpay **test** keys. Do not accept real online
 payments until live keys are configured in a new backend secret version and
@@ -43,7 +43,7 @@ When changing frontend `.env`, add `--no-cache` to its build, because BuildKit
 secret changes alone do not invalidate cached build layers.
 
 Apply the manifest with `gcloud run services replace MANIFEST --project=tererang
---region=asia-south1`. Backend `.env` edits do not update Cloud Run automatically:
+--region=asia-southeast1`. Backend `.env` edits do not update Cloud Run automatically:
 create a new Secret Manager version from the reviewed production configuration,
 update its version in the manifest, and deploy a new revision. Preserve the
 production JWT secret unless intentionally invalidating existing sessions.
@@ -56,3 +56,17 @@ or migrate its data. Configure backups and network access at the database host.
 Admin credentials are stored separately in `tererang-admin-login`. The runtime
 service account is not granted access to that secret. Authorized project admins
 can retrieve it through Secret Manager; never include its value in logs or Git.
+
+## GitHub Actions releases
+
+Push a new `v*` tag containing the workflow changes to deploy. Ordinary branch
+pushes do not trigger this workflow. Re-running an old tag uses its old workflow.
+The workflow builds both images in the Mumbai registry and deploys their digests
+to the existing public Singapore service. These locations are intentionally
+different. The Mumbai Cloud Run service is private and is not the deployment target.
+
+The frontend Secret Manager file is passed using `secret-files`; `secrets` would
+pass the filename as the literal value. The frontend build stage skips cached
+layers so updated environment values are included. Generated Google authentication
+files are excluded from Docker contexts. Verification checks both the public
+frontend and the proxied backend health endpoint.

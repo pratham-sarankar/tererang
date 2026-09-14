@@ -17,7 +17,8 @@ on:
 env:
   PROJECT_ID: tererang
   REGION: asia-southeast1
-  REGISTRY: asia-southeast1-docker.pkg.dev
+  # Artifact Registry is in Mumbai; Cloud Run is in Singapore.
+  REGISTRY: asia-south1-docker.pkg.dev
   REPO: tererang/tererang
   SERVICE: tererang
   # Name of the secret in Secret Manager containing frontend production .env
@@ -46,6 +47,9 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
       # ── 4. Fetch frontend environment from Secret Manager ────────────────────
       - name: Fetch frontend environment secret
         id: fetch-env
@@ -72,8 +76,10 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.REPO }}/frontend:${{ steps.tag.outputs.value }}
-          secrets: |
+          secret-files: |
             frontend_env=${{ steps.fetch-env.outputs.secret_path }}
+          # Secret contents do not invalidate Docker build cache.
+          no-cache-filters: build
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPO }}/frontend:cache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPO }}/frontend:cache,mode=max
 
@@ -122,5 +128,6 @@ jobs:
             --region=${{ env.REGION }} \
             --format='value(status.url)')
           echo "Service URL: ${URL}"
-          curl --fail --silent --max-time 20 "${URL}" > /dev/null
+          curl --fail --show-error --silent --retry 3 --max-time 30 "${URL}" > /dev/null
+          curl --fail --show-error --silent --retry 3 --max-time 30 "${URL}/backend/api/health" > /dev/null
           echo "✅ Deployment of ${{ steps.tag.outputs.value }} is live at ${URL}"
