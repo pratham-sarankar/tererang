@@ -126,7 +126,7 @@ const Home = () => {
         <div className="home-container home-tailoring-grid">
           <img className="home-tailoring-image" src={tailoringImage} alt="Tererang traditional silhouettes and embroidery" loading="lazy" />
           <div className="home-tailoring-copy"><p className="home-eyebrow">Bespoke services</p>
-            <h2 id="tailoring-title">personal styling <em>&</em> custom tailoring</h2><div className="home-gold-rule" />
+            <h2 id="tailoring-title">personal styling <em>&</em> custom tailoring</h2><div className="home-magenta-rule" />
             <p className="home-tailoring-description">Tererang pieces are shaped around your rhythm: complimentary size guidance, length adjustments, and direct designer consultation for outfits that fit beautifully.</p>
             <div className="home-actions"><a className="home-button" href="https://wa.me/919548971147" target="_blank" rel="noopener noreferrer"><MessageCircle size={16} />Chat with designer</a><Link className="home-button home-button-outline" to="/shop">Explore catalog</Link></div>
           </div>

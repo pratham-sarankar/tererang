@@ -5,11 +5,11 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-bottom: 1px solid #f0e6d2;
-  background: #faf5ec;
+  border-bottom: 1px solid #f0d6e6;
+  background: #fcebf4;
   padding-top: 8px;
   padding-bottom: 8px;
-  color: #1c1917;
+  color: #291a23;
   font-family: ui-sans-serif, system-ui, sans-serif;
   font-size: 10px;
   font-weight: 400;
@@ -20,26 +20,26 @@
 }
 
 .storefront-header {
-  --foreground: #1c1917;
-  --accent: #a59578;
-  background: rgb(253 251 247 / 80%);
-  border-bottom: 1px solid rgb(250 245 236 / 60%);
+  --foreground: #291a23;
+  --accent: #b50583;
+  background: rgb(253 250 252 / 80%);
+  border-bottom: 1px solid rgb(252 235 244 / 60%);
   box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
 }
 
 .storefront-nav {
-  border-color: rgb(250 245 236 / 60%);
+  border-color: rgb(252 235 244 / 60%);
 }
 
 .storefront-popup {
-  background: rgb(253 251 247 / 95%);
-  border: 1px solid rgb(250 245 236 / 60%);
+  background: rgb(253 250 252 / 95%);
+  border: 1px solid rgb(252 235 244 / 60%);
   box-shadow: 0 4px 12px rgb(0 0 0 / 6%);
   backdrop-filter: blur(8px);
 }
 
 .storefront-header :is(a, button):focus-visible {
-  outline: 2px solid #a59578;
+  outline: 2px solid #b50583;
   outline-offset: 4px;
 }
 
