@@ -5,47 +5,48 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-bottom: 1px solid #f0d6e6;
-  background: #fcebf4;
+  border-bottom: 1px solid #ebd3e0;
+  background: #f8ebf2;
   padding-top: 8px;
   padding-bottom: 8px;
-  color: #291a23;
+  color: #291421;
   font-family: ui-sans-serif, system-ui, sans-serif;
   font-size: 10px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 15px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-align: center;
   text-transform: uppercase;
 }
 
 .storefront-header {
-  --foreground: #291a23;
-  --accent: #b50583;
-  background: rgb(253 250 252 / 80%);
-  border-bottom: 1px solid rgb(252 235 244 / 60%);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+  --foreground: #291421;
+  --accent: #8b2658;
+  background: rgb(252 246 249 / 85%);
+  border-bottom: 1px solid rgb(248 235 242 / 70%);
+  box-shadow: 0 1px 3px rgb(41 20 33 / 4%);
+  backdrop-filter: blur(12px);
 }
 
 .storefront-nav {
-  border-color: rgb(252 235 244 / 60%);
+  border-color: rgb(248 235 242 / 70%);
 }
 
 .storefront-popup {
-  background: rgb(253 250 252 / 95%);
-  border: 1px solid rgb(252 235 244 / 60%);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 6%);
-  backdrop-filter: blur(8px);
+  background: rgb(252 246 249 / 96%);
+  border: 1px solid rgb(235 211 224 / 70%);
+  box-shadow: 0 10px 25px -5px rgb(41 20 33 / 8%);
+  backdrop-filter: blur(12px);
 }
 
 .storefront-header :is(a, button):focus-visible {
-  outline: 2px solid #b50583;
+  outline: 2px solid #8b2658;
   outline-offset: 4px;
 }
 
 @media (min-width: 640px) {
   .storefront-announcement {
-    font-size: 12px;
+    font-size: 11px;
     line-height: 19px;
   }
 }
