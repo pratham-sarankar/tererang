@@ -16,8 +16,8 @@ on:
 
 env:
   PROJECT_ID: tererang
-  REGION: asia-south1
-  REGISTRY: asia-south1-docker.pkg.dev
+  REGION: asia-southeast1
+  REGISTRY: asia-southeast1-docker.pkg.dev
   REPO: tererang/tererang
   SERVICE: tererang
   # Name of the secret in Secret Manager containing frontend production .env
