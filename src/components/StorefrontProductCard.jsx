@@ -1,7 +1,17 @@
 import { Eye, ShoppingBag } from "lucide-react";
 import ProductImage from "./ProductImage.jsx";
 
-const StorefrontProductCard = ({ product, onSelect = () => {}, badge = "Bestseller" }) => (
+const StorefrontProductCard = ({ product, onSelect = () => {}, badge = "Bestseller", variant }) => variant === "home" ? (
+  <article className="home-product-card">
+    <button className="home-product-image" type="button" onClick={() => onSelect(product)} aria-label={`View ${product.title}`}>
+      <ProductImage src={product.image} alt={product.title} loading="lazy" />
+      <span className="home-product-badge">{product.discount > 0 ? `${product.discount}% off` : badge}</span>
+    </button>
+    <p className="home-product-category">{typeof product.raw?.category === "string" ? product.raw.category.replace(/([a-z])([A-Z])/g, "$1 $2") : product.brand}</p>
+    <h3><button type="button" onClick={() => onSelect(product)}>{product.title}</button></h3>
+    <div className="home-product-price">{product.displayPrice}{product.displayOldPrice ? <del>{product.displayOldPrice}</del> : null}</div>
+  </article>
+) : (
   <article className="group flex h-full flex-col overflow-hidden border border-border bg-card">
     <button
       type="button"

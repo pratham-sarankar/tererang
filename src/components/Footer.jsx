@@ -1,7 +1,35 @@
+import { useEffect, useRef } from "react";
 import { Instagram, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export const Footer = () => (
+const footerGroups = [
+  { title: "Collections", links: [["Stylish Kurtis", "/products/Kurti"], ["Designer Suits", "/products/Suit"], ["Wedding Collection", "/products/wedding"], ["Winter Ethnic Wear", "/products/EthnicWear"], ["Elegant Coat Sets", "/products/Coat"]] },
+  { title: "The studio", links: [["My Orders", "/MyOrder"], ["Shipping & Returns", "/Shipping"], ["Terms & Conditions", "/TermsPage"], ["Privacy Policy", "/privacy-policy"], ["FAQ", "/FaqPage"]] },
+];
+const keepDesktopGroupOpen = (event) => {
+  if (window.matchMedia("(min-width: 640px)").matches) event.preventDefault();
+};
+
+const HomeFooter = () => {
+  const footerRef = useRef(null);
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 640px)");
+    const expandDesktop = () => {
+      if (desktop.matches) footerRef.current?.querySelectorAll("details").forEach(group => { group.open = true; });
+    };
+    desktop.addEventListener("change", expandDesktop);
+    return () => desktop.removeEventListener("change", expandDesktop);
+  }, []);
+  return <footer className="home-footer" ref={footerRef}>
+  <div className="home-container home-footer-grid">
+    <div className="home-footer-brand"><Link to="/">tererang</Link><p>Curated with love. Crafted with purpose. Designed to become part of your story.</p><div className="home-footer-socials"><a href="https://www.instagram.com/tererang.official/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Instagram size={17} /></a><a href="https://wa.me/919548971147" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><MessageCircle size={17} /></a></div></div>
+    {footerGroups.map(group => <details className="home-footer-group" key={group.title} open><summary onClick={keepDesktopGroupOpen}>{group.title}</summary><ul>{group.links.map(([label, to]) => <li key={to}><Link to={to}>{label}</Link></li>)}</ul></details>)}
+    <details className="home-footer-group" open><summary onClick={keepDesktopGroupOpen}>Boutique support</summary><div className="home-footer-contact"><a href="mailto:tererangofficial@gmail.com">tererangofficial@gmail.com</a><a href="tel:+919548971147">+91 9548971147</a><p>Moradabad, Uttar Pradesh, India</p><a href="https://wa.me/919548971147" target="_blank" rel="noopener noreferrer">Chat with designer ↗</a></div></details>
+  </div><div className="home-footer-copyright">© 2026 Tererang. All rights reserved.</div>
+</footer>;
+};
+
+export const Footer = ({ variant } = {}) => variant === "home" ? <HomeFooter /> : (
   <footer className="border-t border-border bg-secondary text-foreground">
     <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-16 md:grid-cols-[1.25fr_0.75fr_0.75fr_1fr] lg:px-10">
       <div>

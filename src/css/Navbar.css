@@ -12,7 +12,7 @@
   color: #1c1917;
   font-family: ui-sans-serif, system-ui, sans-serif;
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 15px;
   letter-spacing: 0.1em;
   text-align: center;
@@ -29,6 +29,13 @@
 
 .storefront-nav {
   border-color: rgb(250 245 236 / 60%);
+}
+
+.storefront-popup {
+  background: rgb(253 251 247 / 95%);
+  border: 1px solid rgb(250 245 236 / 60%);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 6%);
+  backdrop-filter: blur(8px);
 }
 
 .storefront-header :is(a, button):focus-visible {

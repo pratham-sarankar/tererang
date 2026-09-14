@@ -22,6 +22,7 @@ import { notifyCartAuthChange } from "../context/cartEvents.js";
 import { apiUrl, imageUrl } from "../config/env.js";
 import ProductImage from "./ProductImage.jsx";
 import "../css/Navbar.css";
+import logo from "../assets/logo.png";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -170,7 +171,7 @@ const Navbar = () => {
   ];
 
   const cartPanel = (
-    <div className="absolute right-0 z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] border border-border bg-card p-5 text-foreground shadow-[0_24px_70px_rgba(45,41,36,0.13)]">
+    <div className="storefront-popup absolute right-0 z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] p-5 text-foreground">
       <div className="mb-3 flex items-center justify-between">
         <div>
           <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground">My cart</p>
@@ -262,10 +263,8 @@ const Navbar = () => {
               </button>
             </div>
 
-            <Link to="/" className="storefront-wordmark absolute left-1/2 z-10 flex -translate-x-1/2 items-baseline gap-1 whitespace-nowrap text-center font-serif text-[15px] font-semibold lowercase tracking-wider text-foreground md:gap-2 md:text-3xl md:tracking-widest">
-              tere
-              <span className="font-serif font-normal italic tracking-normal text-accent">&amp;</span>
-              rang
+            <Link to="/" className="absolute left-1/2 z-10 -translate-x-1/2">
+              <img src={logo} alt="Tererang" className="h-10 w-auto md:h-16" />
             </Link>
 
             <div className="relative z-20 flex items-center gap-2.5 md:gap-5">
@@ -278,42 +277,40 @@ const Navbar = () => {
                   <User className="h-5 w-5 stroke-2" />
                 </button>
 
-                {isLoginMenuOpen ? (
-                  <div className="absolute right-0 z-50 mt-4 w-64 border border-border bg-card p-5 text-foreground shadow-[0_24px_70px_rgba(45,41,36,0.13)]">
-                    {isAuthenticated ? (
-                      <>
-                        <div className="mb-3 flex items-center gap-2">
-                          <User className="h-5 w-5 text-primary" />
-                          <div>
-                            <h4 className="font-serif text-xl lowercase text-foreground">{user?.name || "welcome"}</h4>
-                            <p className="text-sm text-muted-foreground">{user?.phoneNumber}</p>
-                          </div>
+                <div className={`storefront-popup absolute right-0 z-50 mt-4 w-64 border border-border bg-card p-5 text-foreground transition-all duration-200 ${isLoginMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                  {isAuthenticated ? (
+                    <>
+                      <div className="mb-3 flex items-center gap-2">
+                        <User className="h-5 w-5 text-primary" />
+                        <div>
+                          <h4 className="font-serif text-xl lowercase text-foreground">{user?.name || "welcome"}</h4>
+                          <p className="text-sm text-muted-foreground">{user?.phoneNumber}</p>
                         </div>
-                        <hr className="mb-3 border-border" />
-                        <ul className="space-y-3 text-sm">
-                          <li><Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-primary transition hover:opacity-80"><Package className="mr-2 h-4 w-4" /> My orders</Link></li>
-                          <li><Link to="/addresses" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-primary transition hover:opacity-80"><MapPin className="mr-2 h-4 w-4" /> Addresses</Link></li>
-                          <li>
-                            <button onClick={handleLogout} className="flex w-full items-center text-left text-destructive transition hover:opacity-80" type="button">
-                              <LogOut className="mr-2 h-4 w-4" /> Logout
-                            </button>
-                          </li>
-                        </ul>
-                      </>
-                    ) : (
-                      <>
-                        <h4 className="mb-2 font-serif text-xl lowercase">welcome</h4>
-                        <p className="mb-4 text-sm text-muted-foreground">Access your account and manage orders.</p>
-                        <Link to="/login" onClick={() => setIsLoginMenuOpen(false)} className="block bg-primary py-2 text-center text-xs font-semibold tracking-[0.12em] text-white transition hover:bg-primary/90">
-                          Login / signup
-                        </Link>
-                        <hr className="my-4 border-border" />
-                        <Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="mb-3 flex items-center text-sm text-primary transition hover:opacity-80"><Package className="mr-2 h-4 w-4" /> My orders</Link>
-                        <Link to="/AlwaysOffers" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-sm text-primary transition hover:opacity-80"><Gift className="mr-2 h-4 w-4" /> Offers</Link>
-                      </>
-                    )}
-                  </div>
-                ) : null}
+                      </div>
+                      <hr className="mb-3 border-border" />
+                      <ul className="space-y-3 text-sm">
+                        <li><Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-primary transition hover:opacity-80"><Package className="mr-2 h-4 w-4" /> My orders</Link></li>
+                        <li><Link to="/addresses" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-primary transition hover:opacity-80"><MapPin className="mr-2 h-4 w-4" /> Addresses</Link></li>
+                        <li>
+                          <button onClick={handleLogout} className="flex w-full items-center text-left text-destructive transition hover:opacity-80" type="button">
+                            <LogOut className="mr-2 h-4 w-4" /> Logout
+                          </button>
+                        </li>
+                      </ul>
+                    </>
+                  ) : (
+                    <>
+                      <h4 className="mb-2 font-serif text-xl lowercase">welcome</h4>
+                      <p className="mb-4 text-sm text-muted-foreground">Access your account and manage orders.</p>
+                      <Link to="/login" onClick={() => setIsLoginMenuOpen(false)} className="block bg-primary py-2 text-center text-xs font-semibold tracking-[0.12em] text-white transition hover:bg-primary/90">
+                        Login / signup
+                      </Link>
+                      <hr className="my-4 border-border" />
+                      <Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="mb-3 flex items-center text-sm text-primary transition hover:opacity-80"><Package className="mr-2 h-4 w-4" /> My orders</Link>
+                      <Link to="/AlwaysOffers" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-sm text-primary transition hover:opacity-80"><Gift className="mr-2 h-4 w-4" /> Offers</Link>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="relative" ref={cartRef}>
@@ -339,25 +336,23 @@ const Navbar = () => {
               Shop
               <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
             </Link>
-            <div ref={dropdownRef} className="relative">
-              <button type="button" aria-expanded={isDropdownOpen} aria-controls="navbar-collections" onClick={() => setIsDropdownOpen((s) => !s)} className={`${linkTone} inline-flex items-center gap-1 ${location.pathname.startsWith("/products") ? "text-accent" : ""}`}>
+            <div ref={dropdownRef} className="relative" onMouseEnter={() => setIsDropdownOpen(true)} onMouseLeave={() => setIsDropdownOpen(false)}>
+              <button type="button" aria-expanded={isDropdownOpen} aria-controls="navbar-collections" className={`${linkTone} inline-flex items-center gap-1 ${location.pathname.startsWith("/products") ? "text-accent" : ""}`}>
                 Collections
                 <ChevronDown className={`h-3.5 w-3.5 text-accent transition ${isDropdownOpen ? "rotate-180" : ""}`} />
                 <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
               </button>
 
-              {isDropdownOpen ? (
-                <div id="navbar-collections" className="storefront-collections absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 rounded-md border border-border bg-card shadow-[0_18px_50px_rgba(45,41,36,0.12)]">
-                  <div className="py-2">
-                    {productMenu.map((item) => (
-                      <Link key={item.name} to={item.to} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground transition hover:bg-secondary/70 hover:text-primary">
-                        <span className="flex h-8 w-8 items-center justify-center border border-border bg-secondary text-primary">{item.icon}</span>
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
+              <div id="navbar-collections" className={`storefront-popup storefront-collections absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 transition-all duration-200 ${isDropdownOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                <div className="py-2">
+                  {productMenu.map((item) => (
+                    <Link key={item.name} to={item.to} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground transition hover:bg-secondary/70 hover:text-primary">
+                      <span className="flex h-8 w-8 items-center justify-center border border-border bg-secondary text-primary">{item.icon}</span>
+                      {item.name}
+                    </Link>
+                  ))}
                 </div>
-              ) : null}
+              </div>
             </div>
             <Link to="/products/wedding" className={`${linkTone} ${isActive("/products/wedding") ? "text-accent" : ""}`}>
               Bestsellers
@@ -385,7 +380,7 @@ const Navbar = () => {
 
         <aside className={`absolute left-0 top-0 flex h-full w-[88%] max-w-sm transform flex-col border-r border-border bg-card shadow-[0_24px_70px_rgba(45,41,36,0.18)] transition-transform duration-300 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
           <div className="flex items-center justify-between border-b border-border px-6 py-5">
-            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="font-serif text-3xl lowercase tracking-[0.14em]">tererang</Link>
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}><img src={logo} alt="Tererang" className="h-10 w-auto" /></Link>
             <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-muted-foreground transition hover:bg-secondary hover:text-foreground" aria-label="Close menu">
               <X className="h-5 w-5" />
             </button>
