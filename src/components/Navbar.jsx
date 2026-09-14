@@ -21,6 +21,7 @@ import { useCart } from "../context/cartContextStore.js";
 import { notifyCartAuthChange } from "../context/cartEvents.js";
 import { apiUrl, imageUrl } from "../config/env.js";
 import ProductImage from "./ProductImage.jsx";
+import "../css/Navbar.css";
 
 const currencyFormatter = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -41,7 +42,7 @@ const resolveProductImage = (product) => {
   return imageUrl(candidate);
 };
 
-const linkTone = "group relative py-1 text-[11px] font-bold uppercase tracking-[0.28em] text-foreground transition hover:text-accent";
+const linkTone = "group relative py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-foreground transition hover:text-accent";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -169,7 +170,7 @@ const Navbar = () => {
   ];
 
   const cartPanel = (
-    <div className="absolute right-0 z-50 mt-4 w-80 border border-border bg-card p-5 text-foreground shadow-[0_24px_70px_rgba(45,41,36,0.13)]">
+    <div className="absolute right-0 z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] border border-border bg-card p-5 text-foreground shadow-[0_24px_70px_rgba(45,41,36,0.13)]">
       <div className="mb-3 flex items-center justify-between">
         <div>
           <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground">My cart</p>
@@ -248,33 +249,33 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="sticky top-0 z-50 flex min-h-9 items-center justify-center border-b border-[#f0e6d2] bg-[#faf5ec] px-4 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-foreground sm:text-xs">
+      <div className="storefront-announcement">
         {announcementText}
       </div>
 
-      <header className="sticky top-9 z-50 border-b border-[#f0e6d2] bg-[#fbf8f2]/88 text-foreground shadow-[0_3px_16px_rgba(45,41,36,0.04)] backdrop-blur-md">
-        <div className="mx-auto max-w-[1720px] px-4 sm:px-8 lg:px-16">
-          <div className="relative flex h-[104px] items-center justify-between">
+      <header className="storefront-header sticky top-0 z-50 text-foreground backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative flex h-[72px] items-center justify-between">
             <div className="relative z-20 flex w-24 items-center md:w-32">
               <button type="button" onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-foreground transition hover:text-accent md:hidden" aria-label="Open menu">
                 <Menu className="h-5 w-5" />
               </button>
             </div>
 
-            <Link to="/" className="absolute left-1/2 z-10 flex -translate-x-1/2 items-baseline gap-2 whitespace-nowrap text-center font-serif text-[34px] font-bold lowercase tracking-[0.14em] text-foreground sm:text-[48px]">
+            <Link to="/" className="storefront-wordmark absolute left-1/2 z-10 flex -translate-x-1/2 items-baseline gap-1 whitespace-nowrap text-center font-serif text-[15px] font-semibold lowercase tracking-wider text-foreground md:gap-2 md:text-3xl md:tracking-widest">
               tere
-              <span className="font-serif text-[0.8em] font-medium italic tracking-normal text-accent">&amp;</span>
+              <span className="font-serif font-normal italic tracking-normal text-accent">&amp;</span>
               rang
             </Link>
 
-            <div className="relative z-20 flex items-center gap-4 sm:gap-7">
+            <div className="relative z-20 flex items-center gap-2.5 md:gap-5">
               <Link to="/shop" className="p-1 text-foreground transition hover:text-accent" aria-label="Search collections">
-                <Search className="h-6 w-6 stroke-[2.25]" />
+                <Search className="h-5 w-5 stroke-2" />
               </Link>
 
               <div className="relative hidden md:block" ref={loginRef}>
                 <button type="button" onClick={() => setIsLoginMenuOpen((s) => !s)} className="p-1 text-foreground transition hover:text-accent" aria-label={isAuthenticated ? "Account menu" : "Login"}>
-                  <User className="h-6 w-6 stroke-[2.25]" />
+                  <User className="h-5 w-5 stroke-2" />
                 </button>
 
                 {isLoginMenuOpen ? (
@@ -317,7 +318,7 @@ const Navbar = () => {
 
               <div className="relative" ref={cartRef}>
                 <button type="button" onClick={() => setIsCartOpen((prev) => !prev)} className="relative p-1 text-foreground transition hover:text-accent" aria-label="Cart">
-                  <ShoppingBag className="h-6 w-6 stroke-[2.25]" />
+                  <ShoppingBag className="h-5 w-5 stroke-2" />
                   {cartCount > 0 ? (
                     <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
                       {cartBadge}
@@ -329,7 +330,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          <nav className="hidden items-center justify-center gap-16 border-t border-[#f6efe3] py-7 md:flex">
+          <nav className="storefront-nav hidden items-center justify-center gap-10 border-t py-3.5 md:flex">
             <Link to="/" className={`${linkTone} ${isActive("/") ? "text-accent" : ""}`}>
               Home
               <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
@@ -338,15 +339,15 @@ const Navbar = () => {
               Shop
               <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
             </Link>
-            <div ref={dropdownRef} className="relative" onMouseEnter={() => setIsDropdownOpen(true)} onMouseLeave={() => setIsDropdownOpen(false)}>
-              <button type="button" onClick={() => setIsDropdownOpen((s) => !s)} className={`${linkTone} inline-flex items-center gap-1 ${location.pathname.startsWith("/products") ? "text-accent" : ""}`}>
+            <div ref={dropdownRef} className="relative">
+              <button type="button" aria-expanded={isDropdownOpen} aria-controls="navbar-collections" onClick={() => setIsDropdownOpen((s) => !s)} className={`${linkTone} inline-flex items-center gap-1 ${location.pathname.startsWith("/products") ? "text-accent" : ""}`}>
                 Collections
                 <ChevronDown className={`h-3.5 w-3.5 text-accent transition ${isDropdownOpen ? "rotate-180" : ""}`} />
                 <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
               </button>
 
               {isDropdownOpen ? (
-                <div className="absolute left-1/2 top-full z-50 mt-3 w-64 -translate-x-1/2 border border-border bg-card shadow-[0_18px_50px_rgba(45,41,36,0.12)]">
+                <div id="navbar-collections" className="storefront-collections absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 rounded-md border border-border bg-card shadow-[0_18px_50px_rgba(45,41,36,0.12)]">
                   <div className="py-2">
                     {productMenu.map((item) => (
                       <Link key={item.name} to={item.to} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground transition hover:bg-secondary/70 hover:text-primary">

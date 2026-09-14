@@ -1,1 +1,40 @@
-/* Navbar styling is handled inline with the shared storefront Tailwind system. */
+.storefront-announcement {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid #f0e6d2;
+  background: #faf5ec;
+  color: #1c1917;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 19px;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.storefront-header {
+  --foreground: #1c1917;
+  --accent: #a59578;
+  background: rgb(253 251 247 / 80%);
+  border-bottom: 1px solid rgb(250 245 236 / 60%);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+}
+
+.storefront-nav {
+  border-color: rgb(250 245 236 / 60%);
+}
+
+.storefront-header :is(a, button):focus-visible {
+  outline: 2px solid #a59578;
+  outline-offset: 4px;
+}
+
+@media (max-width: 767px) {
+  .storefront-announcement {
+    font-size: 9px;
+    line-height: 15px;
+  }
+}
