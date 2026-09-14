@@ -5,5 +5,6 @@ dist/
 .DS_Store
 .vscode/*.env.local
 backend/.env
+**/serviceAccountKey.json
 
 redesign-preview.html

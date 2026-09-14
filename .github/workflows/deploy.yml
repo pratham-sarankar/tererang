@@ -1,0 +1,126 @@
+# Deploys the frontend + backend to Cloud Run whenever a version tag is pushed.
+# Trigger: git tag v* (e.g. v1.0.0, v2.3.1)
+#
+# Required GitHub repository secrets:
+#   GCP_SERVICE_ACCOUNT_KEY  – JSON key for a deployer SA with these roles:
+#                               Artifact Registry Writer, Cloud Run Admin,
+#                               Service Account User (on tererang-run SA),
+#                               Secret Manager Secret Accessor (to read secrets for build)
+
+name: Deploy to Cloud Run
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  PROJECT_ID: tererang
+  REGION: asia-south1
+  REGISTRY: asia-south1-docker.pkg.dev
+  REPO: tererang/tererang
+  SERVICE: tererang
+  # Name of the secret in Secret Manager containing frontend production .env
+  FRONTEND_ENV_SECRET: tererang-frontend-env
+
+jobs:
+  deploy:
+    name: Build → Push → Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Resolve the release tag ───────────────────────────────────────────
+      - name: Set release tag
+        id: tag
+        run: echo "value=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      # ── 3. Authenticate to Google Cloud ──────────────────────────────────────
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      # ── 4. Fetch frontend environment from Secret Manager ────────────────────
+      - name: Fetch frontend environment secret
+        id: fetch-env
+        run: |
+          gcloud secrets versions access latest \
+            --secret="${{ env.FRONTEND_ENV_SECRET }}" \
+            --project="${{ env.PROJECT_ID }}" > .env.tmp
+          echo "secret_path=.env.tmp" >> "$GITHUB_OUTPUT"
+
+      # ── 5. Configure Docker for Artifact Registry ──────────────────────────
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGISTRY }} --quiet
+
+      # ── 6. Set up Docker Buildx ────────────────────────────────────────────
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── 7. Build & push frontend image ─────────────────────────────────────
+      - name: Build and push frontend
+        id: frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.REPO }}/frontend:${{ steps.tag.outputs.value }}
+          secrets: |
+            frontend_env=${{ steps.fetch-env.outputs.secret_path }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPO }}/frontend:cache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPO }}/frontend:cache,mode=max
+
+      # ── 8. Build & push backend image ──────────────────────────────────────
+      - name: Build and push backend
+        id: backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.REPO }}/backend:${{ steps.tag.outputs.value }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPO }}/backend:cache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPO }}/backend:cache,mode=max
+
+      # ── 9. Stamp digests into cloud-run.yaml and apply ─────────────────────
+      - name: Update manifest and deploy
+        env:
+          FRONTEND_DIGEST: ${{ steps.frontend.outputs.digest }}
+          BACKEND_DIGEST: ${{ steps.backend.outputs.digest }}
+        run: |
+          FRONTEND_IMAGE="${{ env.REGISTRY }}/${{ env.REPO }}/frontend@${FRONTEND_DIGEST}"
+          BACKEND_IMAGE="${{ env.REGISTRY }}/${{ env.REPO }}/backend@${BACKEND_DIGEST}"
+
+          sed -i \
+            "s|image:.*tererang/frontend@.*|image: ${FRONTEND_IMAGE}|" \
+            deploy/cloud-run.yaml
+          sed -i \
+            "s|image:.*tererang/backend@.*|image: ${BACKEND_IMAGE}|" \
+            deploy/cloud-run.yaml
+
+          gcloud run services replace deploy/cloud-run.yaml \
+            --project=${{ env.PROJECT_ID }} \
+            --region=${{ env.REGION }}
+
+      # ── 10. Clean up temporary secret file ─────────────────────────────────
+      - name: Clean up
+        if: always()
+        run: rm -f .env.tmp
+
+      # ── 11. Verify service is live ──────────────────────────────────────────
+      - name: Verify service is live
+        run: |
+          URL=$(gcloud run services describe ${{ env.SERVICE }} \
+            --project=${{ env.PROJECT_ID }} \
+            --region=${{ env.REGION }} \
+            --format='value(status.url)')
+          echo "Service URL: ${URL}"
+          curl --fail --silent --max-time 20 "${URL}" > /dev/null
+          echo "✅ Deployment of ${{ steps.tag.outputs.value }} is live at ${URL}"
