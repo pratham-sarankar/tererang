@@ -4,6 +4,7 @@ import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Loader2 } f
 import ProductImage from '../components/ProductImage.jsx';
 import { useCart } from '../context/cartContextStore.js';
 import { imageUrl } from '../config/env.js';
+import { Footer } from '../components/Footer.jsx';
 
 const currencyFormatter = new Intl.NumberFormat('en-IN', {
   style: 'currency',
@@ -89,11 +90,13 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-8 sm:py-12">
+    <>
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto max-w-7xl px-6 py-10 sm:py-14 lg:px-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-serif lowercase text-foreground mb-2 tracking-wide">Shopping Cart</h1>
+          <p className="text-sm font-semibold tracking-[0.08em] text-accent">Checkout edit</p>
+          <h1 className="mt-2 font-serif text-5xl lowercase leading-none text-foreground sm:text-6xl">shopping cart</h1>
           <p className="text-muted-foreground text-base">
             {cartHasItems ? `${cartCount} item${cartCount === 1 ? '' : 's'} in your cart` : 'Your cart is empty'}
           </p>
@@ -121,10 +124,7 @@ const Cart = () => {
                 const isUpdating = updatingItemId === item.id;
 
                 return (
-                  <div
-                    key={item.id}
-                    className="bg-card rounded-sm p-4 sm:p-6 border border-border transition-colors"
-                  >
+                  <div key={item.id} className="border border-border bg-card p-4 transition-colors sm:p-6">
                     <div className="flex flex-col sm:flex-row gap-4">
                       {/* Product Image */}
                       <div className="flex-shrink-0">
@@ -138,7 +138,7 @@ const Cart = () => {
                       {/* Product Details */}
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
-                          <h3 className="text-base font-serif lowercase text-foreground mb-2">
+                            <h3 className="mb-2 font-serif text-2xl lowercase leading-none text-foreground">
                             {item.product?.name || 'Unavailable product'}
                           </h3>
                           <div className="text-xs text-muted-foreground space-y-1 tracking-wide">
@@ -195,8 +195,8 @@ const Cart = () => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-card rounded-sm p-6 border border-border sticky top-24">
-                <h2 className="text-lg font-serif lowercase text-foreground mb-6 tracking-wide">order summary</h2>
+              <div className="sticky top-28 border border-border bg-card p-6">
+                <h2 className="mb-6 font-serif text-3xl lowercase leading-none text-foreground">order summary</h2>
 
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-muted-foreground text-sm">
@@ -218,14 +218,14 @@ const Cart = () => {
                 <div className="space-y-3">
                   <Link
                     to="/checkout"
-                    className="flex items-center justify-center gap-2 w-full bg-primary text-white font-medium py-3 rounded-sm hover:bg-primary/90 transition text-sm tracking-wide lowercase"
+                    className="flex w-full items-center justify-center gap-2 bg-primary py-3 text-sm font-semibold lowercase tracking-[0.18em] text-white transition hover:bg-primary/90"
                   >
                     proceed to checkout
                     <ArrowRight size={16} />
                   </Link>
                   <Link
                     to="/shop"
-                    className="block w-full text-center border border-primary text-foreground font-medium py-3 rounded-sm hover:bg-primary hover:text-white transition text-sm tracking-wide lowercase"
+                    className="block w-full border border-primary py-3 text-center text-sm font-semibold lowercase tracking-[0.18em] text-foreground transition hover:bg-primary hover:text-white"
                   >
                     continue shopping
                   </Link>
@@ -257,7 +257,9 @@ const Cart = () => {
           </div>
         )}
       </div>
-    </div>
+    </main>
+    <Footer />
+    </>
   );
 };
 

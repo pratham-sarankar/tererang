@@ -55,7 +55,7 @@ const OrderCard = ({ order }) => (
     <div className="bg-card rounded-sm border border-border overflow-hidden">
         <div className="p-6 border-b border-border flex flex-wrap items-center gap-4 justify-between">
             <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Order ID</p>
+                <p className="text-xs font-medium tracking-[0.08em] text-muted-foreground">Order ID</p>
                 <p className="font-serif lowercase text-lg text-foreground">#{order.id.slice(-8).toUpperCase()}</p>
                 <p className="text-sm text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
             </div>
@@ -93,7 +93,7 @@ const OrderCard = ({ order }) => (
                 </div>
             </div>
             <div className="text-right">
-                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Total Amount</p>
+                <p className="text-xs font-medium tracking-[0.08em] text-muted-foreground">Total amount</p>
                 <p className="text-2xl font-serif lowercase text-foreground">{formatCurrency(order.grandTotal || order.subtotal)}</p>
                 {order.paymentMethod === 'cod' && (
                     <p className="text-xs text-amber-600 mt-1 font-medium">Cash on Delivery (₹59 fee paid)</p>
@@ -155,7 +155,7 @@ const MyOrder = () => {
         <div className="min-h-screen bg-background">
             <header className="bg-secondary py-16 border-b border-border">
                 <div className="max-w-5xl mx-auto px-6 text-center">
-                    <p className="uppercase tracking-[0.4em] text-xs text-accent mb-3">Tererang Studio</p>
+                    <p className="mb-3 text-sm font-semibold tracking-[0.08em] text-accent">Tererang studio</p>
                     <h1 className="text-4xl md:text-5xl font-serif lowercase">Your bespoke orders</h1>
                     <p className="mt-3 text-muted-foreground">Track every handcrafted piece you fell in love with.</p>
                 </div>
@@ -167,7 +167,7 @@ const MyOrder = () => {
                         <div key={card.label} className="bg-card rounded-sm border border-border p-6 flex items-center gap-4">
                             <card.icon size={32} className="text-primary" />
                             <div>
-                                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{card.label}</p>
+                                <p className="text-xs font-medium tracking-[0.08em] text-muted-foreground">{card.label}</p>
                                 <p className="text-2xl font-serif lowercase text-foreground">{card.value}</p>
                             </div>
                         </div>

@@ -1,70 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
-import { ShoppingBag, Package, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import ProductImage from "../components/ProductImage.jsx";
+import { createElement, useEffect, useMemo, useState } from "react";
+import { ArrowRight, MessageCircle, Package, RefreshCw, Ruler, Sparkles } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { apiUrl } from "../config/env.js";
 import { mapProductForDisplay } from "../utils/productPresentation.js";
 import { Footer } from "../components/Footer.jsx";
 import SplitBanner from "../components/SplitBanner.jsx";
+import StorefrontProductCard from "../components/StorefrontProductCard.jsx";
+import { collections } from "../components/storefrontData.js";
 
 const LATEST_COLLECTION_LIMIT = 12;
-
-const HomeProductCard = ({ product, onSelect = () => {} }) => (
-  <div className="group bg-card rounded-md overflow-hidden border border-border/80 hover:border-primary/50 transition-all duration-300 cursor-pointer flex flex-col justify-between">
-    <div>
-      <div className="relative w-full aspect-[3/4] overflow-hidden bg-secondary" onClick={() => onSelect(product)}>
-        <ProductImage
-          src={product.image}
-          alt={product.title}
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          loading="lazy"
-        />
-        {product.discount > 0 && (
-          <span className="absolute top-3 left-3 bg-card/90 backdrop-blur-xs text-foreground text-[10px] tracking-wider uppercase font-medium px-2.5 py-1 border border-border">
-            {product.discount}% off
-          </span>
-        )}
-      </div>
-
-      <div className="p-4 sm:p-5 flex flex-col">
-        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium mb-1">
-          {product.brand || "tererang"}
-        </span>
-        <h3 className="font-serif text-base sm:text-lg text-foreground line-clamp-1 group-hover:text-primary transition-colors lowercase">
-          {product.title}
-        </h3>
-        {product.description && (
-          <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
-            {product.description}
-          </p>
-        )}
-      </div>
-    </div>
-
-    <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0">
-      <div className="flex items-baseline gap-2 mb-3">
-        {product.displayPrice && (
-          <span className="text-base sm:text-lg font-medium text-foreground">{product.displayPrice}</span>
-        )}
-        {product.displayOldPrice && (
-          <span className="text-xs line-through text-muted-foreground">{product.displayOldPrice}</span>
-        )}
-      </div>
-
-      <button
-        className="w-full border border-primary text-foreground hover:bg-primary hover:text-white py-2.5 px-4 text-xs lowercase tracking-wider font-medium transition-colors duration-300 flex items-center justify-center gap-2"
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect(product);
-        }}
-        type="button"
-      >
-        <ShoppingBag className="w-3.5 h-3.5" />
-        <span>view details</span>
-      </button>
-    </div>
-  </div>
-);
 
 const Home = () => {
   const [latestProducts, setLatestProducts] = useState([]);
@@ -92,27 +36,16 @@ const Home = () => {
       setError(null);
       try {
         const response = await fetch(latestProductsEndpoint);
+        const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(
-            "Failed to load latest collection. Please try again."
-          );
+          throw new Error(data.message || "Failed to load latest collection. Please try again.");
         }
-        const data = await response.json();
         if (isMounted) {
           const products = Array.isArray(data) ? data : data?.products || [];
           const pagination = data?.pagination;
 
-          if (currentPage === 1) {
-            setLatestProducts(products);
-          } else {
-            setLatestProducts(prev => [...prev, ...products]);
-          }
-
-          if (pagination) {
-            setHasMore(pagination.current < pagination.pages);
-          } else {
-            setHasMore(products.length >= LATEST_COLLECTION_LIMIT);
-          }
+          setLatestProducts((previous) => (currentPage === 1 ? products : [...previous, ...products]));
+          setHasMore(pagination ? pagination.current < pagination.pages : products.length >= LATEST_COLLECTION_LIMIT);
         }
       } catch (err) {
         if (isMounted) {
@@ -143,184 +76,175 @@ const Home = () => {
     setReloadFlag((flag) => flag + 1);
   };
 
-  const handleLoadMore = () => {
-    setCurrentPage((page) => page + 1);
-  };
-
   const handleSelectProduct = (product) => {
-    if (!product?.id) return;
-    navigate(`/product/${product.id}`, { state: { product } });
+    const targetId = product?.backendId || product?.id;
+    if (!targetId) return;
+    navigate(`/product/${targetId}`, { state: { product } });
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Hero Banner */}
       <SplitBanner />
 
-      {/* Latest Collection */}
-      <section
-        id="latest-collection"
-        className="py-20 bg-background"
-      >
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="text-center mb-14">
-            <p className="text-accent uppercase tracking-[0.3em] text-xs mb-3 font-medium">
-              new arrivals
-            </p>
-            <h2 className="text-4xl sm:text-5xl font-serif lowercase text-foreground mb-4 tracking-wide">
-              latest collection
-            </h2>
-            <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
-              handcrafted pieces designed to become part of your story. each silhouette curated with love and precision.
+      <section className="border-b border-border bg-background py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-sm font-semibold tracking-[0.08em] text-accent">Curated closets</p>
+              <h2 className="mt-2 font-serif text-5xl lowercase leading-none text-foreground sm:text-6xl">shop by collection</h2>
+            </div>
+            <Link
+              to="/products/Kurti"
+              className="inline-flex items-center gap-2 self-start border border-primary px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-primary hover:text-white sm:self-auto"
+            >
+              shop all collections
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-5">
+            {collections.map((collection, index) => (
+              <Link
+                key={collection.to}
+                to={collection.to}
+                className={`group relative min-h-[360px] overflow-hidden border border-border bg-card ${
+                  index === 0 ? "lg:col-span-2" : ""
+                }`}
+              >
+                <img
+                  src={collection.img}
+                  alt={collection.title}
+                  className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/20 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                  <p className="text-xs font-semibold tracking-[0.08em] text-accent">{collection.eyebrow}</p>
+                  <h3 className="mt-2 font-serif text-3xl lowercase leading-none">{collection.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-white/85">{collection.desc}</p>
+                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold">
+                    explore collection
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="latest-collection" className="bg-secondary/60 py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-sm font-semibold tracking-[0.08em] text-accent">Highly coveted</p>
+              <h2 className="mt-2 font-serif text-5xl lowercase leading-none text-foreground sm:text-6xl">the bestsellers shelf</h2>
+            </div>
+            <p className="max-w-md text-sm leading-7 text-muted-foreground">
+              Fresh arrivals and customer favorites, custom-finished for graceful everyday and occasion wear.
             </p>
           </div>
 
-          {loading && !error && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
-              {Array.from({ length: 6 }, (_, index) => index + 1).map(
-                (item) => (
-                  <div
-                    key={`skeleton-${item}`}
-                    className="bg-card rounded-md border border-border h-96 animate-pulse"
-                  />
-                )
-              )}
+          {loading && !error ? (
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 8 }, (_, index) => (
+                <div key={index} className="h-[520px] animate-pulse border border-border bg-card" />
+              ))}
             </div>
-          )}
+          ) : null}
 
-          {error && (
-            <div className="bg-card rounded-md border border-border p-10 text-center max-w-md mx-auto">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-secondary rounded-full mb-4">
-                <svg
-                  className="w-6 h-6 text-muted-foreground"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-serif lowercase text-foreground mb-2">
-                unable to load collection
-              </h3>
-              <p className="text-muted-foreground text-sm mb-6">{error}</p>
+          {error ? (
+            <div className="mx-auto max-w-md border border-border bg-card p-10 text-center">
+              <RefreshCw className="mx-auto mb-4 h-9 w-9 text-primary" />
+              <h3 className="font-serif text-2xl lowercase text-foreground">unable to load collection</h3>
+              <p className="mt-2 text-sm leading-7 text-muted-foreground">{error}</p>
               <button
                 type="button"
-                className="border border-primary text-foreground hover:bg-primary hover:text-white px-6 py-2.5 text-xs lowercase tracking-wider font-medium transition-colors"
+                className="mt-6 border border-primary px-6 py-3 text-sm font-semibold text-foreground transition hover:bg-primary hover:text-white"
                 onClick={handleReload}
               >
                 try again
               </button>
             </div>
-          )}
+          ) : null}
 
-          {!error && !loading && enrichedProducts.length === 0 && (
-            <div className="text-center py-16 max-w-md mx-auto">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-secondary rounded-full mb-5">
-                <Package className="w-7 h-7 text-muted-foreground" />
+          {!error && !loading && enrichedProducts.length === 0 ? (
+            <div className="mx-auto max-w-md py-16 text-center">
+              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-border bg-card">
+                <Package className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-serif lowercase text-foreground mb-2">
-                no products available yet
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                check back soon for our latest collection.
-              </p>
+              <h3 className="font-serif text-2xl lowercase text-foreground">no products available yet</h3>
+              <p className="mt-2 text-sm leading-7 text-muted-foreground">Check back soon for our latest collection.</p>
             </div>
-          )}
+          ) : null}
 
-          {!error && enrichedProducts.length > 0 && (
+          {!error && enrichedProducts.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {enrichedProducts.map((product) => (
-                  <HomeProductCard
-                    key={product.id}
-                    product={product}
-                    onSelect={handleSelectProduct}
-                  />
+                  <StorefrontProductCard key={product.id} product={product} onSelect={handleSelectProduct} />
                 ))}
               </div>
 
-              {hasMore && (
-                <div className="flex justify-center mt-14">
+              {hasMore ? (
+                <div className="mt-14 flex justify-center">
                   <button
                     type="button"
-                    onClick={handleLoadMore}
+                    onClick={() => setCurrentPage((page) => page + 1)}
                     disabled={loadingMore}
-                    className="group border-2 border-primary text-foreground hover:bg-primary hover:text-white px-10 py-3.5 text-xs lowercase tracking-widest font-medium transition-all duration-300 inline-flex items-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 border border-primary px-9 py-3.5 text-sm font-semibold text-foreground transition hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {loadingMore ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        loading...
-                      </>
-                    ) : (
-                      <>
-                        <span>load more pieces</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                      </>
-                    )}
+                    {loadingMore ? "loading..." : "load more pieces"}
+                    <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
-              )}
+              ) : null}
             </>
-          )}
+          ) : null}
         </div>
       </section>
 
-      {/* Bespoke Tailoring CTA */}
-      <section className="py-20 bg-secondary border-t border-border">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <p className="text-accent uppercase tracking-[0.3em] text-xs mb-3 font-medium">
-              personal styling
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-serif lowercase text-foreground mb-5 tracking-wide">
-              bespoke custom tailoring
+      <section className="bg-background py-16 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-10">
+          <div className="border border-border bg-secondary p-8 sm:p-10">
+            <p className="text-sm font-semibold tracking-[0.08em] text-accent">Bespoke services</p>
+            <h2 className="mt-3 font-serif text-5xl lowercase leading-none text-foreground sm:text-6xl">
+              personal styling & custom tailoring
             </h2>
-            <p className="text-muted-foreground text-base leading-relaxed mb-8 max-w-2xl mx-auto">
-              at tererang, we believe in perfect silhouettes that fit you flawlessly. enjoy complimentary size customization, length adjustments, and direct styling consultations with our designers.
+            <p className="mt-6 text-base leading-8 text-muted-foreground">
+              Tererang pieces are shaped around your rhythm: complimentary size guidance, length adjustments, and direct designer consultation for outfits that fit beautifully.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
                 href="https://wa.me/919548971147"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border-2 border-primary text-foreground hover:bg-primary hover:text-white px-8 py-3.5 lowercase tracking-widest text-xs font-medium transition-all duration-300 inline-flex items-center gap-2"
+                className="inline-flex items-center justify-center gap-2 bg-primary px-7 py-3 text-sm font-semibold text-white transition hover:bg-primary/90"
               >
-                <span>💬</span>
-                <span>chat with designer</span>
+                <MessageCircle className="h-4 w-4" />
+                chat with designer
               </a>
-              <button
-                onClick={() => navigate("/products/Kurti")}
-                className="text-muted-foreground hover:text-foreground px-8 py-3.5 lowercase tracking-widest text-xs underline transition-colors duration-300"
+              <Link
+                to="/products/Kurti"
+                className="inline-flex items-center justify-center gap-2 border border-primary px-7 py-3 text-sm font-semibold text-foreground transition hover:bg-primary hover:text-white"
               >
                 explore catalog
-              </button>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              ["made to measure", "Fit refinements and length guidance for every selected silhouette.", Ruler],
+              ["designer desk", "A direct WhatsApp line for styling, occasion, and sizing questions.", MessageCircle],
+              ["crafted slowly", "Soft textiles, embroidery detail, and wearable Indian occasion dressing.", Sparkles],
+            ].map(([title, text, ServiceIcon]) => (
+              <div key={title} className="border border-border bg-card p-6">
+                {createElement(ServiceIcon, { className: "mb-8 h-7 w-7 text-primary" })}
+                <h3 className="font-serif text-2xl lowercase leading-none text-foreground">{title}</h3>
+                <p className="mt-4 text-sm leading-7 text-muted-foreground">{text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

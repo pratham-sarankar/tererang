@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -21,22 +21,22 @@
 }
 
 :root {
-  --background: #FAF8F5;
-  --foreground: #2C2825;
-  --card: #FFFFFF;
-  --card-foreground: #2C2825;
-  --primary: #A8B5A0;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F4F1EA;
-  --secondary-foreground: #2C2825;
-  --muted: #E8E5E0;
-  --muted-foreground: #6B6560;
-  --accent: #C9A96E;
-  --accent-foreground: #2C2825;
-  --destructive: #B85C4F;
-  --border: #E8E5E0;
-  --input: #E8E5E0;
-  --ring: #A8B5A0;
+  --background: #fbf8f2;
+  --foreground: #2d2924;
+  --card: #fffdf8;
+  --card-foreground: #2d2924;
+  --primary: #7d8f72;
+  --primary-foreground: #ffffff;
+  --secondary: #f0eadf;
+  --secondary-foreground: #2d2924;
+  --muted: #e5dccd;
+  --muted-foreground: #70685f;
+  --accent: #b89258;
+  --accent-foreground: #2d2924;
+  --destructive: #b85c4f;
+  --border: #ded2bf;
+  --input: #ded2bf;
+  --ring: #7d8f72;
 }
 
 * {
@@ -44,13 +44,44 @@
 }
 
 body {
-  font-family: "Lato", sans-serif;
+  font-family: "Inter", sans-serif;
   background: var(--background);
   color: var(--foreground);
+  text-rendering: optimizeLegibility;
 }
 
 .font-serif {
-  font-family: "Cormorant Garamond", serif;
+  font-family: "Playfair Display", serif;
+}
+
+::selection {
+  background: rgba(184, 146, 88, 0.26);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bca98a;
+  border: 2px solid var(--secondary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }
 
 /* @tailwind base;

@@ -501,7 +501,7 @@ const Checkout = () => {
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
         <section className="bg-card rounded-sm shadow-sm border border-border p-8">
           <div className="inline-flex items-center bg-secondary rounded-sm px-3 py-1 mb-2 border border-border">
-            <p className="text-accent uppercase tracking-[0.2em] text-xs">checkout</p>
+            <p className="text-sm font-semibold tracking-[0.08em] text-accent">Checkout</p>
           </div>
           <h1 className="text-4xl font-serif lowercase text-foreground mb-6 tracking-wide">complete your purchase</h1>
 
@@ -657,7 +657,7 @@ const Checkout = () => {
           <div className="pb-8 border-b border-border">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div>
-                <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-primary font-bold">
+                <div className="flex items-center gap-2 text-xs font-bold tracking-[0.08em] text-primary">
                   <MapPin size={16} /> Shipping
                 </div>
                 <h2 className="text-2xl font-serif lowercase text-foreground mt-2 tracking-wide">delivery address</h2>
@@ -714,7 +714,7 @@ const Checkout = () => {
                           {address.line2 ? `, ${address.line2}` : ''}
                           {address.landmark ? `, ${address.landmark}` : ''}, {address.city}, {address.state} {address.postalCode}, {address.country}
                         </p>
-                        {address.label && <p className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground mt-1">{address.label}</p>}
+                        {address.label && <p className="mt-1 text-[11px] tracking-[0.08em] text-muted-foreground">{address.label}</p>}
                       </div>
                       <div className="flex flex-col gap-2 text-xs text-right">
                         <button

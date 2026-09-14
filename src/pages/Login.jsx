@@ -1,6 +1,6 @@
-// src/pages/Login.jsx
-import React, { useState } from "react";
-import "../css/Login.css";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Phone, ShieldCheck } from "lucide-react";
 import { usePhoneAuth } from "../hooks/usePhoneAuth.js";
 
 const Login = () => {
@@ -12,8 +12,8 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const { recaptchaContainerRef, sendOtp, confirmOtp, loading } = usePhoneAuth();
 
-  const handleSendOTP = async (e) => {
-    e.preventDefault();
+  const handleSendOTP = async (event) => {
+    event.preventDefault();
     setError("");
     setMessage("");
 
@@ -27,16 +27,14 @@ const Login = () => {
     }
   };
 
-  const handleVerifyOTP = async (e) => {
-    e.preventDefault();
+  const handleVerifyOTP = async (event) => {
+    event.preventDefault();
     setError("");
     setMessage("");
 
     try {
       await confirmOtp(otp, name);
-      setMessage("Login Successful ✅");
-
-      // Redirect to home page after 1 second
+      setMessage("Login successful");
       setTimeout(() => {
         window.location.href = "/";
       }, 1000);
@@ -54,113 +52,70 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <form className="login-form" onSubmit={otpSent ? handleVerifyOTP : handleSendOTP}>
-        <h2>Login to Tererang</h2>
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-16 text-foreground">
+      <form className="w-full max-w-md border border-border bg-card p-8 shadow-[0_24px_70px_rgba(45,41,36,0.08)]" onSubmit={otpSent ? handleVerifyOTP : handleSendOTP}>
+        <div className="mb-8 text-center">
+          <p className="text-sm font-semibold tracking-[0.08em] text-accent">Customer atelier</p>
+          <h1 className="mt-3 font-serif text-5xl lowercase leading-none">login to tererang</h1>
+          <p className="mt-4 text-sm leading-7 text-muted-foreground">Access orders, cart, and checkout with phone OTP.</p>
+        </div>
 
-        {error && (
-          <div style={{
-            padding: "10px",
-            marginBottom: "15px",
-            backgroundColor: "#fee",
-            border: "1px solid #fcc",
-            borderRadius: "6px",
-            color: "#c33",
-            fontSize: "14px"
-          }}>
-            {error}
-          </div>
-        )}
-
-        {message && (
-          <div style={{
-            padding: "10px",
-            marginBottom: "15px",
-            backgroundColor: "#efe",
-            border: "1px solid #cfc",
-            borderRadius: "6px",
-            color: "#3c3",
-            fontSize: "14px"
-          }}>
-            {message}
-          </div>
-        )}
+        {error ? <div className="mb-5 border border-red-200 bg-red-50 p-3 text-sm text-destructive">{error}</div> : null}
+        {message ? <div className="mb-5 border border-border bg-secondary p-3 text-sm text-primary">{message}</div> : null}
 
         {!otpSent ? (
           <>
-            <label>Phone Number</label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              placeholder="Enter 10-digit phone number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-              pattern="[0-9]{10}"
-              title="Please enter a 10-digit phone number"
-              disabled={loading}
-            />
+            <label className="mb-2 block text-sm font-semibold">Phone number</label>
+            <div className="relative mb-6">
+              <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+              <input
+                type="tel"
+                name="phoneNumber"
+                placeholder="Enter 10-digit phone number"
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(event.target.value)}
+                required
+                pattern="[0-9]{10}"
+                title="Please enter a 10-digit phone number"
+                disabled={loading}
+                className="w-full border border-border bg-background py-3 pl-10 pr-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary"
+              />
+            </div>
 
-            <button type="submit" className="btn-login" disabled={loading}>
-              {loading ? "Sending OTP..." : "Send OTP"}
+            <button type="submit" className="w-full bg-primary px-6 py-4 text-sm font-semibold lowercase tracking-[0.18em] text-white transition hover:bg-primary/90 disabled:opacity-60" disabled={loading}>
+              {loading ? "sending otp..." : "send otp"}
             </button>
           </>
         ) : (
           <>
-            <label>Phone Number</label>
-            <input
-              type="tel"
-              value={phoneNumber}
-              disabled
-              style={{ backgroundColor: "#f5f5f5" }}
-            />
+            <label className="mb-2 block text-sm font-semibold">Phone number</label>
+            <input type="tel" value={phoneNumber} disabled className="mb-5 w-full border border-border bg-secondary p-3 text-sm text-muted-foreground" />
 
-            <label>Name (Optional)</label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={loading}
-            />
+            <label className="mb-2 block text-sm font-semibold">Name optional</label>
+            <input type="text" name="name" placeholder="Enter your name" value={name} onChange={(event) => setName(event.target.value)} disabled={loading} className="mb-5 w-full border border-border bg-background p-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary" />
 
-            <label>OTP</label>
-            <input
-              type="text"
-              name="otp"
-              placeholder="Enter 6-digit OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              required
-              pattern="[0-9]{6}"
-              title="Please enter the 6-digit OTP"
-              disabled={loading}
-              maxLength="6"
-            />
+            <label className="mb-2 block text-sm font-semibold">OTP</label>
+            <div className="relative mb-6">
+              <ShieldCheck className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+              <input type="text" name="otp" placeholder="Enter 6-digit OTP" value={otp} onChange={(event) => setOtp(event.target.value)} required pattern="[0-9]{6}" title="Please enter the 6-digit OTP" disabled={loading} maxLength="6" className="w-full border border-border bg-background py-3 pl-10 pr-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary" />
+            </div>
 
-            <button type="submit" className="btn-login" disabled={loading}>
-              {loading ? "Verifying..." : "Verify & Login"}
+            <button type="submit" className="w-full bg-primary px-6 py-4 text-sm font-semibold lowercase tracking-[0.18em] text-white transition hover:bg-primary/90 disabled:opacity-60" disabled={loading}>
+              {loading ? "verifying..." : "verify & login"}
             </button>
 
-            <button
-              type="button"
-              onClick={handleReset}
-              className="btn-login"
-              style={{ marginTop: "10px", backgroundColor: "#ddd", color: "#333" }}
-              disabled={loading}
-            >
-              Change Phone Number
+            <button type="button" onClick={handleReset} className="mt-3 w-full border border-border px-6 py-3 text-sm font-semibold lowercase tracking-[0.18em] text-foreground transition hover:border-primary hover:text-primary" disabled={loading}>
+              change phone number
             </button>
           </>
         )}
 
-        <p className="redirect">
-          Don't have an account? <a href="/register">Register</a>
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          Don&apos;t have an account? <Link to="/register" className="font-semibold text-primary hover:underline">Register</Link>
         </p>
       </form>
       <div ref={recaptchaContainerRef} />
-    </div>
+    </main>
   );
 };
 

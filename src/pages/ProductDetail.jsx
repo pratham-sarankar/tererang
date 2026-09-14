@@ -5,6 +5,7 @@ import ProductImage from '../components/ProductImage';
 import { apiUrl } from '../config/env.js';
 import { useCart } from '../context/cartContextStore.js';
 import { mapProductForDisplay } from '../utils/productPresentation.js';
+import { Footer } from '../components/Footer.jsx';
 
 const ICON_MAP = { Zap, Gift, Ruler };
 
@@ -192,7 +193,7 @@ const ProductDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
         Loading product...
       </div>
     );
@@ -200,7 +201,7 @@ const ProductDetailPage = () => {
 
   if (error && !product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center p-6 text-foreground">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6 text-center text-foreground">
         <p className="mb-4">{error}</p>
         <button
           type="button"
@@ -218,20 +219,21 @@ const ProductDetailPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-background p-4 sm:p-10 lg:py-16">
+    <>
+    <main className="relative min-h-screen bg-background px-4 py-8 text-foreground sm:px-8 lg:px-10 lg:py-14">
       <button
         onClick={() => navigate(-1)}
-        className="fixed z-10 top-4 left-4 lg:top-10 lg:left-10 bg-card p-2 rounded-full shadow-sm border border-border text-muted-foreground hover:text-primary transition flex items-center font-medium"
+        className="mb-6 inline-flex items-center gap-2 border border-border bg-card px-4 py-2 text-xs font-semibold lowercase tracking-[0.18em] text-muted-foreground transition hover:border-primary hover:text-primary"
         type="button"
       >
-        <ArrowLeft className="w-5 h-5 mr-1" />
-        <span className="hidden sm:inline">Back to Collection</span>
+        <ArrowLeft className="h-4 w-4" />
+        back to collection
       </button>
 
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row shadow-sm rounded-lg overflow-hidden bg-card border border-border">
-        <div className="w-full lg:w-3/5 p-4 lg:p-8 flex flex-col items-center bg-secondary relative">
+      <div className="mx-auto grid max-w-7xl overflow-hidden border border-border bg-card lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="relative bg-secondary p-4 sm:p-6 lg:p-8">
           {product.discount ? (
-            <div className="absolute top-8 left-8 bg-card/90 backdrop-blur-xs border border-border text-foreground font-medium text-sm py-1 px-3 rounded-sm z-[5]">
+            <div className="absolute left-8 top-8 z-[5] border border-border bg-card/90 px-3 py-1 text-sm font-semibold text-foreground backdrop-blur-sm">
               {product.discount}% off
             </div>
           ) : null}
@@ -239,54 +241,56 @@ const ProductDetailPage = () => {
           <ProductImage
             src={mainImage}
             alt={product.title}
-            className="rounded-sm w-full max-w-lg h-[600px] object-cover mb-6"
+            className="h-[430px] w-full object-cover sm:h-[620px] lg:h-[720px]"
           />
 
-          <div className="flex flex-wrap justify-center gap-3 mt-4">
+          <div className="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-6">
             {product.gallery.map((imgUrl) => (
-              <ProductImage
+              <button
                 key={imgUrl}
-                src={imgUrl}
-                alt={`${product.title} thumbnail`}
-                className={`w-20 h-20 object-cover rounded-sm border cursor-pointer transition duration-200 ${imgUrl === mainImage
-                  ? 'border-primary ring-1 ring-primary'
-                  : 'border-border hover:border-primary/50'
-                  }`}
                 onClick={() => setMainImage(imgUrl)}
-                loading="lazy"
-              />
+                className={`aspect-square overflow-hidden border transition ${imgUrl === mainImage ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-primary/60'}`}
+                type="button"
+              >
+                <ProductImage
+                  src={imgUrl}
+                  alt={`${product.title} thumbnail`}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </button>
             ))}
           </div>
         </div>
 
-        <div className="w-full lg:w-2/5 p-6 sm:p-8 lg:p-10 relative">
-          <span className="text-sm font-medium text-accent uppercase tracking-[0.2em]">
+        <div className="relative p-6 sm:p-8 lg:p-10">
+          <span className="text-sm font-semibold tracking-[0.08em] text-accent">
             {product.brand}
           </span>
-          <h1 className="text-4xl font-serif lowercase text-foreground mb-2 mt-1 tracking-wide">{product.title}</h1>
+          <h1 className="mt-3 font-serif text-5xl lowercase leading-none text-foreground sm:text-6xl">{product.title}</h1>
 
-          <div className="mb-6 border-b border-border pb-4">
-            <div className="flex items-baseline mb-2">
+          <div className="my-7 border-y border-border py-5">
+            <div className="flex items-center gap-3">
               {displayedOriginalPrice && (
-                <span className="line-through text-muted-foreground mr-3 text-xl">
+                <span className="text-lg text-muted-foreground line-through">
                   ₹{displayedOriginalPrice.toLocaleString('en-IN')}
                 </span>
               )}
-              <span className="text-4xl font-medium text-foreground">
+              <span className="font-serif text-5xl leading-none text-foreground">
                 ₹{actualPrice.toLocaleString('en-IN')}
               </span>
               <button
-                className="ml-auto p-2 border border-border rounded-full text-muted-foreground hover:bg-secondary hover:text-primary transition"
+                className="ml-auto flex h-11 w-11 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-secondary hover:text-primary"
                 type="button"
                 onClick={handleShare}
                 aria-label="Share product"
               >
-                <Share2 className="w-5 h-5" />
+                <Share2 className="h-5 w-5" />
               </button>
             </div>
             {displayedOriginalPrice && (
-              <div className="flex items-center gap-2">
-                <span className="inline-block bg-secondary text-foreground px-3 py-1 rounded-sm text-sm border border-border">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="inline-block border border-border bg-secondary px-3 py-1 text-sm font-semibold text-foreground">
                   {globalDiscount.percentage}% off
                 </span>
                 <span className="text-primary text-sm font-medium">
@@ -296,24 +300,26 @@ const ProductDetailPage = () => {
             )}
           </div>
 
-          <p className="text-muted-foreground mb-6 leading-relaxed text-base">{product.description}</p>
+          <p className="mb-6 text-base leading-8 text-muted-foreground">
+            {product.description || 'A Tererang atelier piece finished with thoughtful craft and elegant wearability.'}
+          </p>
 
-          <div className="mb-8 space-y-3 p-4 bg-secondary rounded-md border border-border">
+          <div className="mb-8 space-y-3 border border-border bg-secondary p-5">
             {product.highlights.map((item) => (
               <HighlightItem key={`${item.icon}-${item.text}`} icon={item.icon} text={item.text} />
             ))}
           </div>
 
-          <h3 className="font-medium mb-3 text-foreground flex justify-between items-center text-sm tracking-wide">
-            Select Size:
-            <span className="text-primary font-medium text-lg">{selectedSize || 'Select'}</span>
+          <h3 className="mb-3 flex items-center justify-between text-sm font-semibold text-foreground">
+            select size
+            <span className="text-sm text-primary">{selectedSize || 'select'}</span>
           </h3>
           <div className="flex flex-wrap gap-3 mb-6">
             {displaySizes.map((size) => (
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`border px-6 py-2 rounded-sm font-medium transition duration-200 ${selectedSize === size
+                className={`min-w-14 border px-5 py-3 text-sm font-semibold transition duration-200 ${selectedSize === size
                   ? 'bg-primary text-white border-primary'
                   : 'border-border text-foreground hover:border-primary hover:bg-secondary'
                   }`}
@@ -326,55 +332,51 @@ const ProductDetailPage = () => {
 
           <div className="mb-10" />
 
-          <div className="lg:sticky lg:bottom-0 lg:left-0 lg:mt-8 pt-4 lg:bg-card lg:shadow-[0_-5px_15px_rgba(0,0,0,0.04)] flex gap-4 w-full">
+          <div className="mt-8 flex w-full gap-3 border-t border-border pt-5">
             <button
               onClick={handleAddToCart}
               disabled={isAdded || isAdding || !selectedSize}
-              className="flex-1 flex items-center justify-center bg-primary text-white font-medium text-lg py-3 rounded-sm hover:bg-primary/90 transition duration-300 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+              className="flex flex-1 items-center justify-center bg-primary px-5 py-4 text-sm font-semibold lowercase tracking-[0.18em] text-white transition duration-300 hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
               type="button"
             >
               {isAdded ? (
                 <>
-                  <CheckCircle className="w-6 h-6 mr-2 animate-pulse" /> Added to Cart!
+                  <CheckCircle className="mr-2 h-5 w-5 animate-pulse" /> added to cart
                 </>
               ) : (
                 <>
-                  <ShoppingCart className="w-6 h-6 mr-2" /> {isAdding ? 'Adding...' : 'Add to Cart'}
+                  <ShoppingCart className="mr-2 h-5 w-5" /> {isAdding ? 'adding...' : 'add to cart'}
                 </>
               )}
             </button>
             <button
-              className="p-3 border border-border rounded-sm text-muted-foreground hover:bg-secondary hover:text-destructive transition duration-300"
+              className="border border-border p-4 text-muted-foreground transition duration-300 hover:bg-secondary hover:text-destructive"
               type="button"
             >
-              <Heart className="w-6 h-6" />
+              <Heart className="h-5 w-5" />
             </button>
           </div>
 
           {cartMessage?.text && (
-            <p
-              className={`mt-4 text-sm ${cartMessage.type === 'error' ? 'text-red-500' : 'text-green-500'
-                }`}
-            >
+            <p className={`mt-4 text-sm ${cartMessage.type === 'error' ? 'text-destructive' : 'text-primary'}`}>
               {cartMessage.text}
             </p>
           )}
 
           {shareMessage?.text && (
-            <p
-              className={`mt-4 text-sm ${shareMessage.type === 'error' ? 'text-red-500' : 'text-green-500'
-                }`}
-            >
+            <p className={`mt-4 text-sm ${shareMessage.type === 'error' ? 'text-destructive' : 'text-primary'}`}>
               {shareMessage.text}
             </p>
           )}
 
           {!selectedSize && (
-            <p className="text-red-500 text-sm mt-3 text-center">Please select a Size before adding to cart.</p>
+            <p className="mt-3 text-center text-sm text-destructive">Please select a size before adding to cart.</p>
           )}
         </div>
       </div>
-    </div>
+    </main>
+    <Footer />
+    </>
   );
 };
 

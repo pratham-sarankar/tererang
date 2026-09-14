@@ -105,7 +105,7 @@ const AddressBook = () => {
     <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-4xl mx-auto">
         <header className="text-center mb-10">
-          <p className="uppercase tracking-[0.35em] text-xs text-accent">profile</p>
+          <p className="text-sm font-semibold tracking-[0.08em] text-accent">Profile</p>
           <h1 className="text-4xl font-serif lowercase text-foreground mt-3">manage delivery addresses</h1>
           <p className="text-muted-foreground mt-3">Save multiple addresses to breeze through checkout without retyping details.</p>
         </header>
@@ -120,7 +120,7 @@ const AddressBook = () => {
           <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin size={18} />
-              <span className="text-xs font-medium uppercase tracking-[0.3em]">Saved addresses</span>
+              <span className="text-sm font-medium">Saved addresses</span>
             </div>
             {addresses.length > 0 && (
               <button
@@ -160,7 +160,7 @@ const AddressBook = () => {
                       {address.line2 ? `, ${address.line2}` : ''}
                       {address.landmark ? `, ${address.landmark}` : ''}, {address.city}, {address.state} {address.postalCode}, {address.country}
                     </p>
-                    {address.label && <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mt-1">{address.label}</p>}
+                    {address.label && <p className="mt-1 text-xs tracking-[0.08em] text-muted-foreground">{address.label}</p>}
                   </div>
                   <div className="flex gap-2 text-sm">
                     <button
