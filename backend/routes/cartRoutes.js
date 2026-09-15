@@ -2,6 +2,7 @@ import express from 'express';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { apiLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -118,7 +119,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', apiLimiter, async (req, res) => {
     try {
         const { productId, quantity = 1, size, height } = req.body;
 
@@ -184,7 +185,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.patch('/:itemId', async (req, res) => {
+router.patch('/:itemId', apiLimiter, async (req, res) => {
     try {
         const { itemId } = req.params;
         const { quantity, size, height } = req.body;
@@ -247,7 +248,7 @@ router.patch('/:itemId', async (req, res) => {
     }
 });
 
-router.delete('/:itemId', async (req, res) => {
+router.delete('/:itemId', apiLimiter, async (req, res) => {
     try {
         const { itemId } = req.params;
         const user = await User.findById(req.user._id);
@@ -275,7 +276,7 @@ router.delete('/:itemId', async (req, res) => {
     }
 });
 
-router.delete('/', async (req, res) => {
+router.delete('/', apiLimiter, async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
         if (!user) {
