@@ -31,7 +31,7 @@ const ProductDetailPage = () => {
   });
   const [loading, setLoading] = useState(!product);
   const [error, setError] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(product?.sizes[0] || '');
+  const [selectedSize, setSelectedSize] = useState('');
   const [mainImage, setMainImage] = useState(product?.gallery[0]);
   const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -101,30 +101,23 @@ const ProductDetailPage = () => {
   }, [canFetchFromBackend, productId]);
 
   const displaySizes = useMemo(() => {
-    const normalized = Array.isArray(product?.sizes) ? product.sizes : [];
-    const sanitized = normalized.map((size) => {
-      if (!size || typeof size !== 'string') return size;
-      const compact = size.replace(/\s+/g, '').toLowerCase();
-      return compact === 'extrasmall' || compact === 'xs' ? 'XS' : size;
-    });
-    const hasExtraSmall = normalized.some((size) => {
-      if (!size || typeof size !== 'string') return false;
-      const compact = size.replace(/\s+/g, '').toLowerCase();
-      return compact === 'extrasmall' || compact === 'xs';
-    });
-
-    if (sanitized.length === 0) {
-      return ['XS'];
+    if (Array.isArray(product?.sizeOptions) && product.sizeOptions.length > 0) {
+      return product.sizeOptions;
     }
 
-    return hasExtraSmall ? sanitized : ['XS', ...sanitized];
+    return (product?.sizes || []).map((size) => ({ label: size, quantity: null }));
   }, [product]);
+
+  const isSizeSelectable = (option) => option && (option.quantity === null || option.quantity > 0);
 
   useEffect(() => {
     if (!product) return;
-    setSelectedSize(displaySizes[0] || '');
+    const nextSelectedSize = displaySizes.find((option) => option.label === selectedSize && isSizeSelectable(option))?.label
+      || displaySizes.find((option) => isSizeSelectable(option))?.label
+      || '';
+    setSelectedSize(nextSelectedSize);
     setMainImage(product.gallery[0]);
-  }, [product, displaySizes]);
+  }, [displaySizes, product, selectedSize]);
 
   // Calculate displayed original price (marked up from database price)
   const calculateDisplayedOriginalPrice = (dbPrice) => {
@@ -315,19 +308,24 @@ const ProductDetailPage = () => {
             <span className="text-sm text-primary">{selectedSize || 'select'}</span>
           </h3>
           <div className="flex flex-wrap gap-3 mb-6">
-            {displaySizes.map((size) => (
+            {displaySizes.map((option) => {
+              const isSelectable = isSizeSelectable(option);
+              return (
               <button
-                key={size}
-                onClick={() => setSelectedSize(size)}
-                className={`min-w-14 border px-5 py-3 text-sm font-semibold transition duration-200 ${selectedSize === size
+                key={option.label}
+                onClick={() => isSelectable && setSelectedSize(option.label)}
+                className={`min-w-14 border px-5 py-3 text-sm font-semibold transition duration-200 ${selectedSize === option.label
                   ? 'bg-primary text-white border-primary'
-                  : 'border-border text-foreground hover:border-primary hover:bg-secondary'
+                  : isSelectable
+                    ? 'border-border text-foreground hover:border-primary hover:bg-secondary'
+                    : 'cursor-not-allowed border-border/60 text-muted-foreground line-through opacity-60'
                   }`}
+                disabled={!isSelectable}
                 type="button"
               >
-                {size}
+                {option.label}
               </button>
-            ))}
+            )})}
           </div>
 
           <div className="mb-10" />

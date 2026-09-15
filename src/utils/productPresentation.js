@@ -26,6 +26,35 @@ export const toAbsoluteImage = (pathValue) => {
     return /^https?:\/\//i.test(pathValue) ? pathValue : imageUrl(pathValue);
 };
 
+const normalizeSizeLabel = (value) => {
+    if (!value || typeof value !== 'string') return '';
+    const trimmed = value.trim();
+    const compact = trimmed.replace(/\s+/g, '').toLowerCase();
+    return compact === 'extrasmall' || compact === 'xs' ? 'XS' : trimmed;
+};
+
+const deriveSizeOptions = (rawProduct = {}) => {
+    if (Array.isArray(rawProduct.sizeStock) && rawProduct.sizeStock.length > 0) {
+        return rawProduct.sizeStock
+            .map((entry) => {
+                const label = normalizeSizeLabel(entry?.size || entry?.label);
+                if (!label) return null;
+                const quantity = Number(entry?.quantity);
+                return {
+                    label,
+                    quantity: Number.isFinite(quantity) ? Math.max(0, quantity) : 0,
+                };
+            })
+            .filter(Boolean);
+    }
+
+    const sizes = rawProduct.sizes?.length ? rawProduct.sizes : DEFAULT_SIZES;
+    return sizes
+        .map((size) => normalizeSizeLabel(size))
+        .filter(Boolean)
+        .map((label) => ({ label, quantity: null }));
+};
+
 const stripCurrency = (value) => {
     if (typeof value === 'number') return value;
     if (typeof value !== 'string') return null;
@@ -52,6 +81,7 @@ export const computeDiscount = (current, previous) => {
 export const mapProductForDisplay = (rawProduct = {}, options = {}) => {
     const fallbackBrand = options.fallbackBrand || 'Tererang';
     const backendId = rawProduct.backendId || rawProduct._id || rawProduct.id;
+    const sizeOptions = deriveSizeOptions(rawProduct);
 
     const gallerySources = [
         ...(Array.isArray(rawProduct.gallery) ? rawProduct.gallery : []),
@@ -113,7 +143,8 @@ export const mapProductForDisplay = (rawProduct = {}, options = {}) => {
         image: gallery[0],
         gallery,
         additionalImages: gallery.slice(1),
-        sizes: rawProduct.sizes?.length ? rawProduct.sizes : DEFAULT_SIZES,
+        sizes: sizeOptions.map((option) => option.label),
+        sizeOptions,
         heightOptions: rawProduct.heightOptions?.length
             ? rawProduct.heightOptions
             : DEFAULT_HEIGHTS,

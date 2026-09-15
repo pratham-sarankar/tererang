@@ -5,6 +5,69 @@ import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+const normalizeSizeKey = (value) => String(value || '').trim().toLowerCase();
+
+const findSizeVariant = (product, size) => {
+    if (!Array.isArray(product?.sizeStock) || product.sizeStock.length === 0) {
+        return null;
+    }
+
+    const normalizedSize = normalizeSizeKey(size);
+    if (!normalizedSize) return null;
+
+    return product.sizeStock.find((entry) => normalizeSizeKey(entry?.size) === normalizedSize) || null;
+};
+
+const getReservedQuantityForSize = (cart = [], productId, size, excludeItemId = null) => {
+    const normalizedSize = normalizeSizeKey(size);
+    if (!normalizedSize) return 0;
+
+    return cart.reduce((sum, item) => {
+        if (excludeItemId && String(item?._id) === String(excludeItemId)) {
+            return sum;
+        }
+
+        const cartProductId = typeof item?.product === 'object' ? item.product?._id : item?.product;
+        if (String(cartProductId) !== String(productId)) {
+            return sum;
+        }
+
+        return normalizeSizeKey(item?.size) === normalizedSize
+            ? sum + (Number(item?.quantity) || 0)
+            : sum;
+    }, 0);
+};
+
+const validateSizeStockAvailability = ({ product, cart, productId, size, requestedQuantity, excludeItemId = null }) => {
+    if (!Array.isArray(product?.sizeStock) || product.sizeStock.length === 0) {
+        return null;
+    }
+
+    if (!normalizeSizeKey(size)) {
+        return 'Please select a size';
+    }
+
+    const variant = findSizeVariant(product, size);
+    if (!variant) {
+        return 'Selected size is unavailable';
+    }
+
+    const availableQuantity = Number(variant.quantity) || 0;
+    if (availableQuantity <= 0) {
+        return `Size ${variant.size} is out of stock`;
+    }
+
+    const reservedQuantity = getReservedQuantityForSize(cart, productId, variant.size, excludeItemId);
+    if (reservedQuantity + requestedQuantity > availableQuantity) {
+        const remainingQuantity = Math.max(availableQuantity - reservedQuantity, 0);
+        return remainingQuantity > 0
+            ? `Only ${remainingQuantity} item(s) left for size ${variant.size}`
+            : `Size ${variant.size} is out of stock`;
+    }
+
+    return null;
+};
+
 const mapCartResponse = (cart = []) => {
     const items = cart.map((item) => {
         const product = item.product && typeof item.product === 'object'
@@ -73,7 +136,20 @@ router.post('/', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const safeQty = Number(quantity) > 0 ? Number(quantity) : 1;
+        const safeQty = Number.isFinite(Number(quantity)) && Number(quantity) > 0
+            ? Math.max(1, Math.floor(Number(quantity)))
+            : 1;
+
+        const availabilityError = validateSizeStockAvailability({
+            product,
+            cart: user.cart,
+            productId,
+            size,
+            requestedQuantity: safeQty,
+        });
+        if (availabilityError) {
+            return res.status(400).json({ message: availabilityError });
+        }
 
         const existingItem = user.cart.find(
             (item) =>
@@ -128,7 +204,26 @@ router.patch('/:itemId', async (req, res) => {
             if (Number.isNaN(parsedQty) || parsedQty < 1) {
                 return res.status(400).json({ message: 'Quantity must be at least 1' });
             }
-            cartItem.quantity = parsedQty;
+            cartItem.quantity = Math.floor(parsedQty);
+        }
+
+        const product = await Product.findById(cartItem.product);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        const nextSize = size !== undefined ? size : cartItem.size;
+        const nextQuantity = cartItem.quantity || 1;
+        const availabilityError = validateSizeStockAvailability({
+            product,
+            cart: user.cart,
+            productId: product._id,
+            size: nextSize,
+            requestedQuantity: nextQuantity,
+            excludeItemId: cartItem._id,
+        });
+        if (availabilityError) {
+            return res.status(400).json({ message: availabilityError });
         }
 
         if (size !== undefined) {
