@@ -43,7 +43,7 @@ const resolveProductImage = (product) => {
   return imageUrl(candidate);
 };
 
-const linkTone = "group relative py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-foreground transition hover:text-accent";
+const linkTone = "group relative py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/90 transition-colors duration-200 hover:text-primary";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -171,15 +171,15 @@ const Navbar = () => {
   ];
 
   const cartPanel = (
-    <div className="storefront-popup absolute right-0 z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] p-5 text-foreground">
-      <div className="mb-3 flex items-center justify-between">
+    <div className="storefront-popup absolute right-0 z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] p-6 text-foreground">
+      <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground">My cart</p>
           <p className="font-serif text-xl lowercase text-foreground">
             {cartHasItems ? `${cartCount} item${cartCount === 1 ? "" : "s"}` : "no items yet"}
           </p>
         </div>
-        {cartHasItems ? <span className="text-sm text-muted-foreground">{formatCurrency(cartTotal)}</span> : null}
+        {cartHasItems ? <span className="text-sm font-medium text-foreground">{formatCurrency(cartTotal)}</span> : null}
       </div>
 
       {cartFeedback ? (
@@ -190,8 +190,8 @@ const Navbar = () => {
 
       {!isAuthenticated ? (
         <div className="text-center text-sm text-muted-foreground">
-          <p className="mb-3">Log in to start adding beautiful fits to your cart.</p>
-          <Link to="/login" onClick={() => setIsCartOpen(false)} className="inline-block bg-primary px-5 py-2 text-xs font-semibold tracking-[0.12em] text-white transition hover:bg-primary/90">
+          <p className="mb-4">Log in to start adding beautiful fits to your cart.</p>
+          <Link to="/login" onClick={() => setIsCartOpen(false)} className="inline-block bg-primary px-6 py-2.5 text-xs font-semibold tracking-[0.14em] uppercase text-white transition hover:bg-primary/90">
             Login to continue
           </Link>
         </div>
@@ -199,12 +199,12 @@ const Navbar = () => {
         <p className="text-sm text-muted-foreground">Loading cart...</p>
       ) : cartHasItems ? (
         <>
-          <div className="max-h-64 divide-y divide-border overflow-y-auto">
+          <div className="max-h-64 divide-y divide-border/60 overflow-y-auto pr-1">
             {cartItems.map((item) => {
               const previewSrc = resolveProductImage(item.product);
               return (
-                <div key={item.id} className="flex items-start gap-3 py-3">
-                  <ProductImage src={previewSrc} alt={item.product?.name || "Product image"} className="h-16 w-16 border border-border object-cover" />
+                <div key={item.id} className="flex items-start gap-3 py-3.5">
+                  <ProductImage src={previewSrc} alt={item.product?.name || "Product image"} className="h-16 w-16 border border-border/70 object-cover" />
                   <div className="flex-1">
                     <p className="text-sm font-medium leading-tight text-foreground">{item.product?.name || "Unavailable product"}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -227,16 +227,16 @@ const Navbar = () => {
               );
             })}
           </div>
-          <div className="mt-4 border-t border-border pt-4 text-sm">
-            <div className="mb-3 flex items-center justify-between">
+          <div className="mt-4 border-t border-border/70 pt-4 text-sm">
+            <div className="mb-4 flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal</span>
               <span className="font-medium text-foreground">{formatCurrency(cartTotal)}</span>
             </div>
-            <div className="space-y-2">
-              <Link to="/checkout" onClick={() => setIsCartOpen(false)} className="block w-full bg-primary py-2 text-center text-xs font-semibold tracking-[0.12em] text-white transition hover:bg-primary/90">
+            <div className="space-y-2.5">
+              <Link to="/checkout" onClick={() => setIsCartOpen(false)} className="block w-full bg-primary py-2.5 text-center text-xs font-semibold tracking-[0.14em] uppercase text-white transition hover:bg-primary/90">
                 Proceed to checkout
               </Link>
-              <Link to="/shop" onClick={() => setIsCartOpen(false)} className="block w-full border border-border bg-secondary py-2 text-center text-xs font-semibold tracking-[0.12em] text-foreground transition hover:border-primary">
+              <Link to="/shop" onClick={() => setIsCartOpen(false)} className="block w-full border border-border bg-secondary py-2.5 text-center text-xs font-semibold tracking-[0.14em] uppercase text-foreground transition hover:border-primary">
                 Continue shopping
               </Link>
             </div>
@@ -267,57 +267,59 @@ const Navbar = () => {
               <img src={logo} alt="Tererang" className="h-10 w-auto md:h-16" />
             </Link>
 
-            <div className="relative z-20 flex items-center gap-2.5 md:gap-5">
-              <Link to="/shop" className="p-1 text-foreground transition hover:text-accent" aria-label="Search collections">
-                <Search className="h-5 w-5 stroke-2" />
+            <div className="relative z-20 flex items-center gap-3 md:gap-6">
+              <Link to="/shop" className="p-1.5 text-foreground/80 transition-colors duration-200 hover:text-primary" aria-label="Search collections">
+                <Search className="h-[18px] w-[18px] stroke-[1.75]" />
               </Link>
 
               <div className="relative hidden md:block" ref={loginRef}>
-                <button type="button" onClick={() => setIsLoginMenuOpen((s) => !s)} className="p-1 text-foreground transition hover:text-accent" aria-label={isAuthenticated ? "Account menu" : "Login"}>
-                  <User className="h-5 w-5 stroke-2" />
+                <button type="button" onClick={() => setIsLoginMenuOpen((s) => !s)} className="p-1.5 text-foreground/80 transition-colors duration-200 hover:text-primary" aria-label={isAuthenticated ? "Account menu" : "Login"}>
+                  <User className="h-[18px] w-[18px] stroke-[1.75]" />
                 </button>
 
-                <div className={`storefront-popup absolute right-0 z-50 mt-4 w-64 border border-border bg-card p-5 text-foreground transition-all duration-200 ${isLoginMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                <div className={`storefront-popup absolute right-0 z-50 mt-4 w-64 p-6 text-foreground transition-all duration-200 ${isLoginMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
                   {isAuthenticated ? (
                     <>
-                      <div className="mb-3 flex items-center gap-2">
+                      <div className="mb-4 flex items-center gap-3">
                         <User className="h-5 w-5 text-primary" />
                         <div>
-                          <h4 className="font-serif text-xl lowercase text-foreground">{user?.name || "welcome"}</h4>
-                          <p className="text-sm text-muted-foreground">{user?.phoneNumber}</p>
+                          <h4 className="font-serif text-lg lowercase text-foreground">{user?.name || "welcome"}</h4>
+                          <p className="text-xs text-muted-foreground">{user?.phoneNumber}</p>
                         </div>
                       </div>
-                      <hr className="mb-3 border-border" />
+                      <hr className="mb-4 border-border/60" />
                       <ul className="space-y-3 text-sm">
-                        <li><Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-primary transition hover:opacity-80"><Package className="mr-2 h-4 w-4" /> My orders</Link></li>
-                        <li><Link to="/addresses" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-primary transition hover:opacity-80"><MapPin className="mr-2 h-4 w-4" /> Addresses</Link></li>
+                        <li><Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary"><Package className="mr-2.5 h-4 w-4 text-primary" /> My orders</Link></li>
+                        <li><Link to="/addresses" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary"><MapPin className="mr-2.5 h-4 w-4 text-primary" /> Addresses</Link></li>
                         <li>
-                          <button onClick={handleLogout} className="flex w-full items-center text-left text-destructive transition hover:opacity-80" type="button">
-                            <LogOut className="mr-2 h-4 w-4" /> Logout
+                          <button onClick={handleLogout} className="flex w-full items-center text-left text-destructive transition-colors duration-200 hover:opacity-80" type="button">
+                            <LogOut className="mr-2.5 h-4 w-4" /> Logout
                           </button>
                         </li>
                       </ul>
                     </>
                   ) : (
                     <>
-                      <h4 className="mb-2 font-serif text-xl lowercase">welcome</h4>
-                      <p className="mb-4 text-sm text-muted-foreground">Access your account and manage orders.</p>
-                      <Link to="/login" onClick={() => setIsLoginMenuOpen(false)} className="block bg-primary py-2 text-center text-xs font-semibold tracking-[0.12em] text-white transition hover:bg-primary/90">
+                      <h4 className="mb-1 font-serif text-lg lowercase text-foreground">welcome</h4>
+                      <p className="mb-4 text-xs text-muted-foreground">Access your account and manage orders.</p>
+                      <Link to="/login" onClick={() => setIsLoginMenuOpen(false)} className="block bg-primary py-2.5 text-center text-xs font-semibold tracking-[0.14em] uppercase text-white transition hover:bg-primary/90">
                         Login / signup
                       </Link>
-                      <hr className="my-4 border-border" />
-                      <Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="mb-3 flex items-center text-sm text-primary transition hover:opacity-80"><Package className="mr-2 h-4 w-4" /> My orders</Link>
-                      <Link to="/AlwaysOffers" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-sm text-primary transition hover:opacity-80"><Gift className="mr-2 h-4 w-4" /> Offers</Link>
+                      <hr className="my-4 border-border/60" />
+                      <ul className="space-y-3 text-sm">
+                        <li><Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary"><Package className="mr-2.5 h-4 w-4 text-primary" /> My orders</Link></li>
+                        <li><Link to="/AlwaysOffers" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary"><Gift className="mr-2.5 h-4 w-4 text-primary" /> Offers</Link></li>
+                      </ul>
                     </>
                   )}
                 </div>
               </div>
 
               <div className="relative" ref={cartRef}>
-                <button type="button" onClick={() => setIsCartOpen((prev) => !prev)} className="relative p-1 text-foreground transition hover:text-accent" aria-label="Cart">
-                  <ShoppingBag className="h-5 w-5 stroke-2" />
+                <button type="button" onClick={() => setIsCartOpen((prev) => !prev)} className="relative p-1.5 text-foreground/80 transition-colors duration-200 hover:text-primary" aria-label="Cart">
+                  <ShoppingBag className="h-[18px] w-[18px] stroke-[1.75]" />
                   {cartCount > 0 ? (
-                    <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-white">
                       {cartBadge}
                     </span>
                   ) : null}
@@ -327,44 +329,46 @@ const Navbar = () => {
             </div>
           </div>
 
-          <nav className="storefront-nav hidden items-center justify-center gap-10 border-t py-3.5 md:flex">
-            <Link to="/" className={`${linkTone} ${isActive("/") ? "text-accent" : ""}`}>
+          <nav className="storefront-nav hidden items-center justify-center gap-12 border-t py-4 md:flex">
+            <Link to="/" className={`${linkTone} ${isActive("/") ? "text-primary" : ""}`}>
               Home
-              <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
+              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
-            <Link to="/shop" className={`${linkTone} ${isActive("/shop") ? "text-accent" : ""}`}>
+            <Link to="/shop" className={`${linkTone} ${isActive("/shop") ? "text-primary" : ""}`}>
               Shop
-              <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
+              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/shop") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
             <div ref={dropdownRef} className="relative" onMouseEnter={() => setIsDropdownOpen(true)} onMouseLeave={() => setIsDropdownOpen(false)}>
-              <button type="button" aria-expanded={isDropdownOpen} aria-controls="navbar-collections" className={`${linkTone} inline-flex items-center gap-1 ${location.pathname.startsWith("/products") ? "text-accent" : ""}`}>
+              <button type="button" aria-expanded={isDropdownOpen} aria-controls="navbar-collections" className={`${linkTone} inline-flex items-center gap-1.5 ${location.pathname.startsWith("/products") ? "text-primary" : ""}`}>
                 Collections
-                <ChevronDown className={`h-3.5 w-3.5 text-accent transition ${isDropdownOpen ? "rotate-180" : ""}`} />
-                <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
+                <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
+                <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${location.pathname.startsWith("/products") ? "w-full" : "w-0 group-hover:w-full"}`} />
               </button>
 
-              <div id="navbar-collections" className={`storefront-popup storefront-collections absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 transition-all duration-200 ${isDropdownOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-                <div className="py-2">
+              <div id="navbar-collections" className={`storefront-popup storefront-collections absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 p-6 text-foreground transition-all duration-200 ${isDropdownOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                <ul className="space-y-3.5 text-sm">
                   {productMenu.map((item) => (
-                    <Link key={item.name} to={item.to} onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground transition hover:bg-secondary/70 hover:text-primary">
-                      <span className="flex h-8 w-8 items-center justify-center border border-border bg-secondary text-primary">{item.icon}</span>
-                      {item.name}
-                    </Link>
+                    <li key={item.name}>
+                      <Link to={item.to} onClick={() => setIsDropdownOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary">
+                        <span className="mr-3 flex items-center justify-center text-primary [&>svg]:h-4 [&>svg]:w-4">{item.icon}</span>
+                        {item.name}
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             </div>
-            <Link to="/products/wedding" className={`${linkTone} ${isActive("/products/wedding") ? "text-accent" : ""}`}>
+            <Link to="/products/wedding" className={`${linkTone} ${isActive("/products/wedding") ? "text-primary" : ""}`}>
               Bestsellers
-              <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
+              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/products/wedding") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
-            <Link to="/TermsPage" className={`${linkTone} ${isActive("/TermsPage") ? "text-accent" : ""}`}>
+            <Link to="/TermsPage" className={`${linkTone} ${isActive("/TermsPage") ? "text-primary" : ""}`}>
               Terms
-              <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
+              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/TermsPage") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
-            <Link to="/contact" className={`${linkTone} ${isActive("/contact") ? "text-accent" : ""}`}>
+            <Link to="/contact" className={`${linkTone} ${isActive("/contact") ? "text-primary" : ""}`}>
               Contact
-              <span className="absolute bottom-0 left-0 h-px w-0 bg-accent/70 transition-all duration-300 group-hover:w-full" />
+              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/contact") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
           </nav>
         </div>
