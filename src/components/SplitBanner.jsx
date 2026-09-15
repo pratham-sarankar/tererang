@@ -28,7 +28,7 @@ export default function SplitBanner() {
     onTouchEnd={event => { if (touchStartX.current !== null) { const delta = touchStartX.current - event.changedTouches[0].clientX; if (Math.abs(delta) > 40) goTo(active + (delta > 0 ? 1 : -1)); } touchStartX.current = null; }}>
     {heroSlides.map((item, index) => <div key={item.title} className={`home-hero-image ${index === active ? "is-active" : ""}`} aria-hidden="true"><img src={item.img} alt="" fetchPriority={index === 0 ? "high" : "auto"} /></div>)}
     <div className="home-hero-shade" />
-    <div className="home-hero-copy"><p className="home-eyebrow">{active === 0 ? "Tererang" : slide.tag}</p><h1>{slide.title.split(" ")[0]}<br /><em>{slide.title.split(" ").slice(1).join(" ")}</em></h1><p className="home-hero-description">{slide.desc}</p><Link className="home-button" to="/shop">{slide.cta}</Link></div>
+    <div className="home-hero-copy"><p className="home-eyebrow">{slide.tag}</p><h1>{slide.title.split(" ")[0]}<br /><em>{slide.title.split(" ").slice(1).join(" ")}</em></h1><p className="home-hero-description">{slide.desc}</p><Link className="home-button" to="/shop">{slide.cta}</Link></div>
     <button className="home-hero-arrow home-hero-prev" onClick={() => goTo(active - 1)} aria-label="Previous slide"><ChevronLeft /></button>
     <button className="home-hero-arrow home-hero-next" onClick={() => goTo(active + 1)} aria-label="Next slide"><ChevronRight /></button>
     <div className="home-hero-dots">{heroSlides.map((item, index) => <button key={item.title} onClick={() => goTo(index)} aria-label={`Go to slide ${index + 1}`} aria-current={index === active ? "true" : undefined} className={index === active ? "is-active" : ""} />)}</div>

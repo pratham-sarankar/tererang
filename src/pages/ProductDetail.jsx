@@ -102,22 +102,12 @@ const ProductDetailPage = () => {
 
   const displaySizes = useMemo(() => {
     const normalized = Array.isArray(product?.sizes) ? product.sizes : [];
-    const sanitized = normalized.map((size) => {
+
+    return normalized.map((size) => {
       if (!size || typeof size !== 'string') return size;
       const compact = size.replace(/\s+/g, '').toLowerCase();
       return compact === 'extrasmall' || compact === 'xs' ? 'XS' : size;
     });
-    const hasExtraSmall = normalized.some((size) => {
-      if (!size || typeof size !== 'string') return false;
-      const compact = size.replace(/\s+/g, '').toLowerCase();
-      return compact === 'extrasmall' || compact === 'xs';
-    });
-
-    if (sanitized.length === 0) {
-      return ['XS'];
-    }
-
-    return hasExtraSmall ? sanitized : ['XS', ...sanitized];
   }, [product]);
 
   useEffect(() => {

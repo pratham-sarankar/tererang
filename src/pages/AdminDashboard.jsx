@@ -1416,7 +1416,7 @@ function ProductSheet({
                         <Button variant="outline" size="sm" onClick={onAddSize}><Plus className="h-4 w-4" /> Add size</Button>
                     </div>
                     {productForm.sizeStock.map((row, index) => (
-                        <div className="grid grid-cols-[1fr_1fr_auto] gap-2" key={`${row.size}-${index}`}>
+                        <div className="grid grid-cols-[1fr_1fr_auto] gap-2" key={index}>
                             <Input placeholder="Size" value={row.size} onChange={(event) => onSizeChange(index, 'size', event.target.value)} />
                             <Input type="number" min="0" placeholder="Qty" value={row.quantity} onChange={(event) => onSizeChange(index, 'quantity', event.target.value)} />
                             <Button variant="destructive" size="icon" disabled={productForm.sizeStock.length <= 1} onClick={() => onRemoveSize(index)}><Trash2 className="h-4 w-4" /></Button>

@@ -43,7 +43,9 @@ const resolveProductImage = (product) => {
   return imageUrl(candidate);
 };
 
-const linkTone = "group relative py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/90 transition-colors duration-200 hover:text-primary";
+const linkTone = "relative rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/75 transition-all duration-300 hover:bg-secondary/70 hover:text-primary";
+
+const iconButtonTone = "rounded-full p-2 text-foreground/70 transition-all duration-200 hover:bg-secondary/70 hover:text-primary";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -56,6 +58,7 @@ const Navbar = () => {
   const [removingItemId, setRemovingItemId] = useState(null);
   const [isProductsAccordionOpen, setIsProductsAccordionOpen] = useState(false);
   const [promotionalText, setPromotionalText] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const dropdownRef = useRef(null);
   const loginRef = useRef(null);
@@ -129,6 +132,13 @@ const Navbar = () => {
     return () => clearTimeout(timer);
   }, [cartFeedback]);
 
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 8);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -171,7 +181,7 @@ const Navbar = () => {
   ];
 
   const cartPanel = (
-    <div className="storefront-popup absolute right-0 z-50 mt-4 w-80 max-w-[calc(100vw-2rem)] p-6 text-foreground">
+    <div className="storefront-popup absolute right-0 z-50 mt-3 w-80 max-w-[calc(100vw-2rem)] origin-top-right p-6 text-foreground">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground">My cart</p>
@@ -254,30 +264,30 @@ const Navbar = () => {
         {announcementText}
       </div>
 
-      <header className="storefront-header sticky top-0 z-50 text-foreground backdrop-blur-md">
+      <header className={`storefront-header sticky top-0 z-50 text-foreground backdrop-blur-md ${isScrolled ? "is-scrolled" : ""}`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-[72px] items-center justify-between">
             <div className="relative z-20 flex w-24 items-center md:w-32">
-              <button type="button" onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-foreground transition hover:text-accent md:hidden" aria-label="Open menu">
+              <button type="button" onClick={() => setIsMobileMenuOpen(true)} className={`${iconButtonTone} md:hidden`} aria-label="Open menu">
                 <Menu className="h-5 w-5" />
               </button>
             </div>
 
-            <Link to="/" className="absolute left-1/2 z-10 -translate-x-1/2">
+            <Link to="/" className="absolute left-1/2 z-10 -translate-x-1/2 transition-transform duration-300 hover:scale-[1.03]">
               <img src={logo} alt="Tererang" className="h-10 w-auto md:h-16" />
             </Link>
 
-            <div className="relative z-20 flex items-center gap-3 md:gap-6">
-              <Link to="/shop" className="p-1.5 text-foreground/80 transition-colors duration-200 hover:text-primary" aria-label="Search collections">
+            <div className="relative z-20 flex items-center gap-1 md:gap-2">
+              <Link to="/shop" className={iconButtonTone} aria-label="Search collections">
                 <Search className="h-[18px] w-[18px] stroke-[1.75]" />
               </Link>
 
               <div className="relative hidden md:block" ref={loginRef}>
-                <button type="button" onClick={() => setIsLoginMenuOpen((s) => !s)} className="p-1.5 text-foreground/80 transition-colors duration-200 hover:text-primary" aria-label={isAuthenticated ? "Account menu" : "Login"}>
+                <button type="button" onClick={() => setIsLoginMenuOpen((s) => !s)} className={iconButtonTone} aria-label={isAuthenticated ? "Account menu" : "Login"}>
                   <User className="h-[18px] w-[18px] stroke-[1.75]" />
                 </button>
 
-                <div className={`storefront-popup absolute right-0 z-50 mt-4 w-64 p-6 text-foreground transition-all duration-200 ${isLoginMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                <div className={`storefront-popup absolute right-0 z-50 mt-3 w-64 origin-top-right p-6 text-foreground transition-all duration-200 ${isLoginMenuOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-95 opacity-0 pointer-events-none'}`}>
                   {isAuthenticated ? (
                     <>
                       <div className="mb-4 flex items-center gap-3">
@@ -316,10 +326,10 @@ const Navbar = () => {
               </div>
 
               <div className="relative" ref={cartRef}>
-                <button type="button" onClick={() => setIsCartOpen((prev) => !prev)} className="relative p-1.5 text-foreground/80 transition-colors duration-200 hover:text-primary" aria-label="Cart">
+                <button type="button" onClick={() => setIsCartOpen((prev) => !prev)} className={`relative ${iconButtonTone}`} aria-label="Cart">
                   <ShoppingBag className="h-[18px] w-[18px] stroke-[1.75]" />
                   {cartCount > 0 ? (
-                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-white">
+                    <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-white shadow-sm ring-2 ring-[var(--card,#fff)]">
                       {cartBadge}
                     </span>
                   ) : null}
@@ -329,28 +339,41 @@ const Navbar = () => {
             </div>
           </div>
 
-          <nav className="storefront-nav hidden items-center justify-center gap-12 border-t py-4 md:flex">
-            <Link to="/" className={`${linkTone} ${isActive("/") ? "text-primary" : ""}`}>
+          <nav className="storefront-nav hidden items-center justify-center gap-1 border-t py-3 md:flex">
+            <Link to="/" className={`${linkTone} ${isActive("/") ? "bg-primary/10 text-primary" : ""}`}>
               Home
-              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
-            <Link to="/shop" className={`${linkTone} ${isActive("/shop") ? "text-primary" : ""}`}>
+            <Link to="/shop" className={`${linkTone} ${isActive("/shop") ? "bg-primary/10 text-primary" : ""}`}>
               Shop
-              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/shop") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
-            <div ref={dropdownRef} className="relative" onMouseEnter={() => setIsDropdownOpen(true)} onMouseLeave={() => setIsDropdownOpen(false)}>
-              <button type="button" aria-expanded={isDropdownOpen} aria-controls="navbar-collections" className={`${linkTone} inline-flex items-center gap-1.5 ${location.pathname.startsWith("/products") ? "text-primary" : ""}`}>
+            <div ref={dropdownRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen((prev) => !prev)}
+                aria-expanded={isDropdownOpen}
+                aria-controls="navbar-collections"
+                className={`${linkTone} inline-flex items-center gap-1.5 ${isDropdownOpen || location.pathname.startsWith("/products") ? "bg-primary/10 text-primary" : ""}`}
+              >
                 Collections
-                <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
-                <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${location.pathname.startsWith("/products") ? "w-full" : "w-0 group-hover:w-full"}`} />
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
               </button>
 
-              <div id="navbar-collections" className={`storefront-popup storefront-collections absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 p-6 text-foreground transition-all duration-200 ${isDropdownOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-                <ul className="space-y-3.5 text-sm">
+              <div
+                id="navbar-collections"
+                className={`storefront-popup storefront-collections absolute left-1/2 top-full z-50 mt-3 w-72 origin-top -translate-x-1/2 p-2 text-foreground transition-all duration-200 ${isDropdownOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-95 opacity-0 pointer-events-none'}`}
+              >
+                <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Shop by category</p>
+                <ul>
                   {productMenu.map((item) => (
                     <li key={item.name}>
-                      <Link to={item.to} onClick={() => setIsDropdownOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary">
-                        <span className="mr-3 flex items-center justify-center text-primary [&>svg]:h-4 [&>svg]:w-4">{item.icon}</span>
+                      <Link
+                        to={item.to}
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="group/item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground/85 transition-all duration-200 hover:bg-secondary hover:text-primary"
+                      >
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors duration-200 group-hover/item:bg-primary group-hover/item:text-white [&>svg]:h-4 [&>svg]:w-4">
+                          {item.icon}
+                        </span>
                         {item.name}
                       </Link>
                     </li>
@@ -358,17 +381,14 @@ const Navbar = () => {
                 </ul>
               </div>
             </div>
-            <Link to="/products/wedding" className={`${linkTone} ${isActive("/products/wedding") ? "text-primary" : ""}`}>
+            <Link to="/products/wedding" className={`${linkTone} ${isActive("/products/wedding") ? "bg-primary/10 text-primary" : ""}`}>
               Bestsellers
-              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/products/wedding") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
-            <Link to="/TermsPage" className={`${linkTone} ${isActive("/TermsPage") ? "text-primary" : ""}`}>
+            <Link to="/TermsPage" className={`${linkTone} ${isActive("/TermsPage") ? "bg-primary/10 text-primary" : ""}`}>
               Terms
-              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/TermsPage") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
-            <Link to="/contact" className={`${linkTone} ${isActive("/contact") ? "text-primary" : ""}`}>
+            <Link to="/contact" className={`${linkTone} ${isActive("/contact") ? "bg-primary/10 text-primary" : ""}`}>
               Contact
-              <span className={`absolute bottom-0 left-0 h-[1.5px] bg-primary transition-all duration-300 ease-out ${isActive("/contact") ? "w-full" : "w-0 group-hover:w-full"}`} />
             </Link>
           </nav>
         </div>

@@ -91,7 +91,7 @@ const Home = () => {
       <section className="home-section home-collections" aria-labelledby="collections-title">
         <div className="home-container">
           <div className="home-section-heading">
-            <div><p className="home-eyebrow">Curated closets</p><h2 id="collections-title">shop by <em>collection</em></h2></div>
+            <div><p className="home-eyebrow">The collection edit</p><h2 id="collections-title">A wardrobe, <em>considered.</em></h2></div>
             <Link className="home-text-link" to="/shop">Shop all collections <ArrowRight size={15} /></Link>
           </div>
           <HomeCarousel label="Collections">
@@ -110,8 +110,8 @@ const Home = () => {
       <section id="latest-collection" className="home-section home-bestsellers" aria-labelledby="bestsellers-title">
         <div className="home-container">
           <div className="home-section-heading">
-            <div><p className="home-eyebrow">Highly coveted</p><h2 id="bestsellers-title">the bestsellers <em>shelf</em></h2></div>
-            <Link className="home-text-link" to="/shop">Shop bestsellers <ArrowRight size={15} /></Link>
+            <div><p className="home-eyebrow">Discover Tererang</p><h2 id="bestsellers-title">Pieces to <em>treasure.</em></h2></div>
+            <Link className="home-text-link" to="/shop">Explore the edit <ArrowRight size={15} /></Link>
           </div>
           {loading && !enrichedProducts.length && !error ? <div className="home-skeletons" role="status" aria-label="Loading products">{Array.from({length:4}, (_, i) => <div className="home-skeleton" key={i} />)}</div> : null}
           {!loading && !error && !enrichedProducts.length ? <div className="home-status"><h3>No products available yet</h3><p>Check back soon for our latest collection.</p></div> : null}
@@ -126,7 +126,7 @@ const Home = () => {
         <div className="home-container home-tailoring-grid">
           <img className="home-tailoring-image" src={tailoringImage} alt="Tererang traditional silhouettes and embroidery" loading="lazy" />
           <div className="home-tailoring-copy"><p className="home-eyebrow">Bespoke services</p>
-            <h2 id="tailoring-title">personal styling <em>&</em> custom tailoring</h2><div className="home-rose-rule" />
+            <h2 id="tailoring-title">Made personal.<br /><em>Made for you.</em></h2><div className="home-rose-rule" />
             <p className="home-tailoring-description">Tererang pieces are shaped around your rhythm: complimentary size guidance, length adjustments, and direct designer consultation for outfits that fit beautifully.</p>
             <div className="home-actions"><a className="home-button" href="https://wa.me/919548971147" target="_blank" rel="noopener noreferrer"><MessageCircle size={16} />Chat with designer</a><Link className="home-button home-button-outline" to="/shop">Explore catalog</Link></div>
           </div>

@@ -21,22 +21,22 @@
 }
 
 :root {
-  --background: #fcf6f9;
-  --foreground: #291421;
+  --background: #faf7f0;
+  --foreground: #29251f;
   --card: #ffffff;
-  --card-foreground: #291421;
-  --primary: #8b2658;
+  --card-foreground: #29251f;
+  --primary: #652d3c;
   --primary-foreground: #ffffff;
-  --secondary: #f8ebf2;
-  --secondary-foreground: #291421;
-  --muted: #f0dbe7;
-  --muted-foreground: #856075;
-  --accent: #b74378;
+  --secondary: #f2ede3;
+  --secondary-foreground: #29251f;
+  --muted: #e9e1d3;
+  --muted-foreground: #746b60;
+  --accent: #866b3f;
   --accent-foreground: #ffffff;
   --destructive: #b93b3b;
-  --border: #ebd3e0;
-  --input: #ebd3e0;
-  --ring: #8b2658;
+  --border: #ded5c6;
+  --input: #ded5c6;
+  --ring: #652d3c;
 }
 
 * {
@@ -55,7 +55,7 @@ body {
 }
 
 ::selection {
-  background: rgba(139, 38, 88, 0.2);
+  background: rgba(101, 45, 60, 0.2);
 }
 
 html {
@@ -76,7 +76,7 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cca0b8;
+  background: #b9aa93;
   border: 2px solid var(--secondary);
 }
 

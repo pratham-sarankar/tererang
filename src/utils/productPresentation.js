@@ -113,7 +113,9 @@ export const mapProductForDisplay = (rawProduct = {}, options = {}) => {
         image: gallery[0],
         gallery,
         additionalImages: gallery.slice(1),
-        sizes: rawProduct.sizes?.length ? rawProduct.sizes : DEFAULT_SIZES,
+        sizes: (Array.isArray(rawProduct.sizeStock) && rawProduct.sizeStock.length > 0)
+            ? rawProduct.sizeStock.map(s => s.size).filter(Boolean)
+            : (rawProduct.sizes?.length ? rawProduct.sizes : DEFAULT_SIZES),
         heightOptions: rawProduct.heightOptions?.length
             ? rawProduct.heightOptions
             : DEFAULT_HEIGHTS,

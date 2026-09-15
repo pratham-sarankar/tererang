@@ -5,10 +5,10 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-bottom: 1px solid rgba(235, 211, 224, 0.4);
-  background: var(--secondary, #f8ebf2);
+  border-bottom: 1px solid rgba(222, 213, 198, 0.4);
+  background: var(--secondary, #f2ede3);
   padding: 0 16px;
-  color: var(--foreground, #291421);
+  color: var(--foreground, #29251f);
   font-family: inherit;
   font-size: 11px;
   font-weight: 500;
@@ -18,28 +18,34 @@
 }
 
 .storefront-header {
-  --foreground: #291421;
-  --accent: #8b2658;
-  background: rgba(252, 246, 249, 0.92);
-  border-bottom: 1px solid rgba(235, 211, 224, 0.45);
-  box-shadow: 0 4px 20px -4px rgba(41, 20, 33, 0.03);
+  --foreground: #29251f;
+  --accent: #652d3c;
+  background: rgba(250, 247, 240, 0.92);
+  border-bottom: 1px solid rgba(222, 213, 198, 0.45);
+  box-shadow: none;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.storefront-header.is-scrolled {
+  background: rgba(250, 247, 240, 0.98);
+  box-shadow: 0 12px 30px -14px rgba(41, 37, 31, 0.22);
 }
 
 .storefront-nav {
-  border-color: rgba(235, 211, 224, 0.4);
+  border-color: rgba(222, 213, 198, 0.4);
 }
 
 .storefront-popup {
   background: #ffffff;
-  border: 1px solid rgba(235, 211, 224, 0.6);
-  box-shadow: 0 16px 36px -8px rgba(41, 20, 33, 0.08), 0 4px 12px -2px rgba(41, 20, 33, 0.03);
-  border-radius: 4px;
+  border: 1px solid rgba(222, 213, 198, 0.6);
+  box-shadow: 0 20px 45px -12px rgba(41, 37, 31, 0.14), 0 4px 12px -2px rgba(41, 37, 31, 0.05);
+  border-radius: 16px;
 }
 
 .storefront-header :is(a, button):focus-visible {
-  outline: 2px solid #8b2658;
+  outline: 2px solid #652d3c;
   outline-offset: 4px;
 }
 
@@ -50,3 +56,10 @@
   }
 }
 
+
+.storefront-announcement {
+  background: #29251f;
+  color: #f1e8d8;
+  border-bottom-color: #29251f;
+  font-size: 10px;
+}
