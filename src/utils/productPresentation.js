@@ -13,7 +13,6 @@ export const FALLBACK_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
 </svg>
 `).replace(/%20/g, ' ')}`;
 
-export const DEFAULT_SIZES = ['S', 'M', 'L', 'XL'];
 export const DEFAULT_HEIGHTS = ["Up to 5'3''", "5'4''-5'6''", "5'6'' and above"];
 export const DEFAULT_HIGHLIGHTS = [
     { icon: 'Zap', text: 'Ready-to-Ship (2 days)' },
@@ -49,6 +48,50 @@ export const computeDiscount = (current, previous) => {
     return Math.round(((previous - current) / previous) * 100);
 };
 
+/**
+ * Normalizes size stock entries from raw database product data.
+ * If sizeStock is provided as an array of objects, extracts size and numerical quantity.
+ * If sizes array is provided (legacy), normalizes each into a sizeStock entry with unknown quantity (null).
+ * Otherwise returns an empty array.
+ *
+ * @param {Object} rawProduct - Raw product object from database/API
+ * @returns {Array<{size: string, quantity: number|null}>} Normalized sizeStock list
+ */
+export const normalizeSizeStock = (rawProduct = {}) => {
+    if (Array.isArray(rawProduct.sizeStock) && rawProduct.sizeStock.length > 0) {
+        return rawProduct.sizeStock
+            .filter((item) => item && typeof item.size === 'string' && item.size.trim().length > 0)
+            .map((item) => ({
+                size: item.size.trim(),
+                quantity: typeof item.quantity === 'number'
+                    ? Math.max(0, item.quantity)
+                    : (item.quantity !== undefined && item.quantity !== null && !Number.isNaN(Number(item.quantity))
+                        ? Math.max(0, Number(item.quantity))
+                        : 0),
+            }));
+    }
+
+    if (Array.isArray(rawProduct.sizes) && rawProduct.sizes.length > 0) {
+        return rawProduct.sizes
+            .filter((s) => s && typeof s === 'string' && s.trim().length > 0)
+            .map((s) => ({
+                size: s.trim(),
+                quantity: null, // Unknown stock count for legacy string sizes
+            }));
+    }
+
+    return [];
+};
+
+/**
+ * Maps raw backend product data into a structured format ready for storefront display.
+ * Derives available sizes and stock counts strictly from database fields without hardcoded size defaults.
+ *
+ * @param {Object} rawProduct - Raw product payload from the database or API
+ * @param {Object} [options={}] - Configuration options for presentation mapping
+ * @param {string} [options.fallbackBrand='Tererang'] - Default brand fallback if not specified on the product
+ * @returns {Object} Clean presentation-ready product object
+ */
 export const mapProductForDisplay = (rawProduct = {}, options = {}) => {
     const fallbackBrand = options.fallbackBrand || 'Tererang';
     const backendId = rawProduct.backendId || rawProduct._id || rawProduct.id;
@@ -100,6 +143,9 @@ export const mapProductForDisplay = (rawProduct = {}, options = {}) => {
             stripCurrency(displayOldPrice) ?? numericOldPrice,
         );
 
+    const sizeStock = normalizeSizeStock(rawProduct);
+    const sizes = sizeStock.map((entry) => entry.size);
+
     return {
         id: rawProduct.id || rawProduct._id || backendId,
         backendId,
@@ -113,9 +159,8 @@ export const mapProductForDisplay = (rawProduct = {}, options = {}) => {
         image: gallery[0],
         gallery,
         additionalImages: gallery.slice(1),
-        sizes: (Array.isArray(rawProduct.sizeStock) && rawProduct.sizeStock.length > 0)
-            ? rawProduct.sizeStock.map(s => s.size).filter(Boolean)
-            : (rawProduct.sizes?.length ? rawProduct.sizes : DEFAULT_SIZES),
+        sizes,
+        sizeStock,
         heightOptions: rawProduct.heightOptions?.length
             ? rawProduct.heightOptions
             : DEFAULT_HEIGHTS,

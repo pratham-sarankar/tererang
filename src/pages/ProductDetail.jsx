@@ -100,21 +100,34 @@ const ProductDetailPage = () => {
     };
   }, [canFetchFromBackend, productId]);
 
-  const displaySizes = useMemo(() => {
-    const normalized = Array.isArray(product?.sizes) ? product.sizes : [];
+  const sizeOptions = useMemo(() => {
+    const stockEntries = Array.isArray(product?.sizeStock) ? product.sizeStock : [];
 
-    return normalized.map((size) => {
-      if (!size || typeof size !== 'string') return size;
-      const compact = size.replace(/\s+/g, '').toLowerCase();
-      return compact === 'extrasmall' || compact === 'xs' ? 'XS' : size;
+    return stockEntries.map((entry) => {
+      const sizeStr = entry.size || '';
+      const compact = sizeStr.replace(/\s+/g, '').toLowerCase();
+      const display = compact === 'extrasmall' || compact === 'xs' ? 'XS' : sizeStr;
+
+      // Handle null quantity (e.g. legacy logic where sizeStock isn't fully robust)
+      // If quantity is explicitly 0 or less, mark it out of stock
+      const isOutOfStock = entry.quantity !== null && entry.quantity <= 0;
+
+      return {
+        raw: sizeStr,
+        display,
+        quantity: entry.quantity,
+        isOutOfStock,
+      };
     });
   }, [product]);
 
   useEffect(() => {
     if (!product) return;
-    setSelectedSize(displaySizes[0] || '');
+
+    const firstAvailable = sizeOptions.find((opt) => !opt.isOutOfStock);
+    setSelectedSize(firstAvailable ? firstAvailable.display : '');
     setMainImage(product.gallery[0]);
-  }, [product, displaySizes]);
+  }, [product, sizeOptions]);
 
   // Calculate displayed original price (marked up from database price)
   const calculateDisplayedOriginalPrice = (dbPrice) => {
@@ -133,10 +146,19 @@ const ProductDetailPage = () => {
 
   const handleAddToCart = async () => {
     if (!product) return;
-    if (!selectedSize) {
+
+    const selectedOpt = sizeOptions.find((opt) => opt.display === selectedSize);
+
+    if (!selectedSize || !selectedOpt) {
       setCartMessage({ type: 'error', text: 'Please select a size.' });
       return;
     }
+
+    if (selectedOpt.isOutOfStock) {
+      setCartMessage({ type: 'error', text: 'The selected size is currently out of stock.' });
+      return;
+    }
+
     try {
       setIsAdding(true);
       setCartMessage(null);
@@ -305,19 +327,28 @@ const ProductDetailPage = () => {
             <span className="text-sm text-primary">{selectedSize || 'select'}</span>
           </h3>
           <div className="flex flex-wrap gap-3 mb-6">
-            {displaySizes.map((size) => (
-              <button
-                key={size}
-                onClick={() => setSelectedSize(size)}
-                className={`min-w-14 border px-5 py-3 text-sm font-semibold transition duration-200 ${selectedSize === size
-                  ? 'bg-primary text-white border-primary'
-                  : 'border-border text-foreground hover:border-primary hover:bg-secondary'
+            {sizeOptions.length === 0 ? (
+              <span className="text-sm text-destructive">Currently Unavailable</span>
+            ) : (
+              sizeOptions.map((opt) => (
+                <button
+                  key={opt.display}
+                  onClick={() => !opt.isOutOfStock && setSelectedSize(opt.display)}
+                  disabled={opt.isOutOfStock}
+                  title={opt.isOutOfStock ? "Out of Stock" : `Select size ${opt.display}`}
+                  className={`min-w-14 border px-5 py-3 text-sm font-semibold transition duration-200 ${
+                    opt.isOutOfStock
+                      ? 'border-border/50 text-muted-foreground opacity-50 bg-muted/20 cursor-not-allowed line-through'
+                      : selectedSize === opt.display
+                        ? 'bg-primary text-white border-primary'
+                        : 'border-border text-foreground hover:border-primary hover:bg-secondary'
                   }`}
-                type="button"
-              >
-                {size}
-              </button>
-            ))}
+                  type="button"
+                >
+                  {opt.display}
+                </button>
+              ))
+            )}
           </div>
 
           <div className="mb-10" />
@@ -325,7 +356,7 @@ const ProductDetailPage = () => {
           <div className="mt-8 flex w-full gap-3 border-t border-border pt-5">
             <button
               onClick={handleAddToCart}
-              disabled={isAdded || isAdding || !selectedSize}
+              disabled={isAdded || isAdding || !selectedSize || sizeOptions.length === 0}
               className="flex flex-1 items-center justify-center bg-primary px-5 py-4 text-sm font-semibold lowercase tracking-[0.18em] text-white transition duration-300 hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
               type="button"
             >
