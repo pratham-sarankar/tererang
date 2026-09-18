@@ -1,17 +1,136 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, MessageCircle, RefreshCw } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, RefreshCw, Shield, Truck, RotateCcw, Package } from "lucide-react";
 import { apiUrl } from "../config/env.js";
 import { mapProductForDisplay } from "../utils/productPresentation.js";
 import { Footer } from "../components/Footer.jsx";
-import SplitBanner from "../components/SplitBanner.jsx";
-import StorefrontProductCard from "../components/StorefrontProductCard.jsx";
 import HomeCarousel from "../components/HomeCarousel.jsx";
-import { collections } from "../components/storefrontData.js";
+import StorefrontProductCard from "../components/StorefrontProductCard.jsx";
+
+import bannerMain from "../assets/banner_1.jpeg";
+import bannerFloat from "../assets/banner_2.jpeg";
 import tailoringImage from "../assets/traditional_ethnic_wear.png";
+import modernEthnicImg from "../assets/modern_ethnic_fusion.png";
 import "../css/Home.css";
 
 const LATEST_COLLECTION_LIMIT = 12;
+
+/* ---------- Marquee Strip ---------- */
+const MARQUEE_ITEMS = [
+  "New Arrivals",
+  "●",
+  "Handcrafted Silhouettes",
+  "●",
+  "Bespoke Tailoring",
+  "●",
+  "Occasion Couture",
+  "●",
+  "Free Shipping ₹1,999+",
+  "●",
+  "New Arrivals",
+  "●",
+  "Handcrafted Silhouettes",
+  "●",
+  "Bespoke Tailoring",
+  "●",
+  "Occasion Couture",
+  "●",
+  "Free Shipping ₹1,999+",
+  "●",
+];
+
+/* ---------- Trust items (exact from reference) ---------- */
+const TRUST_ITEMS = [
+  {
+    icon: (
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M12 3 4 6v6c0 4.6 3.2 7.9 8 9 4.8-1.1 8-4.4 8-9V6l-8-3Z" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
+    ),
+    title: "Premium quality",
+    desc: "Considered fabrics & finishing.",
+  },
+  {
+    icon: (
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="M3 10h18" />
+      </svg>
+    ),
+    title: "Secure payments",
+    desc: "Protected checkout experience.",
+  },
+  {
+    icon: (
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M4 7h11v10H4zM15 10h3l2 3v4h-5z" />
+      </svg>
+    ),
+    title: "Fast shipping",
+    desc: "Free over ₹1,999.",
+  },
+  {
+    icon: (
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M7 8H4V5" />
+        <path d="M4.5 8A8 8 0 1 1 4 15" />
+        <path d="M9 12h6" />
+      </svg>
+    ),
+    title: "Easy returns",
+    desc: "Simple 7-day returns.",
+  },
+];
+
+/* ---------- Customer Reviews (exact from reference) ---------- */
+const REVIEWS = [
+  {
+    stars: "★★★★★",
+    quote: "“The fit is so clean, but the colour still makes it feel special. I wore it once and immediately ordered another.”",
+    person: "Aarohi M. — Hyderabad",
+  },
+  {
+    stars: "★★★★★",
+    quote: "“It feels premium without trying too hard. The details are even better in person.”",
+    person: "Riya K. — Bengaluru",
+  },
+  {
+    stars: "★★★★★",
+    quote: "“Finally a brand that understands colour and restraint at the same time.”",
+    person: "Naina S. — Pune",
+  },
+];
+
+/* ---------- Community / Styled by you images (editorial fashion) ---------- */
+const COMMUNITY_IMAGES = [
+  {
+    src: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=900&q=86",
+    fallback: bannerMain,
+    alt: "Tere Rang community style",
+    large: true,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?auto=format&fit=crop&w=700&q=86",
+    fallback: modernEthnicImg,
+    alt: "Lifestyle detail",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=700&q=86",
+    fallback: tailoringImage,
+    alt: "Editorial portrait",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1542295661-3fd8d8c25ca8?auto=format&fit=crop&w=700&q=86",
+    fallback: bannerFloat,
+    alt: "Fashion detail",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=700&q=86",
+    fallback: modernEthnicImg,
+    alt: "Wardrobe styling",
+  },
+];
 
 const Home = () => {
   const [latestProducts, setLatestProducts] = useState([]);
@@ -21,7 +140,27 @@ const Home = () => {
   const [reloadFlag, setReloadFlag] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [email, setEmail] = useState("");
+  const [emailNote, setEmailNote] = useState("");
   const navigate = useNavigate();
+
+  /* --- Scroll reveal observer --- */
+  useEffect(() => {
+    const elements = document.querySelectorAll(".reveal");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("show");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   const latestProductsEndpoint = useMemo(
     () => apiUrl(`/api/products?limit=${LATEST_COLLECTION_LIMIT}&page=${currentPage}`),
@@ -40,20 +179,19 @@ const Home = () => {
       try {
         const response = await fetch(latestProductsEndpoint);
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to load latest collection. Please try again.");
-        }
+        if (!response.ok) throw new Error(data.message || "Failed to load latest collection.");
         if (isMounted) {
           const products = Array.isArray(data) ? data : data?.products || [];
           const pagination = data?.pagination;
-
-          setLatestProducts((previous) => (currentPage === 1 ? products : [...previous, ...products.filter((product) => !previous.some((item) => (item._id || item.id) === (product._id || product.id)))]));
+          setLatestProducts((prev) =>
+            currentPage === 1
+              ? products
+              : [...prev, ...products.filter((p) => !prev.some((item) => (item._id || item.id) === (p._id || p.id)))]
+          );
           setHasMore(pagination ? pagination.current < pagination.pages : products.length >= LATEST_COLLECTION_LIMIT);
         }
       } catch (err) {
-        if (isMounted) {
-          setError(err.message || "Unable to fetch products");
-        }
+        if (isMounted) setError(err.message || "Unable to fetch products");
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -61,7 +199,6 @@ const Home = () => {
         }
       }
     };
-
     fetchProducts();
     return () => {
       isMounted = false;
@@ -69,14 +206,14 @@ const Home = () => {
   }, [latestProductsEndpoint, reloadFlag, currentPage]);
 
   const enrichedProducts = useMemo(
-    () => latestProducts.map((product) => mapProductForDisplay(product)),
+    () => latestProducts.map((p) => mapProductForDisplay(p)),
     [latestProducts]
   );
 
   const handleReload = () => {
     setCurrentPage(1);
     setHasMore(true);
-    setReloadFlag((flag) => flag + 1);
+    setReloadFlag((f) => f + 1);
   };
 
   const handleSelectProduct = (product) => {
@@ -85,55 +222,428 @@ const Home = () => {
     navigate(`/product/${targetId}`, { state: { product } });
   };
 
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      setEmailNote("Please enter your email address.");
+      return;
+    }
+    setEmailNote("Thank you! You have been added to our early access list.");
+    setEmail("");
+  };
+
   return (
-    <main className="home-page">
-      <SplitBanner />
-      <section className="home-section home-collections" aria-labelledby="collections-title">
-        <div className="home-container">
-          <div className="home-section-heading">
-            <div><p className="home-eyebrow">The collection edit</p><h2 id="collections-title">A wardrobe, <em>considered.</em></h2></div>
-            <Link className="home-text-link" to="/shop">Shop all collections <ArrowRight size={15} /></Link>
-          </div>
-          <HomeCarousel label="Collections">
-            {collections.map((collection) => (
-              <Link className="home-collection-card" key={collection.to} to={collection.to}>
-                <img src={collection.img} alt={collection.title} loading="lazy" />
-                <div className="home-collection-copy">
-                  <p className="home-eyebrow">{collection.eyebrow}</p>
-                  <h3>{collection.title}</h3><span>Explore collection</span>
-                </div>
+    <main className="hp-main-wrapper">
+      {/* ======================================================
+          SECTION 0: HERO BANNER (Matches reference 100%)
+          ====================================================== */}
+      <section className="hero" id="new">
+        <div className="container hero-grid">
+          {/* Hero Copy */}
+          <div className="hero-copy">
+            <div className="hero-logo-mark hero-animate">
+              <i /> expressive everyday wear
+            </div>
+            <h1 className="hero-animate d1">
+              Wear your <em>rang.</em>
+              <br />
+              Own the room.
+            </h1>
+            <p className="hero-animate d2">
+              Modern silhouettes with a vivid point of view — designed for women who prefer
+              elegance with personality.
+            </p>
+            <div className="hero-actions hero-animate d3">
+              <Link className="btn" to="/shop">
+                <span>Shop the collection</span>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 12h14M14 7l5 5-5 5" />
+                </svg>
               </Link>
+              <Link className="text-link" to="/shop">
+                Explore new arrivals
+              </Link>
+            </div>
+          </div>
+
+          {/* Hero Art */}
+          <div className="hero-art hero-animate d2">
+            <div className="hero-main">
+              <img
+                src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1400&q=88"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = bannerMain;
+                }}
+                alt="Fashion model in a refined editorial look"
+                fetchPriority="high"
+              />
+            </div>
+            <div className="hero-float">
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=88"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = bannerFloat;
+                }}
+                alt="Portrait detail"
+                loading="lazy"
+              />
+            </div>
+            <div className="color-petals" aria-hidden="true">
+              <span className="petal" />
+              <span className="petal" />
+              <span className="petal" />
+              <span className="petal" />
+              <span className="petal" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================
+          MARQUEE STRIP
+          ====================================================== */}
+      <div className="marquee" aria-hidden="true">
+        <div className="marquee-track">
+          {MARQUEE_ITEMS.map((item, i) => (
+            <span key={i}>{item === "●" ? <b>●</b> : item}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* ======================================================
+          SECTION 1: CURATED EDITS / CATEGORIES
+          ====================================================== */}
+      <section className="section" id="categories">
+        <div className="container">
+          <div className="section-head reveal">
+            <div>
+              <div className="kicker">Curated edits</div>
+              <h2>Shop by mood.</h2>
+            </div>
+            <p style={{ maxWidth: 460 }}>
+              Not categories for the sake of categories — each edit is built around a feeling, a palette, and a moment.
+            </p>
+          </div>
+
+          <div className="categories-grid">
+            {/* Card 1: Large */}
+            <Link className="cat large reveal" to="/products/Kurti">
+              <img
+                src="https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=86"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = modernEthnicImg;
+                }}
+                alt="Rang Bloom collection"
+                loading="lazy"
+              />
+              <div className="cat-info">
+                <div className="kicker" style={{ color: "#fff" }}>01 / Statement</div>
+                <h3>Rang Bloom</h3>
+                <span className="round-arrow" aria-hidden="true">→</span>
+              </div>
+            </Link>
+
+            {/* Card 2 */}
+            <Link className="cat reveal" data-delay="1" to="/products/Suit">
+              <img
+                src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=86"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = bannerMain;
+                }}
+                alt="Soft Structure collection"
+                loading="lazy"
+              />
+              <div className="cat-info">
+                <div className="kicker" style={{ color: "#fff" }}>02 / Everyday</div>
+                <h3>Soft Structure</h3>
+                <span className="round-arrow" aria-hidden="true">→</span>
+              </div>
+            </Link>
+
+            {/* Card 3 */}
+            <Link className="cat reveal" data-delay="2" to="/products/wedding">
+              <img
+                src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=86"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = tailoringImage;
+                }}
+                alt="Finishing Touches collection"
+                loading="lazy"
+              />
+              <div className="cat-info">
+                <div className="kicker" style={{ color: "#fff" }}>03 / Details</div>
+                <h3>Finishing Touches</h3>
+                <span className="round-arrow" aria-hidden="true">→</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================
+          SECTION 2: BEST SELLERS (Dynamic Products from API)
+          ====================================================== */}
+      <section className="section products-wrap" id="products">
+        <div className="container">
+          <div className="section-head reveal">
+            <div>
+              <div className="kicker">Best sellers</div>
+              <h2>Most loved, right now.</h2>
+            </div>
+            <Link className="text-link" to="/shop">
+              Shop all pieces
+            </Link>
+          </div>
+
+          {loading && !enrichedProducts.length && !error ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24, padding: "20px 0" }}>
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i} style={{ height: 380, background: "rgba(31,20,32,.05)", borderRadius: 4, animation: "pulse 1.5s infinite" }} />
+              ))}
+            </div>
+          ) : null}
+
+          {enrichedProducts.length > 0 ? (
+            <HomeCarousel label="Best sellers">
+              {enrichedProducts.map((product) => (
+                <StorefrontProductCard
+                  key={product.id}
+                  product={product}
+                  onSelect={handleSelectProduct}
+                  variant="home"
+                />
+              ))}
+              {hasMore ? (
+                <div style={{ minWidth: 260, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", padding: 30, background: "#fff", border: "1px solid var(--line)" }}>
+                  <div className="kicker" style={{ marginBottom: 8 }}>More to discover</div>
+                  <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: 24, margin: "0 0 20px" }}>
+                    Find your next<br /><em>favourite.</em>
+                  </h3>
+                  <button
+                    className="btn"
+                    disabled={loadingMore || loading}
+                    onClick={() => (error ? setReloadFlag((f) => f + 1) : setCurrentPage((p) => p + 1))}
+                    type="button"
+                  >
+                    <span>{loadingMore || loading ? "Loading…" : error ? "Try again" : "Load more pieces"}</span>
+                    <ArrowRight size={15} />
+                  </button>
+                </div>
+              ) : null}
+            </HomeCarousel>
+          ) : null}
+
+          {error ? (
+            <div style={{ textAlign: "center", padding: 40, background: "#fff", border: "1px solid var(--line)", margin: "20px 0" }}>
+              <RefreshCw size={24} style={{ color: "var(--pink)", marginBottom: 12 }} />
+              <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: 20 }}>Unable to load collection</h3>
+              <p style={{ color: "var(--muted)", margin: "8px 0 18px" }}>{error}</p>
+              <button className="btn" onClick={handleReload} type="button">
+                <span>Try again</span>
+              </button>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      {/* ======================================================
+          SECTION 3: EDITORIAL / NEW COLLECTION
+          ====================================================== */}
+      <section className="editorial">
+        <div className="editorial-grid">
+          <div className="editorial-image reveal">
+            <img
+              src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1500&q=88"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = tailoringImage;
+              }}
+              alt="Editorial fashion campaign"
+              loading="lazy"
+            />
+          </div>
+          <div className="editorial-copy reveal">
+            <div className="kicker" style={{ color: "#ff6bb6" }}>
+              New collection / 2026
+            </div>
+            <h2>Colour, with a quieter confidence.</h2>
+            <p>
+              Fluid tailoring, saturated accents, and pieces that move easily from daylight to dinner.
+              The new collection keeps the drama in the details.
+            </p>
+            <Link className="btn" to="/shop">
+              <span>Discover the edit</span>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M5 12h14M14 7l5 5-5 5" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================
+          SECTION 4: STORY / OUR POINT OF VIEW
+          ====================================================== */}
+      <section className="section story" id="story">
+        <div className="container story-grid">
+          <div className="kicker reveal">Our point of view</div>
+          <div>
+            <div className="story-quote reveal">
+              Designed to feel <em>alive.</em>
+              <br />
+              Made to be remembered.
+            </div>
+            <div className="story-copy reveal" data-delay="1">
+              <p>
+                Tere Rang is built around expression — refined shapes, playful colour, and everyday pieces
+                with enough personality to become yours.
+              </p>
+              <Link className="text-link" to="/contact">
+                Read our story
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================
+          SECTION 5: TRUST PILLARS
+          ====================================================== */}
+      <div className="container">
+        <div className="trust-grid">
+          {TRUST_ITEMS.map((item, i) => (
+            <div className="trust-item reveal" data-delay={i % 4} key={item.title}>
+              {item.icon}
+              <div>
+                <h4>{item.title}</h4>
+                <p>{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ======================================================
+          SECTION 6: REVIEWS / CUSTOMER LOVE
+          ====================================================== */}
+      <section className="section reviews-wrap">
+        <div className="container">
+          <div className="section-head reveal">
+            <div>
+              <div className="kicker">The Tere Rang circle</div>
+              <h2>Worn. Loved. Repeated.</h2>
+            </div>
+            <p>Real notes from customers who made the pieces their own.</p>
+          </div>
+          <div className="reviews">
+            {REVIEWS.map((r, i) => (
+              <article className="review reveal" data-delay={i} key={r.person}>
+                <div className="stars">{r.stars}</div>
+                <blockquote>{r.quote}</blockquote>
+                <div className="person">{r.person}</div>
+              </article>
             ))}
-          </HomeCarousel>
-        </div>
-      </section>
-      <section id="latest-collection" className="home-section home-bestsellers" aria-labelledby="bestsellers-title">
-        <div className="home-container">
-          <div className="home-section-heading">
-            <div><p className="home-eyebrow">Discover Tererang</p><h2 id="bestsellers-title">Pieces to <em>treasure.</em></h2></div>
-            <Link className="home-text-link" to="/shop">Explore the edit <ArrowRight size={15} /></Link>
-          </div>
-          {loading && !enrichedProducts.length && !error ? <div className="home-skeletons" role="status" aria-label="Loading products">{Array.from({length:4}, (_, i) => <div className="home-skeleton" key={i} />)}</div> : null}
-          {!loading && !error && !enrichedProducts.length ? <div className="home-status"><h3>No products available yet</h3><p>Check back soon for our latest collection.</p></div> : null}
-          {enrichedProducts.length > 0 ? <HomeCarousel label="Bestsellers">
-            {enrichedProducts.map((product) => <StorefrontProductCard key={product.id} product={product} onSelect={handleSelectProduct} variant="home" />)}
-            {hasMore ? <div className="home-load-more"><p className="home-eyebrow">More to discover</p><h3>Find your next<br /><em>favorite.</em></h3><button className="home-button home-button-outline" disabled={loadingMore || loading} onClick={() => error ? setReloadFlag(flag => flag + 1) : setCurrentPage(page => page + 1)}>{loadingMore || loading ? "Loading…" : error ? "Try again" : "Load more pieces"}<ArrowRight size={15} /></button></div> : null}
-          </HomeCarousel> : null}
-          {error ? <div className="home-status" role="alert"><RefreshCw size={24} /><h3>Unable to load {enrichedProducts.length ? "more pieces" : "collection"}</h3><p>{error}</p><button className="home-button home-button-outline" onClick={enrichedProducts.length ? () => setReloadFlag(flag => flag + 1) : handleReload}>Try again</button></div> : null}
-        </div>
-      </section>
-      <section className="home-tailoring" aria-labelledby="tailoring-title">
-        <div className="home-container home-tailoring-grid">
-          <img className="home-tailoring-image" src={tailoringImage} alt="Tererang traditional silhouettes and embroidery" loading="lazy" />
-          <div className="home-tailoring-copy"><p className="home-eyebrow">Bespoke services</p>
-            <h2 id="tailoring-title">Made personal.<br /><em>Made for you.</em></h2><div className="home-rose-rule" />
-            <p className="home-tailoring-description">Tererang pieces are shaped around your rhythm: complimentary size guidance, length adjustments, and direct designer consultation for outfits that fit beautifully.</p>
-            <div className="home-actions"><a className="home-button" href="https://wa.me/919548971147" target="_blank" rel="noopener noreferrer"><MessageCircle size={16} />Chat with designer</a><Link className="home-button home-button-outline" to="/shop">Explore catalog</Link></div>
           </div>
         </div>
       </section>
+
+      {/* ======================================================
+          SECTION 7: COMMUNITY / STYLED BY YOU (@tererang)
+          CRITICAL: Model face visible with objectPosition: "top"
+          ====================================================== */}
+      <section className="section" style={{ paddingTop: 10 }}>
+        <div className="container">
+          <div className="section-head reveal">
+            <div>
+              <div className="kicker">Follow our world</div>
+              <h2>@tererang</h2>
+            </div>
+            <a
+              className="text-link"
+              href="https://www.instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Instagram ↗
+            </a>
+          </div>
+
+          <div className="community-grid">
+            {COMMUNITY_IMAGES.map((img, i) => (
+              <a
+                className="community-tile reveal"
+                data-delay={i % 3}
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                key={i}
+              >
+                <img
+                  src={img.src}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = img.fallback;
+                  }}
+                  alt={img.alt}
+                  loading="lazy"
+                  style={{ objectPosition: "top" }}
+                />
+                <div className="community-overlay">
+                  {i === 0 ? (
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <rect x="3" y="3" width="18" height="18" rx="5" />
+                      <circle cx="12" cy="12" r="4" />
+                      <path d="M17.5 6.5h.01" />
+                    </svg>
+                  ) : (
+                    "♡"
+                  )}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================
+          SECTION 8: NEWSLETTER
+          ====================================================== */}
+      <section className="newsletter">
+        <div className="container newsletter-grid">
+          <div className="reveal">
+            <div className="kicker">Early access starts here</div>
+            <h2>Stay in the loop.</h2>
+            <p>New drops, private edits, and first access to colour stories.</p>
+          </div>
+          <form className="signup reveal" id="newsletterForm" onSubmit={handleEmailSubmit}>
+            <input
+              id="email"
+              type="email"
+              placeholder="Enter your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <button type="submit">
+              Subscribe <span>↗</span>
+            </button>
+          </form>
+          {emailNote ? (
+            <div className="form-note" style={{ gridColumn: "1 / -1" }}>
+              {emailNote}
+            </div>
+          ) : null}
+        </div>
+      </section>
+
       <Footer variant="home" />
     </main>
   );
 };
+
 export default Home;

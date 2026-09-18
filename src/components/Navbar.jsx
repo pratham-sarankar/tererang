@@ -1,22 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  ChevronDown,
   FileText,
-  Gift,
-  Home,
   LogOut,
   MapPin,
-  Menu,
   Package,
-  Phone,
-  Search,
   ShoppingBag,
   Trash2,
   User,
   X,
 } from "lucide-react";
-import { GiAmpleDress, GiDiamondRing, GiKimono, GiLabCoat, GiPoncho } from "react-icons/gi";
 import { useCart } from "../context/cartContextStore.js";
 import { notifyCartAuthChange } from "../context/cartEvents.js";
 import { apiUrl, imageUrl } from "../config/env.js";
@@ -43,33 +36,30 @@ const resolveProductImage = (product) => {
   return imageUrl(candidate);
 };
 
-const linkTone = "relative rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/75 transition-all duration-300 hover:bg-secondary/70 hover:text-primary";
-
-const iconButtonTone = "rounded-full p-2 text-foreground/70 transition-all duration-200 hover:bg-secondary/70 hover:text-primary";
-
 const Navbar = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMegaOpen, setIsMegaOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoginMenuOpen, setIsLoginMenuOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartFeedback, setCartFeedback] = useState(null);
   const [removingItemId, setRemovingItemId] = useState(null);
-  const [isProductsAccordionOpen, setIsProductsAccordionOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [promotionalText, setPromotionalText] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const dropdownRef = useRef(null);
   const loginRef = useRef(null);
   const cartRef = useRef(null);
+  const searchInputRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { cartItems, cartCount, cartTotal, loading: cartLoading, removeCartItem, error: cartError } = useCart();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
-
     if (token && userData) {
       setIsAuthenticated(true);
       setUser(JSON.parse(userData));
@@ -93,37 +83,28 @@ const Navbar = () => {
         console.error("Error fetching promotional text:", error);
       }
     };
-
     fetchPromotionalText();
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-      if (loginRef.current && !loginRef.current.contains(event.target)) {
-        setIsLoginMenuOpen(false);
-      }
-      if (cartRef.current && !cartRef.current.contains(event.target)) {
-        setIsCartOpen(false);
-      }
+      if (loginRef.current && !loginRef.current.contains(event.target)) setIsLoginMenuOpen(false);
+      if (cartRef.current && !cartRef.current.contains(event.target)) setIsCartOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
-    setIsDropdownOpen(false);
+    setIsMegaOpen(false);
+    setIsSearchOpen(false);
     setIsLoginMenuOpen(false);
-    setIsMobileMenuOpen(false);
+    setIsDrawerOpen(false);
     setIsCartOpen(false);
   }, [location]);
 
   useEffect(() => {
-    if (cartError) {
-      setCartFeedback({ type: "error", text: cartError });
-    }
+    if (cartError) setCartFeedback({ type: "error", text: cartError });
   }, [cartError]);
 
   useEffect(() => {
@@ -133,10 +114,47 @@ const Navbar = () => {
   }, [cartFeedback]);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 8);
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Lock body scroll when search or mobile drawer is open
+  useEffect(() => {
+    if (isSearchOpen || isDrawerOpen) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  }, [isSearchOpen, isDrawerOpen]);
+
+  // Focus search input when search open
+  useEffect(() => {
+    if (isSearchOpen) {
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 250);
+      return () => clearTimeout(timer);
+    }
+  }, [isSearchOpen]);
+
+  // Handle escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsSearchOpen(false);
+        setIsDrawerOpen(false);
+        setIsMegaOpen(false);
+        setIsCartOpen(false);
+        setIsLoginMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const handleLogout = () => {
@@ -164,330 +182,368 @@ const Navbar = () => {
     }
   };
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate("/shop");
+    }
+    setIsSearchOpen(false);
+  };
+
   const isActive = (path) => location.pathname === path;
   const cartHasItems = Array.isArray(cartItems) && cartItems.length > 0;
   const cartBadge = cartCount > 99 ? "99+" : cartCount;
   const hasPromotionalText = promotionalText && promotionalText.trim() !== "";
   const announcementText = hasPromotionalText
     ? promotionalText
-    : "✨ Complimentary shipping across India | Custom stitched to perfection";
+    : "Free shipping on orders over ₹1,999";
 
-  const productMenu = [
-    { name: "Stylish Kurtis", to: "/products/Kurti", enabled: true, icon: <GiAmpleDress /> },
-    { name: "Designer Suits", to: "/products/Suit", enabled: true, icon: <GiKimono /> },
-    { name: "Elegant Coat Sets", to: "/products/Coat", enabled: true, icon: <GiLabCoat /> },
-    { name: "Winter Ethnic Wear", to: "/products/EthnicWear", enabled: true, icon: <GiPoncho /> },
-    { name: "Wedding Collection", to: "/products/wedding", enabled: true, icon: <GiDiamondRing /> },
-  ];
-
+  /* ---- Cart panel popup ---- */
   const cartPanel = (
-    <div className="storefront-popup absolute right-0 z-50 mt-3 w-80 max-w-[calc(100vw-2rem)] origin-top-right p-6 text-foreground">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="nav-cart-popup is-open">
+      <div style={{ marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground">My cart</p>
-          <p className="font-serif text-xl lowercase text-foreground">
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--muted)", margin: 0 }}>My cart</p>
+          <p style={{ fontFamily: '"Playfair Display", serif', fontSize: 20, margin: 0 }}>
             {cartHasItems ? `${cartCount} item${cartCount === 1 ? "" : "s"}` : "no items yet"}
           </p>
         </div>
-        {cartHasItems ? <span className="text-sm font-medium text-foreground">{formatCurrency(cartTotal)}</span> : null}
+        {cartHasItems ? <span style={{ fontSize: 14, fontWeight: 600 }}>{formatCurrency(cartTotal)}</span> : null}
       </div>
 
       {cartFeedback ? (
-        <div className={`mb-3 border px-3 py-2 text-xs ${cartFeedback.type === "error" ? "border-red-200 bg-red-50 text-destructive" : "border-border bg-secondary text-primary"}`}>
+        <div style={{ marginBottom: 12, padding: "8px 12px", fontSize: 12, background: cartFeedback.type === "error" ? "#fef2f2" : "#f9f0f6", border: `1px solid ${cartFeedback.type === "error" ? "#fca5a5" : "#ebcadd"}`, color: cartFeedback.type === "error" ? "#c22f2f" : "#8a0b72" }}>
           {cartFeedback.text}
         </div>
       ) : null}
 
       {!isAuthenticated ? (
-        <div className="text-center text-sm text-muted-foreground">
-          <p className="mb-4">Log in to start adding beautiful fits to your cart.</p>
-          <Link to="/login" onClick={() => setIsCartOpen(false)} className="inline-block bg-primary px-6 py-2.5 text-xs font-semibold tracking-[0.14em] uppercase text-white transition hover:bg-primary/90">
+        <div style={{ textAlign: "center", fontSize: 13, color: "var(--muted)" }}>
+          <p style={{ marginBottom: 16 }}>Log in to view your cart items and checkout quickly.</p>
+          <Link to="/login" onClick={() => setIsCartOpen(false)} style={{ display: "inline-block", background: "var(--pink)", color: "#fff", padding: "10px 24px", fontSize: 12, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", textDecoration: "none" }}>
             Login to continue
           </Link>
         </div>
       ) : cartLoading ? (
-        <p className="text-sm text-muted-foreground">Loading cart...</p>
+        <p style={{ fontSize: 13, color: "var(--muted)" }}>Loading cart...</p>
       ) : cartHasItems ? (
         <>
-          <div className="max-h-64 divide-y divide-border/60 overflow-y-auto pr-1">
+          <div style={{ maxHeight: 256, overflowY: "auto", paddingRight: 4 }}>
             {cartItems.map((item) => {
               const previewSrc = resolveProductImage(item.product);
               return (
-                <div key={item.id} className="flex items-start gap-3 py-3.5">
-                  <ProductImage src={previewSrc} alt={item.product?.name || "Product image"} className="h-16 w-16 border border-border/70 object-cover" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium leading-tight text-foreground">{item.product?.name || "Unavailable product"}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Qty {item.quantity}
-                      {item.size ? ` · size ${item.size}` : ""}
-                      {item.height ? ` · ${item.height}` : ""}
+                <div key={item.id} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 0", borderBottom: "1px solid rgba(235,202,221,.6)" }}>
+                  <ProductImage src={previewSrc} alt={item.product?.name || "Product image"} style={{ width: 64, height: 64, objectFit: "cover", border: "1px solid rgba(235,202,221,.7)", flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 14, fontWeight: 500, margin: 0, lineHeight: 1.3 }}>{item.product?.name || "Unavailable product"}</p>
+                    <p style={{ fontSize: 11, color: "var(--muted)", margin: "4px 0" }}>
+                      Qty {item.quantity}{item.size ? ` · size ${item.size}` : ""}{item.height ? ` · ${item.height}` : ""}
                     </p>
-                    <p className="mt-1 text-sm font-medium text-primary">{formatCurrency(item.lineTotal)}</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--pink)", margin: 0 }}>{formatCurrency(item.lineTotal)}</p>
                   </div>
-                  <button
-                    onClick={() => handleRemoveFromCart(item.id)}
-                    disabled={removingItemId === item.id}
-                    className={`text-muted-foreground transition hover:text-destructive ${removingItemId === item.id ? "cursor-not-allowed opacity-50" : ""}`}
-                    aria-label="Remove item"
-                    type="button"
-                  >
+                  <button onClick={() => handleRemoveFromCart(item.id)} disabled={removingItemId === item.id} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", opacity: removingItemId === item.id ? 0.5 : 1 }} aria-label="Remove item" type="button">
                     <Trash2 size={16} />
                   </button>
                 </div>
               );
             })}
           </div>
-          <div className="mt-4 border-t border-border/70 pt-4 text-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium text-foreground">{formatCurrency(cartTotal)}</span>
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(235,202,221,.7)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16, fontSize: 14 }}>
+              <span style={{ color: "var(--muted)" }}>Subtotal</span>
+              <span style={{ fontWeight: 600 }}>{formatCurrency(cartTotal)}</span>
             </div>
-            <div className="space-y-2.5">
-              <Link to="/checkout" onClick={() => setIsCartOpen(false)} className="block w-full bg-primary py-2.5 text-center text-xs font-semibold tracking-[0.14em] uppercase text-white transition hover:bg-primary/90">
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <Link to="/checkout" onClick={() => setIsCartOpen(false)} style={{ display: "block", background: "var(--ink)", color: "#fff", textAlign: "center", padding: "12px", fontSize: 12, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", textDecoration: "none" }}>
                 Proceed to checkout
               </Link>
-              <Link to="/shop" onClick={() => setIsCartOpen(false)} className="block w-full border border-border bg-secondary py-2.5 text-center text-xs font-semibold tracking-[0.14em] uppercase text-foreground transition hover:border-primary">
+              <Link to="/shop" onClick={() => setIsCartOpen(false)} style={{ display: "block", border: "1px solid var(--line)", textAlign: "center", padding: "12px", fontSize: 12, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--ink)", textDecoration: "none" }}>
                 Continue shopping
               </Link>
             </div>
           </div>
         </>
       ) : (
-        <p className="text-sm text-muted-foreground">Your cart is empty. Explore our collections to add something special.</p>
+        <p style={{ fontSize: 13, color: "var(--muted)" }}>Your cart is empty. Explore our collections to add something special.</p>
       )}
     </div>
   );
 
   return (
     <>
-      <div className="storefront-announcement">
-        {announcementText}
+      {/* ===== Announcement bar ===== */}
+      <div className="announce">
+        {announcementText} <Link to="/shop">Shop now</Link>
       </div>
 
-      <header className={`storefront-header sticky top-0 z-50 text-foreground backdrop-blur-md ${isScrolled ? "is-scrolled" : ""}`}>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-[72px] items-center justify-between">
-            <div className="relative z-20 flex w-24 items-center md:w-32">
-              <button type="button" onClick={() => setIsMobileMenuOpen(true)} className={`${iconButtonTone} md:hidden`} aria-label="Open menu">
-                <Menu className="h-5 w-5" />
-              </button>
-            </div>
+      {/* ===== Main Header ===== */}
+      <header
+        className={`nav-wrap${isScrolled ? " scrolled" : ""}`}
+        id="navWrap"
+        onMouseLeave={() => setIsMegaOpen(false)}
+      >
+        <div className="container nav">
+          {/* Logo */}
+          <Link to="/" className="logo" aria-label="Tere Rang home">
+            <img src={logo} alt="Tere Rang" />
+          </Link>
 
-            <Link to="/" className="absolute left-1/2 z-10 -translate-x-1/2 transition-transform duration-300 hover:scale-[1.03]">
-              <img src={logo} alt="Tererang" className="h-10 w-auto md:h-16" />
+          {/* Nav Links */}
+          <nav className="nav-links" aria-label="Primary navigation">
+            <Link className="nav-link" to="/shop">
+              New Arrivals
             </Link>
-
-            <div className="relative z-20 flex items-center gap-1 md:gap-2">
-              <Link to="/shop" className={iconButtonTone} aria-label="Search collections">
-                <Search className="h-[18px] w-[18px] stroke-[1.75]" />
-              </Link>
-
-              <div className="relative hidden md:block" ref={loginRef}>
-                <button type="button" onClick={() => setIsLoginMenuOpen((s) => !s)} className={iconButtonTone} aria-label={isAuthenticated ? "Account menu" : "Login"}>
-                  <User className="h-[18px] w-[18px] stroke-[1.75]" />
-                </button>
-
-                <div className={`storefront-popup absolute right-0 z-50 mt-3 w-64 origin-top-right p-6 text-foreground transition-all duration-200 ${isLoginMenuOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-95 opacity-0 pointer-events-none'}`}>
-                  {isAuthenticated ? (
-                    <>
-                      <div className="mb-4 flex items-center gap-3">
-                        <User className="h-5 w-5 text-primary" />
-                        <div>
-                          <h4 className="font-serif text-lg lowercase text-foreground">{user?.name || "welcome"}</h4>
-                          <p className="text-xs text-muted-foreground">{user?.phoneNumber}</p>
-                        </div>
-                      </div>
-                      <hr className="mb-4 border-border/60" />
-                      <ul className="space-y-3 text-sm">
-                        <li><Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary"><Package className="mr-2.5 h-4 w-4 text-primary" /> My orders</Link></li>
-                        <li><Link to="/addresses" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary"><MapPin className="mr-2.5 h-4 w-4 text-primary" /> Addresses</Link></li>
-                        <li>
-                          <button onClick={handleLogout} className="flex w-full items-center text-left text-destructive transition-colors duration-200 hover:opacity-80" type="button">
-                            <LogOut className="mr-2.5 h-4 w-4" /> Logout
-                          </button>
-                        </li>
-                      </ul>
-                    </>
-                  ) : (
-                    <>
-                      <h4 className="mb-1 font-serif text-lg lowercase text-foreground">welcome</h4>
-                      <p className="mb-4 text-xs text-muted-foreground">Access your account and manage orders.</p>
-                      <Link to="/login" onClick={() => setIsLoginMenuOpen(false)} className="block bg-primary py-2.5 text-center text-xs font-semibold tracking-[0.14em] uppercase text-white transition hover:bg-primary/90">
-                        Login / signup
-                      </Link>
-                      <hr className="my-4 border-border/60" />
-                      <ul className="space-y-3 text-sm">
-                        <li><Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary"><Package className="mr-2.5 h-4 w-4 text-primary" /> My orders</Link></li>
-                        <li><Link to="/AlwaysOffers" onClick={() => setIsLoginMenuOpen(false)} className="flex items-center text-foreground/85 transition-colors duration-200 hover:text-primary"><Gift className="mr-2.5 h-4 w-4 text-primary" /> Offers</Link></li>
-                      </ul>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="relative" ref={cartRef}>
-                <button type="button" onClick={() => setIsCartOpen((prev) => !prev)} className={`relative ${iconButtonTone}`} aria-label="Cart">
-                  <ShoppingBag className="h-[18px] w-[18px] stroke-[1.75]" />
-                  {cartCount > 0 ? (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-white shadow-sm ring-2 ring-[var(--card,#fff)]">
-                      {cartBadge}
-                    </span>
-                  ) : null}
-                </button>
-                {isCartOpen ? cartPanel : null}
-              </div>
-            </div>
-          </div>
-
-          <nav className="storefront-nav hidden items-center justify-center gap-1 border-t py-3 md:flex">
-            <Link to="/" className={`${linkTone} ${isActive("/") ? "bg-primary/10 text-primary" : ""}`}>
-              Home
-            </Link>
-            <Link to="/shop" className={`${linkTone} ${isActive("/shop") ? "bg-primary/10 text-primary" : ""}`}>
+            <Link
+              className="nav-link"
+              to="/shop"
+              id="shopTrigger"
+              aria-expanded={isMegaOpen}
+              onMouseEnter={() => setIsMegaOpen(true)}
+            >
               Shop
             </Link>
-            <div ref={dropdownRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setIsDropdownOpen((prev) => !prev)}
-                aria-expanded={isDropdownOpen}
-                aria-controls="navbar-collections"
-                className={`${linkTone} inline-flex items-center gap-1.5 ${isDropdownOpen || location.pathname.startsWith("/products") ? "bg-primary/10 text-primary" : ""}`}
-              >
-                Collections
-                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
-              </button>
-
-              <div
-                id="navbar-collections"
-                className={`storefront-popup storefront-collections absolute left-1/2 top-full z-50 mt-3 w-72 origin-top -translate-x-1/2 p-2 text-foreground transition-all duration-200 ${isDropdownOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-95 opacity-0 pointer-events-none'}`}
-              >
-                <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Shop by category</p>
-                <ul>
-                  {productMenu.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        to={item.to}
-                        onClick={() => setIsDropdownOpen(false)}
-                        className="group/item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground/85 transition-all duration-200 hover:bg-secondary hover:text-primary"
-                      >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors duration-200 group-hover/item:bg-primary group-hover/item:text-white [&>svg]:h-4 [&>svg]:w-4">
-                          {item.icon}
-                        </span>
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <Link to="/products/wedding" className={`${linkTone} ${isActive("/products/wedding") ? "bg-primary/10 text-primary" : ""}`}>
-              Bestsellers
+            <Link className="nav-link" to="/shop">
+              Collections
             </Link>
-            <Link to="/TermsPage" className={`${linkTone} ${isActive("/TermsPage") ? "bg-primary/10 text-primary" : ""}`}>
-              Terms
+            <Link className="nav-link" to="/products/wedding">
+              Best Sellers
             </Link>
-            <Link to="/contact" className={`${linkTone} ${isActive("/contact") ? "bg-primary/10 text-primary" : ""}`}>
-              Contact
+            <Link className="nav-link" to="/contact">
+              About
             </Link>
           </nav>
+
+          {/* Right Action Icons */}
+          <div className="nav-actions">
+            {/* Search Button */}
+            <button
+              className="icon-btn"
+              id="searchOpen"
+              aria-label="Search"
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m16 16 4 4" />
+              </svg>
+            </button>
+
+            {/* Account (desktop only) */}
+            <div style={{ position: "relative" }} ref={loginRef} className="desktop-only">
+              <button
+                type="button"
+                onClick={() => setIsLoginMenuOpen((s) => !s)}
+                className="icon-btn"
+                aria-label={isAuthenticated ? "Account menu" : "Login"}
+              >
+                <User />
+              </button>
+              <div className={`nav-account-popup${isLoginMenuOpen ? " is-open" : ""}`}>
+                {isAuthenticated ? (
+                  <>
+                    <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+                      <User size={20} style={{ color: "var(--pink)" }} />
+                      <div>
+                        <p style={{ fontFamily: '"Playfair Display", serif', fontSize: 18, margin: 0 }}>{user?.name || "welcome"}</p>
+                        <p style={{ fontSize: 11, color: "var(--muted)", margin: 0 }}>{user?.phoneNumber}</p>
+                      </div>
+                    </div>
+                    <hr style={{ borderColor: "rgba(235,202,221,.6)", margin: "0 0 16px" }} />
+                    <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 12, fontSize: 14 }}>
+                      <li><Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} style={{ display: "flex", alignItems: "center", color: "var(--ink)", textDecoration: "none" }}><Package size={16} style={{ marginRight: 10, color: "var(--pink)" }} /> My orders</Link></li>
+                      <li><Link to="/addresses" onClick={() => setIsLoginMenuOpen(false)} style={{ display: "flex", alignItems: "center", color: "var(--ink)", textDecoration: "none" }}><MapPin size={16} style={{ marginRight: 10, color: "var(--pink)" }} /> Addresses</Link></li>
+                      <li><button onClick={handleLogout} style={{ display: "flex", alignItems: "center", background: "none", border: "none", cursor: "pointer", color: "#c22f2f", fontSize: 14, padding: 0 }} type="button"><LogOut size={16} style={{ marginRight: 10 }} /> Logout</button></li>
+                    </ul>
+                  </>
+                ) : (
+                  <>
+                    <p style={{ fontFamily: '"Playfair Display", serif', fontSize: 18, margin: "0 0 4px" }}>welcome</p>
+                    <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 16px" }}>Access your account and manage orders.</p>
+                    <Link to="/login" onClick={() => setIsLoginMenuOpen(false)} style={{ display: "block", background: "var(--pink)", color: "#fff", textAlign: "center", padding: "10px", fontSize: 12, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", textDecoration: "none" }}>
+                      Login / signup
+                    </Link>
+                    <hr style={{ borderColor: "rgba(235,202,221,.6)", margin: "16px 0" }} />
+                    <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 12, fontSize: 14 }}>
+                      <li><Link to="/MyOrder" onClick={() => setIsLoginMenuOpen(false)} style={{ display: "flex", alignItems: "center", color: "var(--ink)", textDecoration: "none" }}><Package size={16} style={{ marginRight: 10, color: "var(--pink)" }} /> My orders</Link></li>
+                    </ul>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Wishlist Button (desktop only) */}
+            <button
+              className="icon-btn desktop-only"
+              aria-label="Wishlist"
+              type="button"
+              onClick={() => navigate("/shop")}
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M20.8 4.9a5.2 5.2 0 0 0-7.4 0L12 6.3l-1.4-1.4a5.2 5.2 0 1 0-7.4 7.4L12 21l8.8-8.7a5.2 5.2 0 0 0 0-7.4Z" />
+              </svg>
+            </button>
+
+            {/* Cart Button */}
+            <div style={{ position: "relative" }} ref={cartRef}>
+              <button
+                type="button"
+                onClick={() => setIsCartOpen((prev) => !prev)}
+                className="icon-btn"
+                aria-label="Cart"
+              >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M4 7h16l-1.3 13H5.3L4 7Z" />
+                  <path d="M9 7V5a3 3 0 0 1 6 0v2" />
+                </svg>
+                {cartCount > 0 ? <span className="badge" id="cartCount">{cartBadge}</span> : null}
+              </button>
+              {isCartOpen ? cartPanel : null}
+            </div>
+
+            {/* Mobile Hamburger Menu Button */}
+            <button
+              className="icon-btn menu-btn"
+              id="menuOpen"
+              aria-label="Open menu"
+              type="button"
+              onClick={() => setIsDrawerOpen(true)}
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M4 8h16M4 16h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* ===== Mega Menu (Popup when hover on Shop) ===== */}
+        <div
+          className={`mega${isMegaOpen ? " open" : ""}`}
+          id="megaMenu"
+          onMouseEnter={() => setIsMegaOpen(true)}
+          onMouseLeave={() => setIsMegaOpen(false)}
+        >
+          <div className="mega-inner">
+            <div>
+              <h4>Shop by edit</h4>
+              <Link to="/shop" onClick={() => setIsMegaOpen(false)}>New Arrivals</Link>
+              <Link to="/products/wedding" onClick={() => setIsMegaOpen(false)}>Best Sellers</Link>
+              <Link to="/products/Suit" onClick={() => setIsMegaOpen(false)}>Occasion Wear</Link>
+              <Link to="/products/Kurti" onClick={() => setIsMegaOpen(false)}>Everyday Essentials</Link>
+            </div>
+            <div>
+              <h4>Collections</h4>
+              <Link to="/products/Kurti" onClick={() => setIsMegaOpen(false)}>Rang Bloom</Link>
+              <Link to="/products/Suit" onClick={() => setIsMegaOpen(false)}>Soft Structure</Link>
+              <Link to="/products/Coat" onClick={() => setIsMegaOpen(false)}>After Dark</Link>
+              <Link to="/products/EthnicWear" onClick={() => setIsMegaOpen(false)}>Accessories</Link>
+            </div>
+            <Link className="mega-card" to="/shop" onClick={() => setIsMegaOpen(false)}>
+              <div>
+                <span className="kicker">Featured edit</span>
+                <h3 style={{ fontFamily: '"Playfair Display", serif', margin: "6px 0 0", fontSize: "30px" }}>
+                  The Colour Story
+                </h3>
+              </div>
+            </Link>
+          </div>
         </div>
       </header>
 
-      <div className={`fixed inset-0 z-[60] transition md:hidden ${isMobileMenuOpen ? "visible" : "invisible pointer-events-none"}`}>
-        <button
-          type="button"
-          aria-label="Close menu backdrop"
-          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity ${isMobileMenuOpen ? "opacity-100" : "opacity-0"}`}
-          onClick={() => setIsMobileMenuOpen(false)}
+      {/* ===== Search Panel (slides down from top) ===== */}
+      <div
+        className={`search-panel${isSearchOpen ? " open" : ""}`}
+        id="searchPanel"
+        aria-hidden={!isSearchOpen}
+      >
+        <div
+          className="search-backdrop"
+          data-close-search
+          onClick={() => setIsSearchOpen(false)}
         />
-
-        <aside className={`absolute left-0 top-0 flex h-full w-[88%] max-w-sm transform flex-col border-r border-border bg-card shadow-[0_24px_70px_rgba(45,41,36,0.18)] transition-transform duration-300 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
-          <div className="flex items-center justify-between border-b border-border px-6 py-5">
-            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}><img src={logo} alt="Tererang" className="h-10 w-auto" /></Link>
-            <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-muted-foreground transition hover:bg-secondary hover:text-foreground" aria-label="Close menu">
-              <X className="h-5 w-5" />
+        <div className="search-box">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "20px" }}>
+            <div className="kicker">Search Tere Rang</div>
+            <button
+              className="icon-btn"
+              data-close-search
+              aria-label="Close search"
+              type="button"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              ✕
             </button>
           </div>
+          <form className="search-line" onSubmit={handleSearchSubmit}>
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m16 16 4 4" />
+            </svg>
+            <input
+              ref={searchInputRef}
+              id="searchInput"
+              type="search"
+              placeholder="What are you looking for?"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
+          <p style={{ fontSize: "12px", margin: "14px 0 0", color: "var(--muted)" }}>
+            Try “dress”, “co-ord”, or “new arrivals”.
+          </p>
+        </div>
+      </div>
 
-          <div className="flex-1 overflow-y-auto px-6 py-6">
-            <div className="space-y-1">
-              <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-3 text-sm font-medium tracking-[0.06em] text-foreground transition hover:bg-secondary">
-                <Home className="mr-3 h-4 w-4 text-primary" /> Home
-              </Link>
-              <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-3 text-sm font-medium tracking-[0.06em] text-foreground transition hover:bg-secondary">
-                <Search className="mr-3 h-4 w-4 text-primary" /> Shop
-              </Link>
-
-              <div className="border border-border">
-                <button type="button" onClick={() => setIsProductsAccordionOpen(!isProductsAccordionOpen)} className="flex w-full items-center justify-between bg-secondary p-3 text-sm font-medium tracking-[0.06em] text-foreground transition hover:bg-muted">
-                  <span className="flex items-center"><ShoppingBag className="mr-3 h-4 w-4 text-primary" /> Collections</span>
-                  <ChevronDown className={`h-4 w-4 text-muted-foreground transition ${isProductsAccordionOpen ? "rotate-180" : ""}`} />
-                </button>
-
-                <div className={`overflow-hidden transition-all duration-300 ${isProductsAccordionOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}>
-                  <div className="space-y-1 bg-card p-2">
-                    {productMenu.map((item) => (
-                      <Link key={item.to} to={item.to} onClick={() => setIsMobileMenuOpen(false)} className="block p-2.5 text-sm text-muted-foreground transition hover:bg-secondary hover:text-primary">
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <Link to="/TermsPage" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-3 text-sm font-medium tracking-[0.06em] text-foreground transition hover:bg-secondary">
-                <FileText className="mr-3 h-4 w-4 text-primary" /> Terms
-              </Link>
-              <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center p-3 text-sm font-medium tracking-[0.06em] text-foreground transition hover:bg-secondary">
-                <Phone className="mr-3 h-4 w-4 text-primary" /> Contact
-              </Link>
-            </div>
+      {/* ===== Mobile Drawer ===== */}
+      <div
+        className={`drawer${isDrawerOpen ? " open" : ""}`}
+        id="drawer"
+        aria-hidden={!isDrawerOpen}
+      >
+        <div
+          className="drawer-backdrop"
+          data-close-drawer
+          onClick={() => setIsDrawerOpen(false)}
+        />
+        <div className="drawer-panel">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Link className="drawer-logo" to="/" onClick={() => setIsDrawerOpen(false)}>
+              <img src={logo} alt="Tere Rang" />
+            </Link>
+            <button
+              className="icon-btn"
+              data-close-drawer
+              aria-label="Close menu"
+              type="button"
+              onClick={() => setIsDrawerOpen(false)}
+            >
+              ✕
+            </button>
           </div>
-
-          <div className="border-t border-border bg-secondary px-6 py-5">
-            {isAuthenticated ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-primary">
-                    <User className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{user?.name || "Welcome"}</p>
-                    <p className="text-xs text-muted-foreground">{user?.phoneNumber}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className="border border-border bg-card p-2.5 text-center text-[10px] font-semibold tracking-[0.1em] text-muted-foreground transition hover:border-primary">
-                    <ShoppingBag className="mx-auto mb-1 h-4 w-4 text-primary" /> Cart ({cartCount})
-                  </Link>
-                  <Link to="/MyOrder" onClick={() => setIsMobileMenuOpen(false)} className="border border-border bg-card p-2.5 text-center text-[10px] font-semibold tracking-[0.1em] text-muted-foreground transition hover:border-primary">
-                    <Package className="mx-auto mb-1 h-4 w-4 text-primary" /> Orders
-                  </Link>
-                  <Link to="/addresses" onClick={() => setIsMobileMenuOpen(false)} className="border border-border bg-card p-2.5 text-center text-[10px] font-semibold tracking-[0.1em] text-muted-foreground transition hover:border-primary">
-                    <MapPin className="mx-auto mb-1 h-4 w-4 text-primary" /> Address
-                  </Link>
-                </div>
-
-                <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 py-2 text-sm font-medium text-destructive transition hover:bg-red-50" type="button">
-                  <LogOut className="h-4 w-4" /> Logout
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between border border-border bg-card p-3">
-                  <span className="flex items-center text-sm font-medium text-foreground"><ShoppingBag className="mr-3 h-4 w-4 text-primary" /> My cart</span>
-                  {cartCount > 0 ? <span className="bg-primary px-2 py-0.5 text-[10px] font-medium text-white">{cartCount}</span> : null}
-                </Link>
-                <p className="text-center text-xs text-muted-foreground">Login to manage orders and checkout faster.</p>
-                <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="block w-full bg-primary py-3 text-center text-sm font-semibold tracking-[0.12em] text-white transition hover:bg-primary/90">
-                  Login / signup
-                </Link>
-              </div>
-            )}
+          <div className="drawer-links">
+            <Link to="/shop" onClick={() => setIsDrawerOpen(false)}>New Arrivals</Link>
+            <Link to="/shop" onClick={() => setIsDrawerOpen(false)}>Shop</Link>
+            <Link to="/shop" onClick={() => setIsDrawerOpen(false)}>Collections</Link>
+            <Link to="/products/wedding" onClick={() => setIsDrawerOpen(false)}>Best Sellers</Link>
+            <Link to="/contact" onClick={() => setIsDrawerOpen(false)}>About</Link>
           </div>
-        </aside>
+          <div className="drawer-bottom-links">
+            <Link to={isAuthenticated ? "/MyOrder" : "/login"} onClick={() => setIsDrawerOpen(false)}>Account</Link>
+            <Link to="/shop" onClick={() => setIsDrawerOpen(false)}>Wishlist</Link>
+            <button
+              type="button"
+              onClick={() => {
+                setIsDrawerOpen(false);
+                setIsCartOpen(true);
+              }}
+              style={{ background: "none", border: "none", padding: 0, font: "inherit", cursor: "pointer" }}
+            >
+              Cart ({cartCount})
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );
