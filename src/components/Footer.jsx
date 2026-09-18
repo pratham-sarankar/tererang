@@ -1,33 +1,91 @@
-import { useEffect, useRef } from "react";
-import { Instagram, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Instagram, Mail, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const footerGroups = [
-  { title: "Collections", links: [["Stylish Kurtis", "/products/Kurti"], ["Designer Suits", "/products/Suit"], ["Wedding Collection", "/products/wedding"], ["Winter Ethnic Wear", "/products/EthnicWear"], ["Elegant Coat Sets", "/products/Coat"]] },
-  { title: "The studio", links: [["My Orders", "/MyOrder"], ["Shipping & Returns", "/Shipping"], ["Terms & Conditions", "/TermsPage"], ["Privacy Policy", "/privacy-policy"], ["FAQ", "/FaqPage"]] },
+const HOME_FOOTER_COLS = [
+  {
+    title: "Collections",
+    links: [
+      ["Stylish Kurtis", "/products/Kurti"],
+      ["Designer Suits", "/products/Suit"],
+      ["Wedding Collection", "/products/wedding"],
+      ["Winter Ethnic Wear", "/products/EthnicWear"],
+      ["Elegant Coat Sets", "/products/Coat"],
+    ],
+  },
+  {
+    title: "The Studio",
+    links: [
+      ["My Orders", "/MyOrder"],
+      ["Shipping & Returns", "/Shipping"],
+      ["Terms & Conditions", "/TermsPage"],
+      ["Privacy Policy", "/privacy-policy"],
+      ["FAQ", "/FaqPage"],
+    ],
+  },
+  {
+    title: "Info",
+    links: [
+      ["About Us", "/contact"],
+      ["Contact", "/contact"],
+    ],
+  },
 ];
-const keepDesktopGroupOpen = (event) => {
-  if (window.matchMedia("(min-width: 640px)").matches) event.preventDefault();
-};
 
-const HomeFooter = () => {
-  const footerRef = useRef(null);
-  useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 640px)");
-    const expandDesktop = () => {
-      if (desktop.matches) footerRef.current?.querySelectorAll("details").forEach(group => { group.open = true; });
-    };
-    desktop.addEventListener("change", expandDesktop);
-    return () => desktop.removeEventListener("change", expandDesktop);
-  }, []);
-  return <footer className="home-footer" ref={footerRef}>
-  <div className="home-container home-footer-grid">
-    <div className="home-footer-brand"><Link to="/">tererang</Link><p>Curated with love. Crafted with purpose. Designed to become part of your story.</p><div className="home-footer-socials"><a href="https://www.instagram.com/tererang.official/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Instagram size={17} /></a><a href="https://wa.me/919548971147" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><MessageCircle size={17} /></a></div></div>
-    {footerGroups.map(group => <details className="home-footer-group" key={group.title} open><summary onClick={keepDesktopGroupOpen}>{group.title}</summary><ul>{group.links.map(([label, to]) => <li key={to}><Link to={to}>{label}</Link></li>)}</ul></details>)}
-    <details className="home-footer-group" open><summary onClick={keepDesktopGroupOpen}>Boutique support</summary><div className="home-footer-contact"><a href="mailto:tererangofficial@gmail.com">tererangofficial@gmail.com</a><a href="tel:+919548971147">+91 9548971147</a><p>Moradabad, Uttar Pradesh, India</p><a href="https://wa.me/919548971147" target="_blank" rel="noopener noreferrer">Chat with designer ↗</a></div></details>
-  </div><div className="home-footer-copyright">© 2026 Tererang. All rights reserved.</div>
-</footer>;
-};
+const HomeFooter = () => (
+  <footer className="home-footer">
+    <div className="home-container">
+      <div className="home-footer-grid">
+        {/* Brand column */}
+        <div className="home-footer-brand home-footer-col">
+          <Link to="/" className="home-footer-logo">tererang</Link>
+          <p>
+            A Moradabad boutique reimagining Indian couture through breathable fabrics, bespoke finishing, and modern heritage dressing.
+          </p>
+          <div className="home-footer-socials">
+            <a href="https://www.instagram.com/tererang.official/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <Instagram size={15} />
+            </a>
+            <a href="https://wa.me/919548971147" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+              <MessageCircle size={15} />
+            </a>
+            <a href="mailto:tererangofficial@gmail.com" aria-label="Email">
+              <Mail size={15} />
+            </a>
+          </div>
+        </div>
+
+        {/* Link columns */}
+        {HOME_FOOTER_COLS.map((col) => (
+          <div key={col.title} className="home-footer-col">
+            <h4>{col.title}</h4>
+            {col.links.map(([label, to]) => (
+              <Link key={to} to={to}>{label}</Link>
+            ))}
+          </div>
+        ))}
+
+        {/* Contact column */}
+        <div className="home-footer-col">
+          <h4>Boutique Support</h4>
+          <a href="mailto:tererangofficial@gmail.com">tererangofficial@gmail.com</a>
+          <a href="tel:+919548971147">+91 9548971147</a>
+          <a href="https://wa.me/919548971147" target="_blank" rel="noopener noreferrer">Chat with designer ↗</a>
+          <p style={{ fontSize: "12px", color: "#a99da7", marginTop: "8px", lineHeight: 1.6 }}>
+            Moradabad, Uttar Pradesh, India
+          </p>
+        </div>
+      </div>
+
+      <div className="home-footer-bottom">
+        <span>© 2026 Tererang. All rights reserved.</span>
+        <div style={{ display: "flex", gap: "18px" }}>
+          <Link to="/privacy-policy">Privacy</Link>
+          <Link to="/TermsPage">Terms</Link>
+        </div>
+      </div>
+    </div>
+  </footer>
+);
 
 export const Footer = ({ variant } = {}) => variant === "home" ? <HomeFooter /> : (
   <footer className="border-t border-border bg-secondary text-foreground">
