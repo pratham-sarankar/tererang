@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Bell,
@@ -37,6 +37,67 @@ import { ToastViewport } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 import '../css/AdminDashboard.css';
 import { apiUrl, imageUrl } from '../config/env.js';
+
+/* ─── Inline SVG Icons (lightweight, no extra dep) ────────────────────────── */
+const IcoGrid = () => <svg className="ad-nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>;
+const IcoBag = () => <svg className="ad-nav-icon" viewBox="0 0 24 24"><path d="M6 8h12l1 13H5L6 8Z" /><path d="M9 9V6a3 3 0 0 1 6 0v3" /></svg>;
+const IcoBox = () => <svg className="ad-nav-icon" viewBox="0 0 24 24"><path d="M4 7l8-4 8 4-8 4-8-4Z" /><path d="M4 7v10l8 4 8-4V7M12 11v10" /></svg>;
+const IcoTag = () => <svg className="ad-nav-icon" viewBox="0 0 24 24"><path d="M20.6 13.6 11 23l-9-9V2h12l6.6 6.6a3.5 3.5 0 0 1 0 5Z" /><circle cx="7" cy="7" r="1.5" /></svg>;
+const IcoSettings = () => <svg className="ad-nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z" /></svg>;
+const IcoLog = () => <svg className="ad-nav-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>;
+const IcoSearch = () => <svg className="ad-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.4-4.4" /></svg>;
+const IcoCalendar = () => <svg className="ad-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></svg>;
+const IcoBell = () => <svg className="ad-ico" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></svg>;
+const IcoPlus = () => <svg className="ad-ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>;
+const IcoChevron = () => <svg className="ad-ico" style={{width:12}} viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></svg>;
+const IcoTrend = () => <svg className="ad-ico" viewBox="0 0 24 24"><path d="m3 17 6-6 4 4 8-8" /><path d="M15 7h6v6" /></svg>;
+const IcoUsers = () => <svg className="ad-ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
+const IcoLayers = () => <svg className="ad-ico" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5M3 17l9 5 9-5" /></svg>;
+const IcoMenu = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>;
+const IcoMore = () => <svg className="ad-ico" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></svg>;
+
+/* ─── Reveal animation hook ───────────────────────────────────────────────── */
+function useRevealAndCount() {
+    useEffect(() => {
+        const revealEls = document.querySelectorAll('.ad-reveal');
+        const countEls = document.querySelectorAll('.ad-count');
+        if (!revealEls.length && !countEls.length) return;
+
+        const io = new IntersectionObserver(
+            (entries) => entries.forEach((e) => {
+                if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); }
+            }),
+            { threshold: 0.08 }
+        );
+        revealEls.forEach((el) => io.observe(el));
+
+        const cio = new IntersectionObserver(
+            (entries) => entries.forEach((e) => {
+                if (!e.isIntersecting) return;
+                const el = e.target;
+                const target = +el.dataset.target;
+                const prefix = el.dataset.prefix || '';
+                const suffix = el.dataset.suffix || '';
+                const start = performance.now();
+                const tick = (now) => {
+                    const p = Math.min(1, (now - start) / 800);
+                    const v = target * (1 - Math.pow(1 - p, 3));
+                    const formatted = el.dataset.format === 'indian'
+                        ? Math.round(v).toLocaleString('en-IN')
+                        : Math.round(v).toLocaleString('en-IN');
+                    el.textContent = prefix + formatted + suffix;
+                    if (p < 1) requestAnimationFrame(tick);
+                };
+                requestAnimationFrame(tick);
+                cio.unobserve(el);
+            }),
+            { threshold: 0.5 }
+        );
+        countEls.forEach((el) => cio.observe(el));
+
+        return () => { io.disconnect(); cio.disconnect(); };
+    });
+}
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'processing', 'completed', 'cancelled'];
 const PAYMENT_STATUSES = ['pending', 'paid'];
@@ -810,88 +871,408 @@ export default function AdminDashboard() {
         }
     };
 
-    const navItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'products', label: 'Products', icon: Package },
-        { id: 'orders', label: 'Orders', icon: ShoppingCart },
-        { id: 'inventory', label: 'Inventory', icon: Inbox },
-        { id: 'settings', label: 'Settings', icon: Settings },
+    const adNavItems = [
+        { id: 'dashboard', label: 'Dashboard', Icon: IcoGrid },
+        { id: 'products', label: 'Products', Icon: IcoBag },
+        { id: 'orders', label: 'Orders', Icon: IcoBox },
+        { id: 'inventory', label: 'Inventory', Icon: IcoTag },
+        { id: 'settings', label: 'Settings', Icon: IcoSettings },
     ];
-    const pageTitle = navItems.find((item) => item.id === activeView)?.label || 'Dashboard';
+    const pageTitle = adNavItems.find((item) => item.id === activeView)?.label || 'Dashboard';
 
-    const sidebar = (
-        <div className="flex h-full flex-col border-r bg-background">
-            <div className={cn('flex h-16 items-center gap-3 border-b px-4', collapsed && 'justify-center px-2')}>
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">TR</div>
-                {!collapsed && <span className="text-lg font-semibold">TereRang</span>}
-            </div>
-            <nav className="flex-1 space-y-1 p-3">
-                {navItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                        <button
-                            type="button"
-                            key={item.id}
-                            onClick={() => {
-                                setActiveView(item.id);
-                                setMobileMenuOpen(false);
-                            }}
-                            className={cn(
-                                'flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground',
-                                activeView === item.id && 'bg-accent text-accent-foreground',
-                                collapsed && 'justify-center px-0'
-                            )}
-                        >
-                            <Icon className="h-4 w-4 shrink-0" />
-                            {!collapsed && <span>{item.label}</span>}
-                        </button>
-                    );
-                })}
-            </nav>
-            <div className="border-t p-3">
-                <Button variant="ghost" className={cn('w-full justify-start', collapsed && 'justify-center px-0')} onClick={logoutAndRedirect}>
-                    <LogOut className="h-4 w-4" />
-                    {!collapsed && 'Logout'}
-                </Button>
-            </div>
-        </div>
-    );
+    useRevealAndCount();
 
-    const renderDashboard = () => (
-        <div className="space-y-5">
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <MetricCard title="Total Revenue" value={formatCurrency(metrics.revenue)} icon={ShoppingCart} />
-                <MetricCard title="Total Orders" value={metrics.totalOrders} icon={ShoppingCart} />
-                <MetricCard title="Total Products" value={metrics.totalProducts} icon={Package} />
-                <MetricCard title="Low / Out Stock" value={`${metrics.lowStock}/${metrics.outOfStock}`} icon={Inbox} />
-            </div>
-            <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Order Pipeline</CardTitle>
-                        <CardDescription>Current state across real orders.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <PipelineRow label="Pending" value={metrics.pendingOrders} variant="warning" />
-                        <PipelineRow label="Confirmed" value={metrics.confirmedOrders} variant="info" />
-                        <PipelineRow label="Cancelled" value={metrics.cancelledOrders} variant="destructive" />
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex-row items-center justify-between space-y-0">
-                        <div>
-                            <CardTitle>Recent Orders</CardTitle>
-                            <CardDescription>Latest orders from the existing API.</CardDescription>
+    const renderDashboard = () => {
+        const revenueDisplay = metrics.revenue;
+        const topProducts = [...products]
+            .sort((a, b) => Number(b.price || 0) - Number(a.price || 0))
+            .slice(0, 5);
+        const lowStockProducts = products
+            .filter((p) => p.inStock && getTotalStock(p.sizeStock) > 0 && getTotalStock(p.sizeStock) <= LOW_STOCK_THRESHOLD)
+            .slice(0, 4);
+
+        /* Sparkline path: illustrative S-curve representing growth */
+        const sparkPts = [0.55, 0.45, 0.52, 0.38, 0.48, 0.42, 0.6, 0.55, 0.7, 0.65, 0.75, 0.82, 0.78, 0.88, 0.84, 0.95, 0.9, 1];
+        const W = 600, H = 48;
+        const toX = (i) => (i / (sparkPts.length - 1)) * W;
+        const toY = (v) => H - v * H * 0.92;
+        const linePts = sparkPts.map((v, i) => `${toX(i)},${toY(v)}`).join(' ');
+        const areaPath = `M0,${H} L${sparkPts.map((v, i) => `${toX(i)},${toY(v)}`).join(' L')} L${W},${H} Z`;
+
+        /* Revenue chart: 18 weeks of illustrative data */
+        const chartWeeks = ['Apr', 'Apr', 'May', 'May', 'May', 'Jun', 'Jun', 'Jul', 'Jul', 'Aug', 'Aug', 'Sep', 'Sep', 'Sep', 'Sep', 'Sep', 'Sep', 'Sep'];
+        const chartCurrent = [32, 28, 41, 38, 45, 42, 55, 50, 62, 58, 71, 67, 78, 74, 82, 79, 88, 95];
+        const chartPrev    = [28, 24, 35, 32, 39, 36, 48, 43, 54, 50, 61, 57, 66, 62, 70, 67, 74, 80];
+        const CW = 800, CH = 240, pad = { top: 16, right: 12, bottom: 32, left: 36 };
+        const innerW = CW - pad.left - pad.right;
+        const innerH = CH - pad.top - pad.bottom;
+        const xS = (i) => pad.left + (i / (chartCurrent.length - 1)) * innerW;
+        const yS = (v) => pad.top + innerH - (v / 100) * innerH;
+        const curPath = chartCurrent.map((v, i) => `${i === 0 ? 'M' : 'L'}${xS(i)},${yS(v)}`).join(' ');
+        const prevPath = chartPrev.map((v, i) => `${i === 0 ? 'M' : 'L'}${xS(i)},${yS(v)}`).join(' ');
+        const areaChartPath = `${curPath} L${xS(chartCurrent.length-1)},${pad.top+innerH} L${pad.left},${pad.top+innerH} Z`;
+        const gridLines = [0, 25, 50, 75, 100];
+        /* Customer split illustrative bars */
+        const custBars = [{ n: 42, r: 58 }, { n: 38, r: 62 }, { n: 35, r: 65 }, { n: 40, r: 60 }, { n: 33, r: 67 }, { n: 37, r: 63 }, { n: 30, r: 70 }];
+
+        return (
+            <>
+                {/* ── Hero Overview ── */}
+                <div className="ad-hero-overview">
+                    {/* Revenue Hero Card */}
+                    <div className="ad-revenue-hero ad-reveal">
+                        <div className="ad-revenue-head">
+                            <div>
+                                <div className="ad-eyebrow">Total Revenue</div>
+                            </div>
+                            <div className="ad-period-tabs" id="periodTabs">
+                                <button type="button" className="ad-period-tab">7 days</button>
+                                <button type="button" className="ad-period-tab">30 days</button>
+                                <button type="button" className="ad-period-tab active">This period</button>
+                            </div>
                         </div>
-                        <Button variant="outline" size="sm" onClick={() => setActiveView('orders')}>View all</Button>
-                    </CardHeader>
-                    <CardContent>
-                        <OrdersTable rows={orders.slice(0, 5)} compact onView={openOrderSheet} />
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    );
+                        <div className="ad-metric-big">
+                            <div className="ad-value">
+                                ₹<span
+                                    className="ad-count"
+                                    data-target={revenueDisplay}
+                                    data-format="indian"
+                                >{Math.round(revenueDisplay).toLocaleString('en-IN')}</span>
+                            </div>
+                            {revenueDisplay > 0 && (
+                                <div className="ad-trend">
+                                    <IcoTrend />
+                                    Live
+                                </div>
+                            )}
+                        </div>
+                        <div className="ad-metric-copy">From {metrics.totalOrders} orders · {metrics.pendingOrders} pending</div>
+                        <div className="ad-hero-spark">
+                            <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#d4008a" stopOpacity="0.22" />
+                                        <stop offset="100%" stopColor="#d4008a" stopOpacity="0" />
+                                    </linearGradient>
+                                </defs>
+                                <path d={areaPath} fill="url(#sparkGrad)" />
+                                <polyline points={linePts} fill="none" stroke="#d4008a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    {/* Mini Metrics 2×2 */}
+                    <div className="ad-mini-metrics">
+                        <div className="ad-mini-metric">
+                            <div className="ad-metric-label">Total orders</div>
+                            <div className="ad-metric-value ad-count" data-target={metrics.totalOrders}>{metrics.totalOrders}</div>
+                            <div className="ad-metric-foot neutral">{metrics.pendingOrders} pending</div>
+                        </div>
+                        <div className="ad-mini-metric">
+                            <div className="ad-metric-label">Products</div>
+                            <div className="ad-metric-value ad-count" data-target={metrics.totalProducts}>{metrics.totalProducts}</div>
+                            <div className="ad-metric-foot neutral">In catalog</div>
+                        </div>
+                        <div className="ad-mini-metric">
+                            <div className="ad-metric-label">Confirmed</div>
+                            <div className="ad-metric-value ad-count" data-target={metrics.confirmedOrders}>{metrics.confirmedOrders}</div>
+                            <div className="ad-metric-foot">Ready to ship</div>
+                        </div>
+                        <div className="ad-mini-metric">
+                            <div className="ad-metric-label">Low stock</div>
+                            <div className="ad-metric-value">{metrics.lowStock}<span style={{fontSize:13,color:'#c64054',marginLeft:4}}>{metrics.outOfStock > 0 && `+${metrics.outOfStock} out`}</span></div>
+                            <div className={`ad-metric-foot ${metrics.lowStock > 0 ? 'down' : 'neutral'}`}>{metrics.outOfStock} out of stock</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Analytics + Products ── */}
+                <div className="ad-grid-main">
+                    <div className="ad-surface ad-reveal">
+                        <div className="ad-section-head">
+                            <div className="ad-section-title">
+                                <h2>Revenue analytics</h2>
+                                <p>Weekly trend — illustrative shape, live totals above</p>
+                            </div>
+                            <select className="ad-tiny-select"><option>Revenue</option><option>Orders</option></select>
+                        </div>
+                        <div className="ad-analytics-body">
+                            <div className="ad-chart-meta">
+                                <strong>₹{Math.round(revenueDisplay).toLocaleString('en-IN')}</strong>
+                                <div className="ad-legend">
+                                    <span><i style={{background:'#d4008a'}} />This period</span>
+                                    <span><i style={{background:'#bbb0b8'}} />Previous</span>
+                                </div>
+                            </div>
+                            <svg className="ad-revenue-chart" viewBox={`0 0 ${CW} ${CH}`} preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#d4008a" stopOpacity="0.13" />
+                                        <stop offset="100%" stopColor="#d4008a" stopOpacity="0" />
+                                    </linearGradient>
+                                </defs>
+                                {/* Grid */}
+                                {gridLines.map((v) => (
+                                    <g key={v}>
+                                        <line x1={pad.left} y1={yS(v)} x2={pad.left+innerW} y2={yS(v)} stroke="#eee5ea" strokeWidth="1" />
+                                        <text x={pad.left-6} y={yS(v)+3} fill="#8f838d" fontSize="9" textAnchor="end">{v}%</text>
+                                    </g>
+                                ))}
+                                {/* Month labels */}
+                                {['Apr','May','Jun','Jul','Aug','Sep'].map((m, i) => (
+                                    <text key={m} x={pad.left + (i / 5) * innerW} y={CH - 8} fill="#8f838d" fontSize="9" textAnchor="middle">{m}</text>
+                                ))}
+                                {/* Area fill */}
+                                <path d={areaChartPath} fill="url(#areaGrad)" />
+                                {/* Prev period dashed */}
+                                <path d={prevPath} fill="none" stroke="#bbb0b8" strokeWidth="1.5" strokeDasharray="4 5" strokeLinecap="round" strokeLinejoin="round" />
+                                {/* Current period line */}
+                                <path d={curPath} fill="none" stroke="#d4008a" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" />
+                                {/* End point dot */}
+                                <circle cx={xS(chartCurrent.length-1)} cy={yS(chartCurrent[chartCurrent.length-1])} r="4" fill="#fff" stroke="#d4008a" strokeWidth="2" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    {/* Top Products */}
+                    <div className="ad-surface ad-reveal">
+                        <div className="ad-section-head">
+                            <div className="ad-section-title"><h2>Top products</h2><p>By price, from catalog</p></div>
+                        </div>
+                        <div className="ad-product-list">
+                            {topProducts.length === 0 && <p style={{padding:'16px 0',fontSize:11,color:'var(--muted)'}}>No products yet</p>}
+                            {topProducts.map((p) => (
+                                <div className="ad-product-row" key={p._id}>
+                                    <div className="ad-thumb">
+                                        {getPrimaryProductImage(p)
+                                            ? <img src={getPrimaryProductImage(p)} alt={p.name} onError={(e) => { e.currentTarget.style.display='none'; }} />
+                                            : null}
+                                    </div>
+                                    <div>
+                                        <div className="ad-product-name">{p.name}</div>
+                                        <div className="ad-product-cat">{titleCase(p.category)}</div>
+                                    </div>
+                                    <div className="ad-product-stat">
+                                        <strong>₹{Number(p.price).toLocaleString('en-IN')}</strong>
+                                        <span>{getTotalStock(p.sizeStock)} in stock</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Recent Orders ── */}
+                <div className="ad-split">
+                    <div className="ad-surface ad-reveal">
+                        <div className="ad-section-head">
+                            <div className="ad-section-title"><h2>Recent orders</h2><p>Latest customer transactions</p></div>
+                            <button className="ad-primary-btn" type="button" onClick={() => setActiveView('orders')}>
+                                <span>View all</span>
+                            </button>
+                        </div>
+                        <div className="ad-orders-body">
+                            {orders.length === 0
+                                ? <p style={{padding:'20px 22px',fontSize:11,color:'var(--muted)'}}>No orders yet.</p>
+                                : (
+                                    <table className="ad-orders-table" id="ordersTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Customer</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>Payment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {orders.slice(0, 6).map((order) => (
+                                                <tr key={order.id} onClick={() => openOrderSheet(order)} style={{cursor:'pointer'}}>
+                                                    <td><span className="ad-order-id">#{String(order.id).slice(-8)}</span></td>
+                                                    <td>
+                                                        <div className="ad-customer-cell">
+                                                            <div className="ad-customer-avatar">
+                                                                {(order.user?.name || 'G').charAt(0).toUpperCase()}
+                                                            </div>
+                                                            <div>
+                                                                <div style={{fontWeight:700,fontSize:10}}>{order.user?.name || 'Guest'}</div>
+                                                                <div style={{fontSize:9,color:'var(--muted)'}}>{order.user?.phoneNumber || order.user?.email || ''}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td style={{fontWeight:700}}>{formatCurrency(order.grandTotal || order.subtotal)}</td>
+                                                    <td><span className={`ad-status-pill ${order.status}`}>{order.status}</span></td>
+                                                    <td><span className={`ad-payment ${order.paymentStatus}`}>{order.paymentStatus}</span></td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
+                        </div>
+                    </div>
+
+                    {/* Order pipeline summary */}
+                    <div className="ad-surface ad-reveal">
+                        <div className="ad-section-head">
+                            <div className="ad-section-title"><h2>Order pipeline</h2><p>Current fulfilment state</p></div>
+                        </div>
+                        <div className="ad-widget-body">
+                            <div className="ad-stock-stats">
+                                <div className="ad-stock-stat"><span>Pending</span><strong className="ad-count" data-target={metrics.pendingOrders}>{metrics.pendingOrders}</strong></div>
+                                <div className="ad-stock-stat"><span>Confirmed</span><strong className="ad-count" data-target={metrics.confirmedOrders}>{metrics.confirmedOrders}</strong></div>
+                                <div className="ad-stock-stat"><span>Cancelled</span><strong className="ad-count" data-target={metrics.cancelledOrders}>{metrics.cancelledOrders}</strong></div>
+                            </div>
+                            <div className="ad-inventory-bar" style={{
+                                background: `linear-gradient(90deg,
+                                    var(--green) 0 ${metrics.totalOrders > 0 ? Math.round((metrics.confirmedOrders/metrics.totalOrders)*100) : 0}%,
+                                    var(--amber) ${metrics.totalOrders > 0 ? Math.round((metrics.confirmedOrders/metrics.totalOrders)*100) : 0}% ${metrics.totalOrders > 0 ? Math.round(((metrics.confirmedOrders+metrics.pendingOrders)/metrics.totalOrders)*100) : 0}%,
+                                    var(--red) ${metrics.totalOrders > 0 ? Math.round(((metrics.confirmedOrders+metrics.pendingOrders)/metrics.totalOrders)*100) : 0}% 100%)`
+                            }} />
+                            {metrics.pendingOrders > 0 && (
+                                <div className="ad-warning">⚠ {metrics.pendingOrders} order{metrics.pendingOrders > 1 ? 's' : ''} waiting for confirmation</div>
+                            )}
+                            <div style={{fontSize:10,color:'var(--muted)',marginTop:8}}>Total: {metrics.totalOrders} orders</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Triple Widgets ── */}
+                <div className="ad-triple">
+                    {/* Inventory Health */}
+                    <div className="ad-surface ad-reveal">
+                        <div className="ad-section-head">
+                            <div className="ad-section-title"><h2>Inventory health</h2><p>Live from product stock</p></div>
+                        </div>
+                        <div className="ad-widget-body">
+                            <div className="ad-stock-stats">
+                                <div className="ad-stock-stat"><span>In stock</span><strong className="ad-count" data-target={metrics.totalProducts - metrics.lowStock - metrics.outOfStock}>{metrics.totalProducts - metrics.lowStock - metrics.outOfStock}</strong></div>
+                                <div className="ad-stock-stat"><span>Low stock</span><strong className="ad-count" data-target={metrics.lowStock}>{metrics.lowStock}</strong></div>
+                                <div className="ad-stock-stat"><span>Out of stock</span><strong className="ad-count" data-target={metrics.outOfStock}>{metrics.outOfStock}</strong></div>
+                            </div>
+                            {lowStockProducts.length > 0 && (
+                                <>
+                                    <div className="ad-warning">⚠ Low stock items need restocking</div>
+                                    {lowStockProducts.map((p) => (
+                                        <div className="ad-low-item" key={p._id}>
+                                            <span>{p.name}</span>
+                                            <span className="ad-low-badge amber">{getTotalStock(p.sizeStock)} left</span>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                            {metrics.outOfStock > 0 && (
+                                <div className="ad-low-item">
+                                    <span>{metrics.outOfStock} product{metrics.outOfStock > 1 ? 's' : ''} out of stock</span>
+                                    <span className="ad-low-badge">Out</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Customer / New vs Returning (illustrative) */}
+                    <div className="ad-surface ad-reveal">
+                        <div className="ad-section-head">
+                            <div className="ad-section-title"><h2>Customer mix</h2><p>New vs returning (illustrative)</p></div>
+                        </div>
+                        <div className="ad-widget-body">
+                            <div className="ad-customer-grid">
+                                <div className="ad-customer-kpi"><span>New</span><strong>35%</strong></div>
+                                <div className="ad-customer-kpi"><span>Returning</span><strong>65%</strong></div>
+                            </div>
+                            <div className="ad-customer-split">
+                                {custBars.map((b, i) => (
+                                    <div key={i} className="ad-bar-pair">
+                                        <i style={{height: `${b.n}%`}} />
+                                        <i style={{height: `${b.r}%`, opacity: 0.72}} />
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="ad-customer-legend">
+                                <span>■ New customers</span>
+                                <span>■ Returning</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Category Performance */}
+                    <div className="ad-surface ad-reveal">
+                        <div className="ad-section-head">
+                            <div className="ad-section-title"><h2>Category split</h2><p>By product count</p></div>
+                        </div>
+                        <div className="ad-widget-body">
+                            <div className="ad-category-list">
+                                {(() => {
+                                    const catCounts = products.reduce((acc, p) => {
+                                        const k = p.category || 'Other';
+                                        acc[k] = (acc[k] || 0) + 1;
+                                        return acc;
+                                    }, {});
+                                    const sorted = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+                                    const maxVal = sorted[0]?.[1] || 1;
+                                    return sorted.map(([cat, count]) => (
+                                        <div className="ad-category-row" key={cat}>
+                                            <b>{titleCase(cat)}</b>
+                                            <div className="ad-category-track">
+                                                <i style={{width: `${(count/maxVal)*100}%`}} />
+                                            </div>
+                                            <span>{count}</span>
+                                        </div>
+                                    ));
+                                })()}
+                                {products.length === 0 && <p style={{fontSize:10,color:'var(--muted)'}}>No products yet</p>}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Activity + Insight ── */}
+                <div className="ad-bottom-grid">
+                    {/* Live Activity */}
+                    <div className="ad-surface ad-reveal">
+                        <div className="ad-section-head">
+                            <div className="ad-section-title">
+                                <h2>Live store activity</h2>
+                                <p>Recent order and product events</p>
+                            </div>
+                            <span style={{fontSize:8,color:'var(--green)',fontWeight:700}}>● LIVE</span>
+                        </div>
+                        <div className="ad-activity">
+                            {orders.slice(0, 5).map((order, i) => (
+                                <div className="ad-activity-item" key={order.id}>
+                                    <div className="ad-activity-icon" style={order.status === 'pending' ? {color:'var(--amber)',background:'#fff8ec'} : {}}>
+                                        {i % 2 === 0 ? <IcoBag /> : <IcoUsers />}
+                                    </div>
+                                    <div>
+                                        <strong>Order #{String(order.id).slice(-8)} {order.status === 'pending' ? 'awaiting' : order.status}</strong>
+                                        <span>{order.user?.name || 'Guest'} · {formatCurrency(order.grandTotal || order.subtotal)}</span>
+                                    </div>
+                                    <div className="ad-activity-time">{new Date(order.createdAt).toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'})}</div>
+                                </div>
+                            ))}
+                            {orders.length === 0 && <p style={{fontSize:11,color:'var(--muted)',padding:'10px 0'}}>No recent activity.</p>}
+                        </div>
+                    </div>
+
+                    {/* Insight Panel */}
+                    <div className="ad-insight-panel ad-reveal">
+                        <div className="ad-insight-inner">
+                            <div className="ad-eyebrow">Store overview</div>
+                            <h3>Your catalog is <em>live</em> and ready to sell.</h3>
+                            <p>Manage your products, confirm orders, and track inventory all from this dashboard.</p>
+                            <div className="ad-insight-number">
+                                <div><strong className="ad-count" data-target={metrics.totalOrders}>{metrics.totalOrders}</strong><span>Total orders</span></div>
+                                <div><strong className="ad-count" data-target={metrics.totalProducts}>{metrics.totalProducts}</strong><span>Products</span></div>
+                                <div><strong className="ad-count" data-target={metrics.confirmedOrders}>{metrics.confirmedOrders}</strong><span>Confirmed</span></div>
+                            </div>
+                            <button className="ad-text-link" type="button" onClick={() => setActiveView('orders')}>
+                                Manage orders <IcoChevron />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    };
 
     const renderProducts = () => {
         const rows = paginate(filteredProducts, productPage);
@@ -1135,57 +1516,112 @@ export default function AdminDashboard() {
 
     if (loading) {
         return (
-            <div className="grid min-h-screen place-items-center bg-muted/40">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="ad-root">
+                <div className="ad-loading">
+                    <div>
+                        <div className="ad-spinner" />
+                        <p style={{marginTop:16,fontSize:12,color:'var(--muted)',textAlign:'center'}}>Loading dashboard…</p>
+                    </div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-muted/40">
+        <div className="ad-root">
             <ToastViewport toasts={toasts} onDismiss={(id) => setToasts((prev) => prev.filter((toast) => toast.id !== id))} />
-            <Sheet open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} title="TereRang Admin" side="left" className="max-w-[280px]">
-                <div className="-m-5 h-[calc(100vh-4rem)]">{sidebar}</div>
-            </Sheet>
-            <div className="flex min-h-screen">
-                <aside className={cn('hidden shrink-0 transition-all duration-200 lg:block', collapsed ? 'w-[74px]' : 'w-64')}>
-                    {sidebar}
-                </aside>
-                <div className="min-w-0 flex-1">
-                    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur lg:px-6">
-                        <div className="flex min-w-0 items-center gap-3">
-                            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileMenuOpen(true)}>
-                                <Menu className="h-5 w-5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="hidden lg:inline-flex" onClick={() => setCollapsed((prev) => !prev)}>
-                                {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-                            </Button>
-                            <div className="min-w-0">
-                                <h1 className="truncate text-lg font-semibold">{pageTitle}</h1>
-                                <p className="hidden text-sm text-muted-foreground sm:block">Admin / {pageTitle}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="icon" aria-label="Notifications" className="relative">
-                                <Bell className="h-4 w-4" />
-                                {metrics.pendingOrders > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary" />}
-                            </Button>
-                            <div className="hidden items-center gap-2 rounded-md border bg-background px-3 py-2 sm:flex">
-                                <div className="grid h-7 w-7 place-items-center rounded-full bg-muted"><User className="h-4 w-4" /></div>
-                                <span className="text-sm font-medium">{adminData.username || 'Admin'}</span>
-                            </div>
-                        </div>
-                    </header>
-                    <main className="p-4 lg:p-6">
-                        {error && (
-                            <Alert variant="destructive" className="mb-4 flex items-center justify-between gap-3">
-                                <span>{error}</span>
-                                <button type="button" onClick={() => setError('')}><X className="h-4 w-4" /></button>
-                            </Alert>
-                        )}
-                        {renderContent()}
-                    </main>
+
+            {/* Mobile backdrop */}
+            <div
+                id="backdrop"
+                className={`ad-backdrop ${mobileMenuOpen ? 'show' : ''}`}
+                onClick={() => setMobileMenuOpen(false)}
+            />
+
+            {/* ── Sidebar ── */}
+            <nav className={`ad-sidebar ${mobileMenuOpen ? 'open' : ''}`} id="sidebar">
+                <div className="ad-brand">
+                    <div className="ad-brand-logo">TR</div>
+                    <span className="ad-brand-name">Tere <em>Rang</em></span>
                 </div>
+
+                <div className="ad-nav-label">Main</div>
+                <div className="ad-nav">
+                    {adNavItems.map(({ id, label, Icon }) => (
+                        <button
+                            type="button"
+                            key={id}
+                            className={`ad-nav-link ${activeView === id ? 'active' : ''}`}
+                            onClick={() => { setActiveView(id); setMobileMenuOpen(false); }}
+                        >
+                            <Icon />
+                            {label}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="ad-nav-bottom">
+                    <button type="button" className="ad-nav-link" onClick={logoutAndRedirect}>
+                        <IcoLog />
+                        Sign out
+                    </button>
+                    <div className="ad-store-mini">
+                        <div className="ad-store-dot" />
+                        <div>
+                            <strong>{adminData.username || 'Admin'}</strong>
+                            <span>Store admin</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            {/* ── Main ── */}
+            <div className="ad-main">
+                {/* Topbar */}
+                <header className="ad-topbar">
+                    <button
+                        id="menuToggle"
+                        type="button"
+                        className="ad-mobile-toggle"
+                        onClick={() => setMobileMenuOpen(true)}
+                        aria-label="Open menu"
+                    >
+                        <IcoMenu />
+                    </button>
+                    <div className="ad-top-title">
+                        <h1>{pageTitle}</h1>
+                        <p>Tere Rang admin · {new Date().toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}</p>
+                    </div>
+                    <div className="ad-top-actions">
+                        <div className="ad-search">
+                            <IcoSearch />
+                            <input placeholder="Search orders, products…" aria-label="Global search" />
+                        </div>
+                        <button type="button" className="ad-pill-btn">
+                            <IcoCalendar />
+                            <span>{new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span>
+                        </button>
+                        <button type="button" className="ad-icon-btn" aria-label="Notifications">
+                            <IcoBell />
+                            {metrics.pendingOrders > 0 && <span className="ad-notif-dot" />}
+                        </button>
+                        <button type="button" className="ad-avatar-btn">
+                            <div className="ad-avatar">{(adminData.username || 'A').charAt(0).toUpperCase()}</div>
+                            <span>{adminData.username || 'Admin'}</span>
+                        </button>
+                    </div>
+                </header>
+
+                {/* Content */}
+                <main className="ad-content">
+                    {error && (
+                        <div className="ad-error">
+                            <span>{error}</span>
+                            <button type="button" onClick={() => setError('')}>×</button>
+                        </div>
+                    )}
+                    {renderContent()}
+                </main>
             </div>
 
             <ProductSheet
@@ -1277,6 +1713,7 @@ function PipelineRow({ label, value, variant }) {
         </div>
     );
 }
+
 
 function SearchBox({ value, onChange, placeholder }) {
     return (
