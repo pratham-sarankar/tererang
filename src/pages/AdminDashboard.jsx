@@ -268,6 +268,12 @@ export default function AdminDashboard() {
     const [productSort, setProductSort] = useState({ field: 'name', direction: 'asc' });
     const [orderSort, setOrderSort] = useState({ field: 'createdAt', direction: 'desc' });
     const [inventorySort, setInventorySort] = useState({ field: 'stock', direction: 'asc' });
+    const [categories, setCategories] = useState([]);
+    const [categoryLoading, setCategoryLoading] = useState(false);
+    const [categorySheetOpen, setCategorySheetOpen] = useState(false);
+    const [editingCategory, setEditingCategory] = useState(null);
+    const [categoryForm, setCategoryForm] = useState({ name: '', description: '' });
+    const [categorySubmitting, setCategorySubmitting] = useState(false);
     const [toasts, setToasts] = useState([]);
     const navigate = useNavigate();
     const adminData = getAdminData();
@@ -354,11 +360,29 @@ export default function AdminDashboard() {
         }
     };
 
+    const fetchCategories = async () => {
+        setCategoryLoading(true);
+        try {
+            const response = await fetch(apiUrl('/api/categories'));
+            const data = await response.json();
+            if (response.ok) {
+                setCategories(data);
+            } else {
+                setError('Failed to fetch categories');
+            }
+        } catch (fetchError) {
+            console.error('Fetch categories error:', fetchError);
+            setError('Network error. Please try again.');
+        } finally {
+            setCategoryLoading(false);
+        }
+    };
+
     useEffect(() => {
         checkAuth();
         const initialize = async () => {
             setLoading(true);
-            await Promise.all([fetchProducts(), fetchOrders(), fetchSettings()]);
+            await Promise.all([fetchProducts(), fetchOrders(), fetchSettings(), fetchCategories()]);
             setLoading(false);
         };
         initialize();
@@ -797,6 +821,86 @@ export default function AdminDashboard() {
         }
     };
 
+    const openCategorySheet = (category = null) => {
+        setEditingCategory(category);
+        setCategoryForm(category ? { name: category.name, description: category.description } : { name: '', description: '' });
+        setCategorySheetOpen(true);
+    };
+
+    const closeCategorySheet = () => {
+        setCategorySheetOpen(false);
+        setEditingCategory(null);
+        setCategoryForm({ name: '', description: '' });
+    };
+
+    const handleSaveCategory = async (e) => {
+        e.preventDefault();
+        const token = checkAuth();
+        if (!token) return;
+        if (!categoryForm.name.trim()) {
+            pushToast('Category name is required', 'error');
+            return;
+        }
+        setCategorySubmitting(true);
+        try {
+            const method = editingCategory ? 'PUT' : 'POST';
+            const url = editingCategory ? apiUrl(`/api/categories/${editingCategory._id}`) : apiUrl('/api/categories');
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    name: categoryForm.name.trim(),
+                    description: categoryForm.description.trim(),
+                }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                await fetchCategories();
+                closeCategorySheet();
+                pushToast(editingCategory ? 'Category updated' : 'Category created');
+            } else {
+                setError(data.message || 'Failed to save category');
+                pushToast(data.message || 'Failed to save category', 'error');
+                if (response.status === 401) logoutAndRedirect();
+            }
+        } catch (saveError) {
+            console.error('Save category error:', saveError);
+            setError('Network error. Please try again.');
+            pushToast('Network error. Please try again.', 'error');
+        } finally {
+            setCategorySubmitting(false);
+        }
+    };
+
+    const handleDeleteCategory = async (id) => {
+        const token = checkAuth();
+        if (!token) return;
+        try {
+            const response = await fetch(apiUrl(`/api/categories/${id}`), {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (response.ok) {
+                await fetchCategories();
+                pushToast('Category deleted');
+            } else {
+                const data = await response.json();
+                setError(data.message || 'Failed to delete category');
+                pushToast(data.message || 'Failed to delete category', 'error');
+                if (response.status === 401) logoutAndRedirect();
+            }
+        } catch (deleteError) {
+            console.error('Delete category error:', deleteError);
+            setError('Network error. Please try again.');
+            pushToast('Network error. Please try again.', 'error');
+        } finally {
+            setDeleteDialog({ open: false, type: null, id: null, label: '' });
+        }
+    };
+
     const triggerOrderAction = async (orderId, action, reason) => {
         const token = checkAuth();
         if (!token) return;
@@ -874,8 +978,9 @@ export default function AdminDashboard() {
     const adNavItems = [
         { id: 'dashboard', label: 'Dashboard', Icon: IcoGrid },
         { id: 'products', label: 'Products', Icon: IcoBag },
+        { id: 'categories', label: 'Categories', Icon: IcoTag },
         { id: 'orders', label: 'Orders', Icon: IcoBox },
-        { id: 'inventory', label: 'Inventory', Icon: IcoTag },
+        { id: 'inventory', label: 'Inventory', Icon: IcoLayers },
         { id: 'settings', label: 'Settings', Icon: IcoSettings },
     ];
     const pageTitle = adNavItems.find((item) => item.id === activeView)?.label || 'Dashboard';
@@ -1506,9 +1611,60 @@ export default function AdminDashboard() {
         </form>
     );
 
+    const renderCategories = () => (
+        <div className="ad-view fade-in">
+            <div className="ad-view-header">
+                <div>
+                    <h2 className="ad-title">Categories</h2>
+                    <p className="ad-subtitle">Manage product categories</p>
+                </div>
+                <Button onClick={() => openCategorySheet()}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Category
+                </Button>
+            </div>
+            {categoryLoading ? (
+                <div className="ad-loading-state"><Loader2 className="h-6 w-6 animate-spin" /> Loading categories…</div>
+            ) : categories.length === 0 ? (
+                <EmptyState title="No categories yet" description="Create your first category to organize products." />
+            ) : (
+                <div className="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead className="w-[100px]">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {categories.map((category) => (
+                                <TableRow key={category._id}>
+                                    <TableCell className="font-medium">{category.name}</TableCell>
+                                    <TableCell className="text-muted-foreground">{category.description || '—'}</TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-1">
+                                            <Button variant="ghost" size="icon" onClick={() => openCategorySheet(category)}>
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" onClick={() => setDeleteDialog({ open: true, type: 'category', id: category._id, label: category.name })}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            )}
+        </div>
+    );
+
     const renderContent = () => {
         if (activeView === 'dashboard') return renderDashboard();
         if (activeView === 'products') return renderProducts();
+        if (activeView === 'categories') return renderCategories();
         if (activeView === 'orders') return renderOrders();
         if (activeView === 'inventory') return renderInventory();
         return renderSettings();
@@ -1642,6 +1798,16 @@ export default function AdminDashboard() {
                 onAddMoreImages={addMoreImages}
             />
 
+            <CategorySheet
+                open={categorySheetOpen}
+                editingCategory={editingCategory}
+                categoryForm={categoryForm}
+                submitting={categorySubmitting}
+                onClose={closeCategorySheet}
+                onSubmit={handleSaveCategory}
+                onChange={(field, value) => setCategoryForm((prev) => ({ ...prev, [field]: value }))}
+            />
+
             <OrderSheet
                 open={orderSheetOpen}
                 order={selectedOrder}
@@ -1679,7 +1845,11 @@ export default function AdminDashboard() {
                 footer={(
                     <>
                         <Button variant="outline" onClick={() => setDeleteDialog({ open: false, type: null, id: null, label: '' })}>Close</Button>
-                        <Button variant="destructive" onClick={() => deleteDialog.type === 'product' ? deleteProduct(deleteDialog.id) : deleteOrder(deleteDialog.id)}>Delete</Button>
+                        <Button variant="destructive" onClick={() => {
+                            if (deleteDialog.type === 'product') deleteProduct(deleteDialog.id);
+                            else if (deleteDialog.type === 'category') handleDeleteCategory(deleteDialog.id);
+                            else deleteOrder(deleteDialog.id);
+                        }}>Delete</Button>
                     </>
                 )}
             >
@@ -2063,5 +2233,41 @@ function InfoRow({ label, value }) {
             <span className="text-muted-foreground">{label}</span>
             <span className="text-right font-medium">{value}</span>
         </div>
+    );
+}
+
+function CategorySheet({ open, editingCategory, categoryForm, submitting, onClose, onSubmit, onChange }) {
+    return (
+        <Sheet
+            open={open}
+            onClose={onClose}
+            title={editingCategory ? 'Edit Category' : 'Add Category'}
+            description="Manage category name and description."
+            footer={
+                <Button className="w-full" type="submit" form="category-form" disabled={submitting}>
+                    {submitting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                    {editingCategory ? 'Update Category' : 'Create Category'}
+                </Button>
+            }
+        >
+            <form id="category-form" onSubmit={onSubmit} className="space-y-5">
+                <Field label="Category Name">
+                    <Input
+                        required
+                        value={categoryForm.name}
+                        onChange={(event) => onChange('name', event.target.value)}
+                        placeholder="e.g. Sarees"
+                    />
+                </Field>
+                <Field label="Description">
+                    <Textarea
+                        rows={4}
+                        value={categoryForm.description}
+                        onChange={(event) => onChange('description', event.target.value)}
+                        placeholder="Brief description of this category (optional)"
+                    />
+                </Field>
+            </form>
+        </Sheet>
     );
 }
