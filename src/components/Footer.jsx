@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
+import "../css/Footer.css";
 
 const HomeFooter = () => {
   return (
-    <footer>
+    <footer className="site-footer">
       <div className="container">
         <div className="footer-grid">
           {/* Brand Col */}
@@ -19,8 +20,8 @@ const HomeFooter = () => {
             <h4>Shop</h4>
             <Link to="/shop">New Arrivals</Link>
             <Link to="/products/wedding">Best Sellers</Link>
-            <Link to="/shop">Collections</Link>
-            <Link to="/shop">Sale</Link>
+            <Link to="/categories">Collections</Link>
+            <Link to="/deals">Sale</Link>
           </div>
 
           {/* Col 2: Help */}
@@ -58,10 +59,10 @@ const HomeFooter = () => {
         {/* Footer Bottom */}
         <div className="footer-bottom">
           <span>© 2026 Tere Rang. All rights reserved.</span>
-          <div style={{ display: "flex", gap: "22px" }}>
-            <Link to="/privacy-policy" style={{ color: "inherit", textDecoration: "none" }}>Privacy</Link>
-            <Link to="/TermsPage" style={{ color: "inherit", textDecoration: "none" }}>Terms</Link>
-            <Link to="/Shipping" style={{ color: "inherit", textDecoration: "none" }}>Shipping</Link>
+          <div className="footer-bottom-links">
+            <Link to="/privacy-policy">Privacy</Link>
+            <Link to="/TermsPage">Terms</Link>
+            <Link to="/Shipping">Shipping</Link>
           </div>
         </div>
       </div>
@@ -74,3 +75,4 @@ export const Footer = ({ variant } = {}) => {
 };
 
 export default Footer;
+

@@ -4,7 +4,6 @@ import { ArrowRight, RefreshCw, Shield, Truck, RotateCcw, Package } from "lucide
 import { apiUrl } from "../config/env.js";
 import { mapProductForDisplay } from "../utils/productPresentation.js";
 import { Footer } from "../components/Footer.jsx";
-import HomeCarousel from "../components/HomeCarousel.jsx";
 import StorefrontProductCard from "../components/StorefrontProductCard.jsx";
 
 import bannerMain from "../assets/banner_1.jpeg";
@@ -132,6 +131,52 @@ const COMMUNITY_IMAGES = [
   },
 ];
 
+/* ---------- Reference products from index.html ---------- */
+const REFERENCE_FALLBACK_PRODUCTS = [
+  {
+    id: "ref-gulabi-dress",
+    title: "Gulabi Drape Dress",
+    image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=86",
+    displayPrice: "₹2,899",
+    meta: "Signature / Rose",
+    category: "Signature / Rose",
+    badge: "Bestseller",
+    swatches: ["pink", "black"],
+  },
+  {
+    id: "ref-noor-set",
+    title: "Noor Co-ord Set",
+    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=86",
+    displayPrice: "₹3,499",
+    meta: "Co-ords / Ivory",
+    category: "Co-ords / Ivory",
+    badge: "New",
+    swatches: ["cream", "pink"],
+  },
+  {
+    id: "ref-midnight-jacket",
+    title: "Midnight Wrap Jacket",
+    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=800&q=86",
+    displayPrice: "₹2,399",
+    displayOldPrice: "₹2,999",
+    discount: 20,
+    meta: "Layering / Black",
+    category: "Layering / Black",
+    badge: "-20%",
+    swatches: ["black", "blue"],
+  },
+  {
+    id: "ref-meher-dress",
+    title: "Meher Midi Dress",
+    image: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?auto=format&fit=crop&w=800&q=86",
+    displayPrice: "₹2,699",
+    meta: "Dresses / Sky",
+    category: "Dresses / Sky",
+    badge: "Bestseller",
+    swatches: ["blue", "cream"],
+  },
+];
+
 const Home = () => {
   const [latestProducts, setLatestProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -140,27 +185,10 @@ const Home = () => {
   const [reloadFlag, setReloadFlag] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [activeFilter, setActiveFilter] = useState("All");
   const [email, setEmail] = useState("");
   const [emailNote, setEmailNote] = useState("");
   const navigate = useNavigate();
-
-  /* --- Scroll reveal observer --- */
-  useEffect(() => {
-    const elements = document.querySelectorAll(".reveal");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("show");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
 
   const latestProductsEndpoint = useMemo(
     () => apiUrl(`/api/products?limit=${LATEST_COLLECTION_LIMIT}&page=${currentPage}`),
@@ -210,6 +238,57 @@ const Home = () => {
     [latestProducts]
   );
 
+  const allAvailableProducts = useMemo(() => {
+    if (enrichedProducts.length === 0) {
+      return REFERENCE_FALLBACK_PRODUCTS;
+    }
+    if (enrichedProducts.length < 4) {
+      return [
+        ...enrichedProducts,
+        ...REFERENCE_FALLBACK_PRODUCTS.slice(0, 4 - enrichedProducts.length),
+      ];
+    }
+    return enrichedProducts;
+  }, [enrichedProducts]);
+
+  const filteredProducts = useMemo(() => {
+    if (activeFilter === "All") return allAvailableProducts;
+    const filterKey = activeFilter.toLowerCase();
+    const result = allAvailableProducts.filter((product) => {
+      const cat = String(product.raw?.category || product.category || product.meta || "").toLowerCase();
+      const title = String(product.title || "").toLowerCase();
+      if (filterKey === "dresses") {
+        return cat.includes("kurti") || cat.includes("dress") || cat.includes("skirt") || title.includes("dress") || title.includes("kurti") || title.includes("skirt");
+      }
+      if (filterKey === "sets") {
+        return cat.includes("suit") || cat.includes("set") || cat.includes("lehenga") || cat.includes("co-ord") || title.includes("set") || title.includes("suit") || title.includes("co-ord");
+      }
+      if (filterKey === "accessories") {
+        return cat.includes("wedding") || cat.includes("accessory") || cat.includes("coat") || cat.includes("ethnic") || cat.includes("layering") || title.includes("jacket") || title.includes("wrap");
+      }
+      return cat.includes(filterKey) || title.includes(filterKey);
+    });
+    return result.length > 0 ? result : allAvailableProducts;
+  }, [allAvailableProducts, activeFilter]);
+
+  /* --- Scroll reveal observer --- */
+  useEffect(() => {
+    const elements = document.querySelectorAll(".reveal:not(.show)");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("show");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [filteredProducts]);
+
   const handleReload = () => {
     setCurrentPage(1);
     setHasMore(true);
@@ -217,6 +296,10 @@ const Home = () => {
   };
 
   const handleSelectProduct = (product) => {
+    if (product?.id && String(product.id).startsWith("ref-")) {
+      navigate("/shop");
+      return;
+    }
     const targetId = product?.backendId || product?.id;
     if (!targetId) return;
     navigate(`/product/${targetId}`, { state: { product } });
@@ -386,7 +469,7 @@ const Home = () => {
       </section>
 
       {/* ======================================================
-          SECTION 2: BEST SELLERS (Dynamic Products from API)
+          SECTION 2: BEST SELLERS (Grid view matching index.html)
           ====================================================== */}
       <section className="section products-wrap" id="products">
         <div className="container">
@@ -395,50 +478,58 @@ const Home = () => {
               <div className="kicker">Best sellers</div>
               <h2>Most loved, right now.</h2>
             </div>
-            <Link className="text-link" to="/shop">
-              Shop all pieces
-            </Link>
+            <div className="product-toolbar" aria-label="Product filters">
+              {["All", "Dresses", "Sets", "Accessories"].map((filter) => (
+                <button
+                  key={filter}
+                  className={`chip ${activeFilter === filter ? "active" : ""}`}
+                  onClick={() => setActiveFilter(filter)}
+                  type="button"
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {loading && !enrichedProducts.length && !error ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24, padding: "20px 0" }}>
+          {loading && !allAvailableProducts.length && !error ? (
+            <div className="products">
               {Array.from({ length: 4 }, (_, i) => (
-                <div key={i} style={{ height: 380, background: "rgba(31,20,32,.05)", borderRadius: 4, animation: "pulse 1.5s infinite" }} />
+                <div key={i} style={{ height: 420, background: "rgba(31,20,32,.05)", borderRadius: 2 }} />
               ))}
             </div>
           ) : null}
 
-          {enrichedProducts.length > 0 ? (
-            <HomeCarousel label="Best sellers">
-              {enrichedProducts.map((product) => (
+          {filteredProducts.length > 0 ? (
+            <div className="products">
+              {filteredProducts.map((product, index) => (
                 <StorefrontProductCard
-                  key={product.id}
+                  key={product.id || index}
                   product={product}
                   onSelect={handleSelectProduct}
                   variant="home"
+                  index={index}
+                  dataDelay={index % 4 || undefined}
                 />
               ))}
-              {hasMore ? (
-                <div style={{ minWidth: 260, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", padding: 30, background: "#fff", border: "1px solid var(--line)" }}>
-                  <div className="kicker" style={{ marginBottom: 8 }}>More to discover</div>
-                  <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: 24, margin: "0 0 20px" }}>
-                    Find your next<br /><em>favourite.</em>
-                  </h3>
-                  <button
-                    className="btn"
-                    disabled={loadingMore || loading}
-                    onClick={() => (error ? setReloadFlag((f) => f + 1) : setCurrentPage((p) => p + 1))}
-                    type="button"
-                  >
-                    <span>{loadingMore || loading ? "Loading…" : error ? "Try again" : "Load more pieces"}</span>
-                    <ArrowRight size={15} />
-                  </button>
-                </div>
-              ) : null}
-            </HomeCarousel>
+            </div>
           ) : null}
 
-          {error ? (
+          {hasMore && activeFilter === "All" && latestProducts.length > 0 ? (
+            <div className="products-load-more reveal">
+              <button
+                className="btn"
+                disabled={loadingMore || loading}
+                onClick={() => (error ? setReloadFlag((f) => f + 1) : setCurrentPage((p) => p + 1))}
+                type="button"
+              >
+                <span>{loadingMore || loading ? "Loading…" : error ? "Try again" : "Load more pieces"}</span>
+                <ArrowRight size={15} />
+              </button>
+            </div>
+          ) : null}
+
+          {error && !allAvailableProducts.length ? (
             <div style={{ textAlign: "center", padding: 40, background: "#fff", border: "1px solid var(--line)", margin: "20px 0" }}>
               <RefreshCw size={24} style={{ color: "var(--pink)", marginBottom: 12 }} />
               <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: 20 }}>Unable to load collection</h3>
