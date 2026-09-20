@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import Product from '../models/Product.js';
 import authMiddleware from '../middleware/authMiddleware.js';
-import GoogleCloudStorage, { deleteFileFromGCS, getPublicUrl } from '../utils/cloudStorage.js';
+import GoogleCloudStorage, { deleteFileFromGCS, deleteProductStorageImages, getPublicUrl } from '../utils/cloudStorage.js';
 
 const router = express.Router();
 
@@ -227,20 +227,8 @@ router.put('/:id', authMiddleware, upload.array('images', 8), async (req, res) =
 
         // Handle images update: if new files provided, replace all images
         if (req.files && req.files.length > 0) {
-            // Delete old image files from Google Cloud Storage
-            const oldFiles = Array.isArray(product.images) && product.images.length > 0
-                ? product.images
-                : (product.image ? [product.image] : []);
-
-            await Promise.all(
-                oldFiles.map(async (filename) => {
-                    try {
-                        await deleteFileFromGCS(filename);
-                    } catch (error) {
-                        console.error('Error deleting old image from GCS:', error);
-                    }
-                })
-            );
+            // Delete old image files from Firebase Storage
+            await deleteProductStorageImages(product);
 
             updateData.images = req.files.map(f => f.filename); // Keep filenames for deletion
             updateData.imageUrls = req.files.map(f => f.publicUrl); // Store public URLs for frontend
@@ -291,37 +279,47 @@ router.delete('/:id/images/:imageIndex', authMiddleware, async (req, res) => {
         }
 
         const imageIndex = parseInt(req.params.imageIndex, 10);
+        const totalImages = Math.max(
+            Array.isArray(product.images) ? product.images.length : 0,
+            Array.isArray(product.imageUrls) ? product.imageUrls.length : 0
+        );
 
         // Validate index
-        if (isNaN(imageIndex) || imageIndex < 0 || imageIndex >= product.images.length) {
+        if (isNaN(imageIndex) || imageIndex < 0 || imageIndex >= totalImages) {
             return res.status(400).json({
                 message: 'Invalid image index'
             });
         }
 
-        // Get filename for GCS deletion
-        const filenameToDelete = product.images[imageIndex];
+        // Get image reference (filename or URL) for Firebase Storage deletion
+        const imageRefToDelete = product.images?.[imageIndex] || product.imageUrls?.[imageIndex];
 
-        // Delete from GCS (log but don't fail if file doesn't exist)
-        try {
-            await deleteFileFromGCS(filenameToDelete);
-        } catch (error) {
-            console.error(`Error deleting file ${filenameToDelete} from GCS:`, error);
-            // Continue with database update even if GCS delete fails
+        // Delete from Firebase Storage (log but don't fail if file doesn't exist)
+        if (imageRefToDelete) {
+            try {
+                await deleteFileFromGCS(imageRefToDelete);
+            } catch (error) {
+                console.error(`Error deleting image ${imageRefToDelete} from Firebase Storage:`, error);
+                // Continue with database update even if cloud delete fails
+            }
         }
 
         // Remove from both arrays at the same index
-        product.images.splice(imageIndex, 1);
-        product.imageUrls.splice(imageIndex, 1);
+        if (Array.isArray(product.images) && product.images.length > imageIndex) {
+            product.images.splice(imageIndex, 1);
+        }
+        if (Array.isArray(product.imageUrls) && product.imageUrls.length > imageIndex) {
+            product.imageUrls.splice(imageIndex, 1);
+        }
 
         // Handle edge case: if no images left, clear all image fields
-        if (product.images.length === 0) {
+        if ((!product.images || product.images.length === 0) && (!product.imageUrls || product.imageUrls.length === 0)) {
             product.image = '';
             product.images = [];
             product.imageUrls = [];
         } else {
             // Sync primary image from first URL
-            product.image = product.imageUrls[0];
+            product.image = product.imageUrls?.[0] || '';
         }
 
         await product.save();
@@ -462,20 +460,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
             });
         }
 
-        // Delete image files from Google Cloud Storage (all if array exists, else legacy single)
-        const filesToDelete = Array.isArray(product.images) && product.images.length > 0
-            ? product.images
-            : (product.image ? [product.image] : []);
-
-        await Promise.all(
-            filesToDelete.map(async (filename) => {
-                try {
-                    await deleteFileFromGCS(filename);
-                } catch (error) {
-                    console.error('Error deleting image file from GCS:', error);
-                }
-            })
-        );
+        // Delete all associated image files from Firebase Storage
+        await deleteProductStorageImages(product);
 
         await Product.findByIdAndDelete(req.params.id);
 

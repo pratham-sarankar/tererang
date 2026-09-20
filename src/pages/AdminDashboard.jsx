@@ -271,26 +271,12 @@ export default function AdminDashboard() {
 
     // Product Actions
     const openCreateProduct = () => {
-        setEditingProduct(null);
-        setProductForm(blankProductForm());
-        setProductImages([]);
-        setProductSheetOpen(true);
+        navigate('/admin/dashboard/products/new');
     };
 
     const openEditProduct = (product) => {
-        setEditingProduct(product);
-        setProductForm({
-            name: product.name || '',
-            price: product.price ?? '',
-            description: product.description || '',
-            category: product.category || 'kurti',
-            inStock: Boolean(product.inStock),
-            sizeStock: Array.isArray(product.sizeStock) && product.sizeStock.length > 0
-                ? product.sizeStock.map((entry) => ({ size: entry.size, quantity: entry.quantity ?? 0 }))
-                : blankProductForm().sizeStock,
-        });
-        setProductImages([]);
-        setProductSheetOpen(true);
+        const id = product._id || product.id;
+        navigate(`/admin/dashboard/products/${id}/edit`);
     };
 
     const submitProduct = async (e) => {
@@ -1251,7 +1237,7 @@ export default function AdminDashboard() {
                         {/* Image upload */}
                         <div className="admin-form-group">
                             <label>Product Imagery</label>
-                            <div className="admin-upload-box">
+                            <div className="admin-upload-box" style={{ position: 'relative', overflow: 'hidden' }}>
                                 <UploadCloud size={24} style={{ color: 'var(--pink)', margin: '0 auto 8px' }} />
                                 <p style={{ fontSize: 11, margin: '0 0 6px', fontWeight: 600 }}>Click or drop product files here</p>
                                 <span style={{ fontSize: 9, color: 'var(--muted)' }}>JPEG, PNG, WEBP up to 10MB</span>
@@ -1260,7 +1246,7 @@ export default function AdminDashboard() {
                                     multiple
                                     accept="image/*"
                                     onChange={(e) => setProductImages(Array.from(e.target.files || []))}
-                                    style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+                                    style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }}
                                 />
                             </div>
 
