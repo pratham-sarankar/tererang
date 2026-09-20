@@ -353,22 +353,14 @@ const Home = () => {
           <div className="hero-art hero-animate d2">
             <div className="hero-main">
               <img
-                src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1400&q=88"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = bannerMain;
-                }}
+                src={bannerMain}
                 alt="Fashion model in a refined editorial look"
                 fetchPriority="high"
               />
             </div>
             <div className="hero-float">
               <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=88"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = bannerFloat;
-                }}
+                src={bannerFloat}
                 alt="Portrait detail"
                 loading="lazy"
               />
