@@ -573,7 +573,7 @@
   box-shadow: 0 8px 30px rgba(94, 23, 78, .025);
 }
 
-.section-head {
+.admin-app .section-head {
   height: 66px;
   padding: 0 22px;
   display: flex;
@@ -584,14 +584,14 @@
   margin: 0 !important;
 }
 
-.section-title h2 {
+.admin-app .section-title h2 {
   font-size: 14px;
   margin: 0 0 3px;
   font-weight: 700;
   color: var(--ink);
 }
 
-.section-title p {
+.admin-app .section-title p {
   font-size: 10px;
   color: var(--muted);
   margin: 0;
@@ -1998,7 +1998,7 @@
     grid-column: auto;
   }
 
-  .section-head {
+  .admin-app .section-head {
     min-height: 60px;
     height: auto;
     padding: 14px 16px;

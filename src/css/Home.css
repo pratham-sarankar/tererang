@@ -36,11 +36,13 @@
 }
 
 .kicker {
+  display: block;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: .18em;
   text-transform: uppercase;
   color: var(--wine);
+  margin-bottom: 8px;
 }
 
 h1,
@@ -405,12 +407,26 @@ p {
   align-items: flex-end;
   justify-content: space-between;
   gap: 30px;
-  margin-bottom: 44px;
+  margin-top: 0;
+  margin-bottom: 48px;
+  height: auto;
+  min-height: auto;
+  padding: 0;
+  border-bottom: none;
+}
+
+.hp-main-wrapper .section-head h2 {
+  margin-bottom: 6px;
 }
 
 .hp-main-wrapper .section-head h2 em {
   color: var(--pink);
   font-style: italic;
+}
+
+.hp-main-wrapper .section-head p {
+  max-width: 520px;
+  margin-bottom: 6px;
 }
 
 /* ======================================================
@@ -996,6 +1012,10 @@ p {
   align-items: center;
 }
 
+.newsletter h2 {
+  margin: 8px 0 12px;
+}
+
 .signup {
   display: flex;
   border-bottom: 1px solid var(--ink);
@@ -1121,7 +1141,12 @@ p {
   .hp-main-wrapper .section-head {
     align-items: flex-start;
     flex-direction: column;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
+    height: auto;
+    min-height: auto;
+    padding: 0;
+    border-bottom: none;
+    gap: 16px;
   }
 
   .product-toolbar {
