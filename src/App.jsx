@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
@@ -12,6 +12,16 @@ import Categories from "./pages/Categories";
 // Admin Components
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminOverview from "./pages/admin/AdminOverview";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminInventory from "./pages/admin/AdminInventory";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminCustomers from "./pages/admin/AdminCustomers";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminMarketing from "./pages/admin/AdminMarketing";
+import AdminReviews from "./pages/admin/AdminReviews";
+import AdminHelp from "./pages/admin/AdminHelp";
 
 // Products
 import Kurti from "./products/Kurti";
@@ -69,7 +79,20 @@ function App() {
 
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />}>
+            <Route index element={<AdminOverview />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="customers" element={<AdminCustomers />} />
+            <Route path="inventory" element={<AdminInventory />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="discounts" element={<AdminSettings />} />
+            <Route path="marketing" element={<AdminMarketing />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="settings" element={<AdminSettings />} />
+            <Route path="help" element={<AdminHelp />} />
+          </Route>
 
           {/* Products */}
           <Route path="/products/Kurti" element={<Kurti />} />

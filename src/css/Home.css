@@ -400,7 +400,7 @@ p {
   padding: 110px 0;
 }
 
-.section-head {
+.hp-main-wrapper .section-head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -408,7 +408,7 @@ p {
   margin-bottom: 44px;
 }
 
-.section-head h2 em {
+.hp-main-wrapper .section-head h2 em {
   color: var(--pink);
   font-style: italic;
 }
@@ -1118,7 +1118,7 @@ p {
     padding: 78px 0;
   }
 
-  .section-head {
+  .hp-main-wrapper .section-head {
     align-items: flex-start;
     flex-direction: column;
     margin-bottom: 30px;
