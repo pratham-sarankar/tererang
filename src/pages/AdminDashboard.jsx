@@ -47,6 +47,7 @@ export default function AdminDashboard() {
     // Data States
     const [products, setProducts] = useState([]);
     const [orders, setOrders] = useState([]);
+    const [categories, setCategories] = useState(PRODUCT_CATEGORIES);
     const [settings, setSettings] = useState({
         globalDiscountPercentage: 0,
         globalDiscountEnabled: false,
@@ -99,6 +100,7 @@ export default function AdminDashboard() {
         overview: { title: 'Overview', sub: 'Here’s what’s happening with your store today.' },
         orders: { title: 'Orders', sub: 'Search, review, confirm, and update customer purchases.' },
         products: { title: 'Products', sub: 'Manage catalog products, images, categories, and inventory.' },
+        categories: { title: 'Categories', sub: 'Create custom categories and track product distribution.' },
         customers: { title: 'Customers', sub: 'Track audience growth, buyer retention, and metrics.' },
         inventory: { title: 'Inventory', sub: 'Monitor stock levels, size allocations, and restock alerts.' },
         analytics: { title: 'Analytics', sub: 'Deep dive into revenue trends and sales channels.' },
@@ -197,11 +199,27 @@ export default function AdminDashboard() {
         }
     };
 
+    const fetchCategories = async () => {
+        try {
+            const response = await fetch(apiUrl('/api/categories'));
+            const data = await response.json();
+            if (response.ok && Array.isArray(data.categories) && data.categories.length > 0) {
+                const mapped = data.categories.map((c) => ({
+                    value: c.slug || (c.title || c.name || '').toLowerCase(),
+                    label: c.title || c.name,
+                }));
+                setCategories(mapped);
+            }
+        } catch (err) {
+            console.error('Fetch categories error:', err);
+        }
+    };
+
     useEffect(() => {
         checkAuth();
         const init = async () => {
             setLoading(true);
-            await Promise.all([fetchProducts(), fetchOrders(), fetchSettings()]);
+            await Promise.all([fetchProducts(), fetchOrders(), fetchSettings(), fetchCategories()]);
             setLoading(false);
         };
         init();
@@ -548,6 +566,8 @@ export default function AdminDashboard() {
         fetchProducts,
         fetchOrders,
         fetchSettings,
+        categories,
+        fetchCategories,
         setSettings,
         saveSettings,
         searchQuery,
@@ -608,6 +628,12 @@ export default function AdminDashboard() {
                     <symbol id="i-box" viewBox="0 0 24 24">
                         <path d="M4 7l8-4 8 4-8 4-8-4Z" />
                         <path d="M4 7v10l8 4 8-4V7M12 11v10" />
+                    </symbol>
+                    <symbol id="i-category" viewBox="0 0 24 24">
+                        <rect width="7" height="7" x="3" y="3" rx="1.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
+                        <rect width="7" height="7" x="14" y="3" rx="1.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
+                        <rect width="7" height="7" x="14" y="14" rx="1.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
+                        <rect width="7" height="7" x="3" y="14" rx="1.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
                     </symbol>
                     <symbol id="i-users" viewBox="0 0 24 24">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -731,6 +757,14 @@ export default function AdminDashboard() {
                     >
                         <svg className="ico"><use href="#i-box" /></svg>
                         Products
+                    </NavLink>
+                    <NavLink
+                        to="/admin/dashboard/categories"
+                        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <svg className="ico"><use href="#i-category" /></svg>
+                        Category
                     </NavLink>
                     <NavLink
                         to="/admin/dashboard/customers"
@@ -1170,7 +1204,7 @@ export default function AdminDashboard() {
                                     value={productForm.category}
                                     onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
                                 >
-                                    {PRODUCT_CATEGORIES.map((c) => (
+                                    {categories.map((c) => (
                                         <option key={c.value} value={c.value}>{c.label}</option>
                                     ))}
                                 </select>

@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "server": "node backend/server.js",
     "server:dev": "node --watch backend/server.js",
-    "setup-admin": "node backend/setup-admin.js"
+    "setup-admin": "node backend/setup-admin.js",
+    "seed:categories": "node backend/seed-categories.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",

@@ -34,13 +34,33 @@ export default function AdminProductForm() {
   const navigate = useNavigate();
   const isEdit = Boolean(id);
 
-  const { products = [], fetchProducts, pushToast } = useOutletContext() || {};
+  const { products = [], fetchProducts, pushToast, categories: outletCategories } = useOutletContext() || {};
 
   const fileInputRef = useRef(null);
 
   const [loadingProduct, setLoadingProduct] = useState(isEdit);
   const [submitting, setSubmitting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [categories, setCategories] = useState(outletCategories || PRODUCT_CATEGORIES);
+
+  useEffect(() => {
+    if (outletCategories && outletCategories.length > 0) {
+      setCategories(outletCategories);
+      return;
+    }
+    fetch(apiUrl('/api/categories'))
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.categories) && data.categories.length > 0) {
+          const list = data.categories.map((c) => ({
+            value: c.slug || (c.title || c.name || '').toLowerCase(),
+            label: c.title || c.name,
+          }));
+          setCategories(list);
+        }
+      })
+      .catch((err) => console.warn('Failed to load categories:', err));
+  }, [outletCategories]);
 
   const [form, setForm] = useState(blankProductForm());
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -389,7 +409,7 @@ export default function AdminProductForm() {
                     value={form.category}
                     onChange={(e) => handleFieldChange('category', e.target.value)}
                   >
-                    {PRODUCT_CATEGORIES.map((c) => (
+                    {categories.map((c) => (
                       <option key={c.value} value={c.value}>
                         {c.label}
                       </option>
