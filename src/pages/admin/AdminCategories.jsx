@@ -62,7 +62,7 @@ export default function AdminCategories() {
     } catch (err) {
       console.error('Error fetching categories:', err);
       if (pushToast) {
-        pushToast({ type: 'error', message: 'Failed to load categories.' });
+        pushToast('Failed to load categories.', 'error');
       }
     } finally {
       setLoading(false);
@@ -204,13 +204,11 @@ export default function AdminCategories() {
         throw new Error(data.message || 'Operation failed');
       }
 
-      if (pushToast) {
-        pushToast({
-          type: 'success',
-          message: editingCategory
-            ? `Category "${formData.title}" updated successfully.`
-            : `Category "${formData.title}" created successfully.`,
-        });
+      if (editingCategory && pushToast) {
+        pushToast(
+          `Category "${formData.title}" updated successfully.`,
+          'success'
+        );
       }
 
       setModalOpen(false);
@@ -236,7 +234,7 @@ export default function AdminCategories() {
 
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      if (pushToast) pushToast({ type: 'error', message: 'Authentication required.' });
+      if (pushToast) pushToast('Authentication required.', 'error');
       return;
     }
 
@@ -254,13 +252,6 @@ export default function AdminCategories() {
         throw new Error(data.message || 'Failed to delete category');
       }
 
-      if (pushToast) {
-        pushToast({
-          type: 'success',
-          message: `Category "${categoryToDelete.title || categoryToDelete.name}" and its cover image were deleted from cloud storage.`,
-        });
-      }
-
       setDeleteDialogOpen(false);
       setCategoryToDelete(null);
       fetchCategories();
@@ -268,7 +259,7 @@ export default function AdminCategories() {
     } catch (err) {
       console.error('Delete category error:', err);
       if (pushToast) {
-        pushToast({ type: 'error', message: err.message || 'Failed to delete category.' });
+        pushToast(err.message || 'Failed to delete category.', 'error');
       }
     } finally {
       setIsDeleting(false);
@@ -411,7 +402,7 @@ export default function AdminCategories() {
           </div>
         ) : viewMode === 'grid' ? (
           /* Grid View */
-          <div className="category-grid" style={{ padding: '20px 0' }}>
+          <div className="category-grid">
             {filteredCategories.map((cat) => {
               const displayTitle = cat.title || cat.name;
               const productCount = cat.productCount || 0;
