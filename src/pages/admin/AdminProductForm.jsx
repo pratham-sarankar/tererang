@@ -53,14 +53,18 @@ export default function AdminProductForm() {
       .then((data) => {
         if (Array.isArray(data.categories) && data.categories.length > 0) {
           const list = data.categories.map((c) => ({
-            value: c.slug || (c.title || c.name || '').toLowerCase(),
+            value: c._id,
             label: c.title || c.name,
+            slug: c.slug,
           }));
           setCategories(list);
+          if (!isEdit) {
+            setForm((prev) => ({ ...prev, category: prev.category || list[0].value }));
+          }
         }
       })
       .catch((err) => console.warn('Failed to load categories:', err));
-  }, [outletCategories]);
+  }, [outletCategories, isEdit]);
 
   const [form, setForm] = useState(blankProductForm());
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -146,11 +150,14 @@ export default function AdminProductForm() {
       }));
     }
 
+    const selectedCatId =
+      (product.category && typeof product.category === 'object' ? product.category._id : product.category) || '';
+
     setForm({
       name: product.name || '',
       price: product.price ?? '',
       description: product.description || '',
-      category: product.category || 'kurti',
+      category: selectedCatId,
       inStock: Boolean(product.inStock),
       sizeStock: sizes,
     });
@@ -687,7 +694,9 @@ export default function AdminProductForm() {
                 </div>
 
                 <div className="mini-card-details">
-                  <span className="mini-card-category">{titleCase(form.category)}</span>
+                  <span className="mini-card-category">
+                    {categories.find((c) => c.value === form.category)?.label || titleCase(form.category)}
+                  </span>
                   <h4 className="mini-card-title">{form.name || 'Untitled Product'}</h4>
                   <div className="mini-card-bottom">
                     <span className="mini-card-price">

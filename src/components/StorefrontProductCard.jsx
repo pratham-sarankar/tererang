@@ -49,10 +49,12 @@ const StorefrontProductCard = ({
 
   if (variant === "home") {
     const swatches = product.swatches || SWATCH_PAIRS[index % SWATCH_PAIRS.length];
+    const rawCat = product.raw?.category || product.category;
+    const catName = rawCat && typeof rawCat === 'object'
+      ? (rawCat.title || rawCat.name || '')
+      : (typeof rawCat === 'string' ? rawCat.replace(/([a-z])([A-Z])/g, "$1 $2") : '');
+    const categoryMeta = product.meta || catName || product.brand || "Signature";
     const displayBadge = product.discount > 0 ? `-${product.discount}%` : (product.badge || badge);
-    const categoryMeta = product.meta || (typeof product.raw?.category === "string"
-      ? product.raw.category.replace(/([a-z])([A-Z])/g, "$1 $2")
-      : (product.category || product.brand || "Signature"));
 
     return (
       <article

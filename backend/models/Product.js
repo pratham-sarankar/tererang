@@ -48,9 +48,9 @@ const productSchema = new mongoose.Schema({
         trim: true
     },
     category: {
-        type: String,
-        default: 'kurti',
-        trim: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: [true, 'Product category is required'],
     },
     inStock: {
         type: Boolean,

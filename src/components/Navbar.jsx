@@ -292,7 +292,7 @@ const Navbar = () => {
 
           {/* Nav Links */}
           <nav className="nav-links" aria-label="Primary navigation">
-            <Link className="nav-link" to="/shop">
+            <Link className="nav-link" to="/shop?sort=newest">
               New Arrivals
             </Link>
             <Link
@@ -307,7 +307,7 @@ const Navbar = () => {
             <Link className="nav-link" to="/shop">
               Collections
             </Link>
-            <Link className="nav-link" to="/products/wedding">
+            <Link className="nav-link" to="/shop?category=wedding">
               Best Sellers
             </Link>
             <Link className="nav-link" to="/contact">
@@ -428,17 +428,17 @@ const Navbar = () => {
           <div className="mega-inner">
             <div>
               <h4>Shop by edit</h4>
-              <Link to="/shop" onClick={() => setIsMegaOpen(false)}>New Arrivals</Link>
-              <Link to="/products/wedding" onClick={() => setIsMegaOpen(false)}>Best Sellers</Link>
-              <Link to="/products/Suit" onClick={() => setIsMegaOpen(false)}>Occasion Wear</Link>
-              <Link to="/products/Kurti" onClick={() => setIsMegaOpen(false)}>Everyday Essentials</Link>
+              <Link to="/shop?sort=newest" onClick={() => setIsMegaOpen(false)}>New Arrivals</Link>
+              <Link to="/shop?category=wedding" onClick={() => setIsMegaOpen(false)}>Best Sellers</Link>
+              <Link to="/shop?category=suit" onClick={() => setIsMegaOpen(false)}>Occasion Wear</Link>
+              <Link to="/shop?category=kurti" onClick={() => setIsMegaOpen(false)}>Everyday Essentials</Link>
             </div>
             <div>
               <h4>Collections</h4>
-              <Link to="/products/Kurti" onClick={() => setIsMegaOpen(false)}>Rang Bloom</Link>
-              <Link to="/products/Suit" onClick={() => setIsMegaOpen(false)}>Soft Structure</Link>
-              <Link to="/products/Coat" onClick={() => setIsMegaOpen(false)}>After Dark</Link>
-              <Link to="/products/EthnicWear" onClick={() => setIsMegaOpen(false)}>Accessories</Link>
+              <Link to="/shop?category=kurti" onClick={() => setIsMegaOpen(false)}>Rang Bloom</Link>
+              <Link to="/shop?category=suit" onClick={() => setIsMegaOpen(false)}>Soft Structure</Link>
+              <Link to="/shop?category=coat" onClick={() => setIsMegaOpen(false)}>After Dark</Link>
+              <Link to="/shop?category=ethnicwear" onClick={() => setIsMegaOpen(false)}>Accessories</Link>
             </div>
             <Link className="mega-card" to="/shop" onClick={() => setIsMegaOpen(false)}>
               <div>

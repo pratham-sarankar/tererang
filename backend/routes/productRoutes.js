@@ -2,7 +2,9 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 import Product from '../models/Product.js';
+import Category from '../models/Category.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import GoogleCloudStorage, { deleteFileFromGCS, deleteProductStorageImages, getPublicUrl } from '../utils/cloudStorage.js';
 
@@ -37,6 +39,24 @@ const upload = multer({
         fileSize: 5 * 1024 * 1024 // 5MB limit
     }
 });
+
+const escapeRegex = (string) => String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const resolveCategoryDoc = async (categoryInput) => {
+    if (!categoryInput) return null;
+    const trimmed = String(categoryInput).trim();
+    if (mongoose.Types.ObjectId.isValid(trimmed)) {
+        const cat = await Category.findById(trimmed);
+        if (cat) return cat;
+    }
+    return await Category.findOne({
+        $or: [
+            { slug: trimmed.toLowerCase() },
+            { title: new RegExp(`^${escapeRegex(trimmed)}$`, 'i') },
+            { name: new RegExp(`^${escapeRegex(trimmed)}$`, 'i') }
+        ]
+    });
+};
 
 const normalizeSizeValue = (value) => {
     if (value === undefined || value === null) return '';
@@ -74,29 +94,160 @@ const parseSizeStockInput = (rawValue) => {
         .filter(Boolean);
 };
 
-// Get all products (public route)
+// Get all products (public route) - supports search, category, price range, inStock, size, and sorting
 router.get('/', async (req, res) => {
     try {
-        const { category, inStock, page = 1, limit = 12 } = req.query;
+        const {
+            category,
+            inStock,
+            search,
+            minPrice,
+            maxPrice,
+            size,
+            sort = 'newest',
+            page = 1,
+            limit = 12
+        } = req.query;
+
         const filter = {};
 
-        if (category) filter.category = category;
-        if (inStock !== undefined) filter.inStock = inStock === 'true';
+        // 1. Search filter across name, description, and category
+        if (search && search.trim()) {
+            const escaped = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const searchRegex = new RegExp(escaped, 'i');
 
-        const skip = (page - 1) * limit;
+            // Find categories matching search text
+            const matchedCats = await Category.find({
+                $or: [
+                    { title: searchRegex },
+                    { slug: searchRegex },
+                    { name: searchRegex }
+                ]
+            }, '_id').lean();
+            const matchedCatIds = matchedCats.map((c) => c._id);
+
+            filter.$or = [
+                { name: searchRegex },
+                { description: searchRegex },
+                ...(matchedCatIds.length > 0 ? [{ category: { $in: matchedCatIds } }] : [])
+            ];
+        }
+
+        // 2. Category filter (supports ObjectId, slug, or title, single or comma-separated)
+        if (category && category.trim() && category.toLowerCase() !== 'all') {
+            const cats = category
+                .split(',')
+                .map((c) => c.trim())
+                .filter(Boolean);
+
+            const matchedCategoryIds = [];
+            for (const catTerm of cats) {
+                if (mongoose.Types.ObjectId.isValid(catTerm)) {
+                    matchedCategoryIds.push(new mongoose.Types.ObjectId(catTerm));
+                }
+                const foundCats = await Category.find({
+                    $or: [
+                        { slug: catTerm.toLowerCase() },
+                        { title: new RegExp(`^${escapeRegex(catTerm)}$`, 'i') },
+                        { name: new RegExp(`^${escapeRegex(catTerm)}$`, 'i') }
+                    ]
+                }, '_id').lean();
+                for (const fc of foundCats) {
+                    matchedCategoryIds.push(fc._id);
+                }
+            }
+
+            if (matchedCategoryIds.length > 0) {
+                filter.category = { $in: matchedCategoryIds };
+            } else {
+                // If nonexistent category specified, return empty
+                filter.category = new mongoose.Types.ObjectId();
+            }
+        }
+
+        // 3. Stock availability filter
+        if (inStock !== undefined && inStock !== '') {
+            if (inStock === 'true' || inStock === true) {
+                filter.inStock = true;
+            } else if (inStock === 'false' || inStock === false) {
+                filter.inStock = false;
+            }
+        }
+
+        // 4. Price range filter
+        const min = parseFloat(minPrice);
+        const max = parseFloat(maxPrice);
+        if (!isNaN(min) || !isNaN(max)) {
+            filter.price = {};
+            if (!isNaN(min) && min >= 0) filter.price.$gte = min;
+            if (!isNaN(max) && max >= 0) filter.price.$lte = max;
+        }
+
+        // 5. Size filter (check sizeStock matching sizes with positive quantity)
+        if (size && size.trim() && size.toLowerCase() !== 'all') {
+            const sizes = size
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean);
+
+            if (sizes.length > 0) {
+                const sizeRegexList = sizes.map((s) => new RegExp(`^${s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'));
+                filter.sizeStock = {
+                    $elemMatch: {
+                        size: { $in: sizeRegexList },
+                        quantity: { $gt: 0 }
+                    }
+                };
+            }
+        }
+
+        // 6. Sorting
+        let sortOption = { createdAt: -1 };
+        switch (sort) {
+            case 'price-asc':
+            case 'price-low-high':
+                sortOption = { price: 1, _id: 1 };
+                break;
+            case 'price-desc':
+            case 'price-high-low':
+                sortOption = { price: -1, _id: 1 };
+                break;
+            case 'name-asc':
+            case 'title-asc':
+                sortOption = { name: 1, _id: 1 };
+                break;
+            case 'name-desc':
+            case 'title-desc':
+                sortOption = { name: -1, _id: 1 };
+                break;
+            case 'oldest':
+                sortOption = { createdAt: 1, _id: 1 };
+                break;
+            case 'newest':
+            default:
+                sortOption = { createdAt: -1, _id: 1 };
+                break;
+        }
+
+        const pageNum = Math.max(1, parseInt(page, 10) || 1);
+        const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 12));
+        const skip = (pageNum - 1) * limitNum;
+
         const products = await Product.find(filter)
-            .sort({ createdAt: -1 })
+            .populate('category', 'title name slug coverImage description')
+            .sort(sortOption)
             .skip(skip)
-            .limit(parseInt(limit));
+            .limit(limitNum);
 
         const total = await Product.countDocuments(filter);
 
         res.json({
             products,
             pagination: {
-                current: parseInt(page),
-                pages: Math.ceil(total / limit),
-                total
+                current: pageNum,
+                pages: Math.ceil(total / limitNum) || 1,
+                total,
+                limit: limitNum
             }
         });
     } catch (error) {
@@ -110,7 +261,8 @@ router.get('/', async (req, res) => {
 // Get single product by ID (public route)
 router.get('/:id', async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id)
+            .populate('category', 'title name slug coverImage description');
         if (!product) {
             return res.status(404).json({
                 message: 'Product not found'
@@ -154,6 +306,14 @@ router.post('/', authMiddleware, upload.array('images', 8), async (req, res) => 
 
         const sizeStock = parseSizeStockInput(req.body.sizeStock);
 
+        // Resolve and validate category
+        const categoryDoc = await resolveCategoryDoc(category);
+        if (!categoryDoc) {
+            return res.status(400).json({
+                message: 'A valid category is required. Selected category does not exist.'
+            });
+        }
+
         const productData = {
             name,
             price: parseFloat(price),
@@ -161,7 +321,7 @@ router.post('/', authMiddleware, upload.array('images', 8), async (req, res) => 
             images: req.files.map(f => f.filename), // Keep filenames for deletion purposes
             imageUrls: req.files.map(f => f.publicUrl), // Store public URLs for frontend
             description: description || '',
-            category: category || 'kurti',
+            category: categoryDoc._id,
             inStock: inStock !== 'false',
             sizeStock,
         };
@@ -172,6 +332,7 @@ router.post('/', authMiddleware, upload.array('images', 8), async (req, res) => 
 
         const product = new Product(productData);
         await product.save();
+        await product.populate('category', 'title name slug coverImage description');
 
         res.status(201).json({
             message: 'Product created successfully',
@@ -216,7 +377,15 @@ router.put('/:id', authMiddleware, upload.array('images', 8), async (req, res) =
         if (name) updateData.name = name;
         if (price) updateData.price = parseFloat(price);
         if (description !== undefined) updateData.description = description;
-        if (category) updateData.category = category;
+        if (category !== undefined) {
+            const categoryDoc = await resolveCategoryDoc(category);
+            if (!categoryDoc) {
+                return res.status(400).json({
+                    message: 'A valid category is required. Selected category does not exist.'
+                });
+            }
+            updateData.category = categoryDoc._id;
+        }
         if (inStock !== undefined) updateData.inStock = inStock !== 'false';
 
         const sizeStock = parseSizeStockInput(req.body.sizeStock);
@@ -239,7 +408,7 @@ router.put('/:id', authMiddleware, upload.array('images', 8), async (req, res) =
             req.params.id,
             updateData,
             { new: true, runValidators: true }
-        );
+        ).populate('category', 'title name slug coverImage description');
 
         res.json({
             message: 'Product updated successfully',

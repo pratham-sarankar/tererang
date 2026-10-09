@@ -106,4 +106,12 @@ export const categoryMeta = {
     fallbackCategory: "Wedding Collection",
     image: traditionalEthnicImg,
   },
+  skirt: {
+    category: "skirt",
+    eyebrow: "flared elegance",
+    title: "skirt collection",
+    desc: "Graceful silhouettes, contemporary cuts, and effortless movement for everyday flair.",
+    fallbackCategory: "Skirt",
+    image: modernEthnicImg,
+  },
 };

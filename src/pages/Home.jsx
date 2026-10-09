@@ -131,51 +131,6 @@ const COMMUNITY_IMAGES = [
   },
 ];
 
-/* ---------- Reference products from index.html ---------- */
-const REFERENCE_FALLBACK_PRODUCTS = [
-  {
-    id: "ref-gulabi-dress",
-    title: "Gulabi Drape Dress",
-    image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=86",
-    displayPrice: "₹2,899",
-    meta: "Signature / Rose",
-    category: "Signature / Rose",
-    badge: "Bestseller",
-    swatches: ["pink", "black"],
-  },
-  {
-    id: "ref-noor-set",
-    title: "Noor Co-ord Set",
-    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=86",
-    displayPrice: "₹3,499",
-    meta: "Co-ords / Ivory",
-    category: "Co-ords / Ivory",
-    badge: "New",
-    swatches: ["cream", "pink"],
-  },
-  {
-    id: "ref-midnight-jacket",
-    title: "Midnight Wrap Jacket",
-    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=800&q=86",
-    displayPrice: "₹2,399",
-    displayOldPrice: "₹2,999",
-    discount: 20,
-    meta: "Layering / Black",
-    category: "Layering / Black",
-    badge: "-20%",
-    swatches: ["black", "blue"],
-  },
-  {
-    id: "ref-meher-dress",
-    title: "Meher Midi Dress",
-    image: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?auto=format&fit=crop&w=800&q=86",
-    displayPrice: "₹2,699",
-    meta: "Dresses / Sky",
-    category: "Dresses / Sky",
-    badge: "Bestseller",
-    swatches: ["blue", "cream"],
-  },
-];
 
 const Home = () => {
   const [latestProducts, setLatestProducts] = useState([]);
@@ -238,24 +193,17 @@ const Home = () => {
     [latestProducts]
   );
 
-  const allAvailableProducts = useMemo(() => {
-    if (enrichedProducts.length === 0) {
-      return REFERENCE_FALLBACK_PRODUCTS;
-    }
-    if (enrichedProducts.length < 4) {
-      return [
-        ...enrichedProducts,
-        ...REFERENCE_FALLBACK_PRODUCTS.slice(0, 4 - enrichedProducts.length),
-      ];
-    }
-    return enrichedProducts;
-  }, [enrichedProducts]);
+  const allAvailableProducts = enrichedProducts;
 
   const filteredProducts = useMemo(() => {
     if (activeFilter === "All") return allAvailableProducts;
     const filterKey = activeFilter.toLowerCase();
-    const result = allAvailableProducts.filter((product) => {
-      const cat = String(product.raw?.category || product.category || product.meta || "").toLowerCase();
+    return allAvailableProducts.filter((product) => {
+      const rawCat = product.raw?.category || product.category;
+      const catVal = rawCat && typeof rawCat === 'object'
+        ? `${rawCat.slug || ''} ${rawCat.title || ''} ${rawCat.name || ''}`
+        : String(rawCat || '');
+      const cat = String(catVal || product.meta || "").toLowerCase();
       const title = String(product.title || "").toLowerCase();
       if (filterKey === "dresses") {
         return cat.includes("kurti") || cat.includes("dress") || cat.includes("skirt") || title.includes("dress") || title.includes("kurti") || title.includes("skirt");
@@ -268,7 +216,6 @@ const Home = () => {
       }
       return cat.includes(filterKey) || title.includes(filterKey);
     });
-    return result.length > 0 ? result : allAvailableProducts;
   }, [allAvailableProducts, activeFilter]);
 
   /* --- Scroll reveal observer --- */
@@ -296,10 +243,6 @@ const Home = () => {
   };
 
   const handleSelectProduct = (product) => {
-    if (product?.id && String(product.id).startsWith("ref-")) {
-      navigate("/shop");
-      return;
-    }
     const targetId = product?.backendId || product?.id;
     if (!targetId) return;
     navigate(`/product/${targetId}`, { state: { product } });
@@ -404,7 +347,7 @@ const Home = () => {
 
           <div className="categories-grid">
             {/* Card 1: Large */}
-            <Link className="cat large reveal" to="/products/Kurti">
+            <Link className="cat large reveal" to="/shop?category=kurti">
               <img
                 src="https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=86"
                 onError={(e) => {
@@ -422,7 +365,7 @@ const Home = () => {
             </Link>
 
             {/* Card 2 */}
-            <Link className="cat reveal" data-delay="1" to="/products/Suit">
+            <Link className="cat reveal" data-delay="1" to="/shop?category=suit">
               <img
                 src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=86"
                 onError={(e) => {
@@ -440,7 +383,7 @@ const Home = () => {
             </Link>
 
             {/* Card 3 */}
-            <Link className="cat reveal" data-delay="2" to="/products/wedding">
+            <Link className="cat reveal" data-delay="2" to="/shop?category=wedding">
               <img
                 src="https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=900&q=86"
                 onError={(e) => {
@@ -470,7 +413,7 @@ const Home = () => {
               <div className="kicker">Best sellers</div>
               <h2>Most loved, right now.</h2>
             </div>
-            <div className="product-toolbar" aria-label="Product filters">
+            <div className="product-toolbar" aria-label="Product filters" style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
               {["All", "Dresses", "Sets", "Accessories"].map((filter) => (
                 <button
                   key={filter}
@@ -481,6 +424,21 @@ const Home = () => {
                   {filter}
                 </button>
               ))}
+              <Link
+                to="/shop"
+                style={{
+                  marginLeft: "auto",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  color: "var(--pink)",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px"
+                }}
+              >
+                Shop all pieces →
+              </Link>
             </div>
           </div>
 
@@ -504,6 +462,15 @@ const Home = () => {
                   dataDelay={index % 4 || undefined}
                 />
               ))}
+            </div>
+          ) : !loading && !error ? (
+            <div style={{ textAlign: "center", padding: "60px 20px" }}>
+              <p style={{ fontFamily: '"Playfair Display", serif', fontSize: "20px", marginBottom: "8px", color: "var(--charcoal)" }}>
+                No pieces found
+              </p>
+              <p style={{ color: "var(--muted)", fontSize: "14px" }}>
+                There are currently no products available in this selection.
+              </p>
             </div>
           ) : null}
 

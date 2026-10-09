@@ -205,10 +205,12 @@ export default function AdminDashboard() {
             const data = await response.json();
             if (response.ok && Array.isArray(data.categories) && data.categories.length > 0) {
                 const mapped = data.categories.map((c) => ({
-                    value: c.slug || (c.title || c.name || '').toLowerCase(),
+                    value: c._id,
                     label: c.title || c.name,
+                    slug: c.slug,
                 }));
                 setCategories(mapped);
+                setProductForm((prev) => ({ ...prev, category: prev.category || mapped[0].value }));
             }
         } catch (err) {
             console.error('Fetch categories error:', err);
@@ -310,7 +312,7 @@ export default function AdminDashboard() {
         formData.append('name', productForm.name);
         formData.append('price', productForm.price);
         formData.append('description', productForm.description || '');
-        formData.append('category', productForm.category || 'kurti');
+        formData.append('category', productForm.category || (categories[0]?.value || ''));
         formData.append('inStock', productForm.inStock);
         formData.append(
             'sizeStock',
@@ -525,9 +527,10 @@ export default function AdminDashboard() {
     const filteredProducts = useMemo(() => {
         const q = searchQuery.trim().toLowerCase();
         if (!q) return products;
-        return products.filter((p) =>
-            [p.name, p.category, p.description, String(p.price || '')].some((v) => String(v || '').toLowerCase().includes(q))
-        );
+        return products.filter((p) => {
+            const catName = p.category && typeof p.category === 'object' ? (p.category.title || p.category.name || '') : (p.category || '');
+            return [p.name, catName, p.description, String(p.price || '')].some((v) => String(v || '').toLowerCase().includes(q));
+        });
     }, [searchQuery, products]);
 
     const filteredOrders = useMemo(() => {

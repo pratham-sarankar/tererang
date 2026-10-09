@@ -16,10 +16,11 @@ import addressRoutes from './routes/addressRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
-
+import { migrateProductCategories } from './migrate-categories.js';
 
 // Connect to database
 await connectDB();
+await migrateProductCategories().catch((err) => console.error('[server] Migration error:', err));
 
 const app = express();
 

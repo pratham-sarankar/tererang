@@ -93,7 +93,7 @@ export default function ProductsTable({ products, onEdit, onDelete, imageUrl }) 
                                         </td>
                                         <td>
                                             <span className="category-badge">
-                                                {product.category}
+                                                {product.category?.title || product.category?.name || product.category}
                                             </span>
                                         </td>
                                         <td className="price-cell">

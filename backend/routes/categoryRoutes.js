@@ -44,12 +44,13 @@ const slugify = (text) => {
 
 // Helper to count products for each category
 const getProductCounts = async () => {
-    const products = await Product.find({}, 'category').lean();
+    const counts = await Product.aggregate([
+        { $match: { category: { $ne: null } } },
+        { $group: { _id: '$category', count: { $sum: 1 } } }
+    ]);
     const countMap = {};
-    for (const p of products) {
-        if (!p.category) continue;
-        const normalized = String(p.category).trim().toLowerCase();
-        countMap[normalized] = (countMap[normalized] || 0) + 1;
+    for (const c of counts) {
+        countMap[String(c._id)] = c.count;
     }
     return countMap;
 };
@@ -60,23 +61,10 @@ router.get('/', async (req, res) => {
         const categories = await Category.find().sort({ createdAt: -1 }).lean();
         const countMap = await getProductCounts();
 
-        const categoriesWithCount = categories.map((cat) => {
-            const slugKey = String(cat.slug || '').trim().toLowerCase();
-            const titleKey = String(cat.title || '').trim().toLowerCase();
-
-            let count = 0;
-            if (slugKey && countMap[slugKey]) {
-                count += countMap[slugKey];
-            }
-            if (titleKey && titleKey !== slugKey && countMap[titleKey]) {
-                count += countMap[titleKey];
-            }
-
-            return {
-                ...cat,
-                productCount: count,
-            };
-        });
+        const categoriesWithCount = categories.map((cat) => ({
+            ...cat,
+            productCount: countMap[String(cat._id)] || 0,
+        }));
 
         res.json({
             categories: categoriesWithCount,
@@ -96,13 +84,7 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Category not found' });
         }
 
-        const countMap = await getProductCounts();
-        const slugKey = String(category.slug || '').trim().toLowerCase();
-        const titleKey = String(category.title || '').trim().toLowerCase();
-
-        let count = 0;
-        if (slugKey && countMap[slugKey]) count += countMap[slugKey];
-        if (titleKey && titleKey !== slugKey && countMap[titleKey]) count += countMap[titleKey];
+        const count = await Product.countDocuments({ category: req.params.id });
 
         res.json({
             category: {
@@ -255,6 +237,14 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         const category = await Category.findById(req.params.id);
         if (!category) {
             return res.status(404).json({ message: 'Category not found' });
+        }
+
+        // Referential integrity: prevent deleting category if products are assigned
+        const assignedProductsCount = await Product.countDocuments({ category: req.params.id });
+        if (assignedProductsCount > 0) {
+            return res.status(400).json({
+                message: `Cannot delete category: ${assignedProductsCount} product(s) are assigned to this category. Please reassign or delete these products first.`
+            });
         }
 
         // Delete cover image from Firebase Storage / Google Cloud Storage

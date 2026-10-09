@@ -32,8 +32,12 @@ export const formatDate = (value) => {
   });
 };
 
-export const titleCase = (value) =>
-  String(value || '--').replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase());
+export const titleCase = (value) => {
+  if (value && typeof value === 'object') {
+    return value.title || value.name || value.slug || '--';
+  }
+  return String(value || '--').replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase());
+};
 
 export const resolveImagePath = (path) => {
   if (!path) return '';
