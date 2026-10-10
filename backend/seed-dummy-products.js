@@ -30,8 +30,9 @@ const uploadImageToStorage = async (sourceFilename, destFilename) => {
     if (!fs.existsSync(publicDir)) {
         fs.mkdirSync(publicDir, { recursive: true });
     }
-    const publicDest = path.join(publicDir, destFilename);
-    fs.copyFileSync(srcPath, publicDest);
+    if (srcPath !== publicDest) {
+        fs.copyFileSync(srcPath, publicDest);
+    }
 
     const fileContent = fs.readFileSync(srcPath);
     const destination = `images/${destFilename}`;
